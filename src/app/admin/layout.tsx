@@ -46,6 +46,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       });
   }, [pathname]);
 
+  // Lock body scroll and listen for Escape key when mobile drawer is open
+  useEffect(() => {
+    if (sidebarOpen) {
+      document.body.style.overflow = "hidden";
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape") setSidebarOpen(false);
+      };
+      window.addEventListener("keydown", handleKeyDown);
+      return () => {
+        document.body.style.overflow = "";
+        window.removeEventListener("keydown", handleKeyDown);
+      };
+    } else {
+      document.body.style.overflow = "";
+    }
+  }, [sidebarOpen]);
+
   const handleLogout = async () => {
     await fetch("/api/admin/auth", { method: "DELETE" });
     router.push("/admin/login");
@@ -57,60 +74,83 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (isAuthenticated === null) {
     return (
-      <div className="min-h-screen bg-fest-dark flex items-center justify-center text-gray-400 text-sm">
+      <div className="min-h-screen bg-fest-dark flex items-center justify-center text-stone-400 text-xs">
         Authenticating Administrator...
       </div>
     );
   }
 
   const navItems = [
-    { href: "/admin", label: "Live Overview", icon: LayoutDashboard },
-    { href: "/admin/vendors", label: "Vendor Management", icon: Utensils },
-    { href: "/admin/ratings", label: "Ratings Inspector", icon: Star },
-    { href: "/admin/anomalies", label: "Anomaly Flags", icon: AlertTriangle },
-    { href: "/admin/awards", label: "Awards Center", icon: Award },
-    { href: "/admin/exports", label: "Data Exports", icon: Download },
-    { href: "/admin/settings", label: "Event Settings", icon: Settings },
+    { href: "/admin", label: "Overview", icon: LayoutDashboard },
+    { href: "/admin/vendors", label: "Vendors", icon: Utensils },
+    { href: "/admin/ratings", label: "Ratings", icon: Star },
+    { href: "/admin/anomalies", label: "Anomalies", icon: AlertTriangle },
+    { href: "/admin/awards", label: "Awards", icon: Award },
+    { href: "/admin/exports", label: "Exports", icon: Download },
+    { href: "/admin/settings", label: "Settings", icon: Settings },
   ];
 
   return (
-    <div className="min-h-screen bg-fest-dark flex flex-col md:flex-row">
-      {/* Mobile admin header */}
-      <div className="md:hidden flex items-center justify-between p-4 bg-fest-card border-b border-fest-border">
-        <div className="flex items-center gap-2 font-bold text-white text-sm">
-          <ShieldAlert className="w-5 h-5 text-amber-500" />
+    <div className="min-h-screen bg-fest-dark flex flex-col md:flex-row text-stone-100">
+      {/* Mobile Top App Bar */}
+      <header className="md:hidden flex items-center justify-between px-4 py-3 bg-fest-card border-b border-fest-border sticky top-0 z-30">
+        <div className="flex items-center gap-2 font-bold text-white text-xs tracking-wider">
+          <ShieldAlert className="w-4 h-4 text-amber-500" />
           <span>FESTIVAL ADMIN</span>
         </div>
         <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-1.5 rounded-lg bg-fest-dark text-gray-300"
+          type="button"
+          onClick={() => setSidebarOpen(true)}
+          className="p-1.5 rounded-lg bg-fest-dark text-stone-300 hover:text-white transition active:scale-95"
+          aria-label="Open menu"
         >
-          {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          <Menu className="w-5 h-5" />
         </button>
-      </div>
+      </header>
 
-      {/* Admin Sidebar */}
+      {/* Mobile Backdrop Overlay */}
+      {sidebarOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/60 backdrop-blur-xs z-40 transition-opacity"
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Slide-in Drawer on Mobile / Persistent Sidebar on Desktop */}
       <aside
-        className={`w-64 bg-fest-card border-r border-fest-border p-4 flex flex-col justify-between shrink-0 ${
-          sidebarOpen ? "block" : "hidden md:flex"
-        }`}
+        className={`
+          fixed inset-y-0 left-0 z-50 w-[85%] max-w-xs bg-fest-card border-r border-fest-border p-4 flex flex-col justify-between shadow-2xl transition-transform duration-200 ease-in-out pb-safe
+          md:static md:translate-x-0 md:w-64 md:flex md:z-0 md:shadow-none shrink-0
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+        `}
       >
         <div className="space-y-6">
-          {/* Header */}
-          <div className="px-2 pt-2">
+          {/* Drawer Header */}
+          <div className="flex items-center justify-between pb-2 border-b border-fest-border">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center text-black font-extrabold text-sm">
+              <div className="w-7 h-7 rounded-lg bg-amber-500 flex items-center justify-center text-stone-950 font-bold text-xs">
                 GF
               </div>
               <div>
-                <h2 className="font-extrabold text-sm text-white leading-none">
-                  FESTIVAL ADMIN
+                <h2 className="font-bold text-xs text-white leading-tight">
+                  Festival Admin
                 </h2>
-                <span className="text-[10px] text-amber-400 font-mono font-semibold">
+                <span className="text-[10px] text-amber-400 font-mono">
                   GFF Hyderabad 2026
                 </span>
               </div>
             </div>
+
+            {/* Mobile close button */}
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(false)}
+              className="md:hidden p-1.5 rounded-lg text-stone-400 hover:text-white hover:bg-fest-dark transition"
+              aria-label="Close menu"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
 
           {/* Nav list */}
@@ -126,11 +166,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   onClick={() => setSidebarOpen(false)}
                   className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition ${
                     isActive
-                      ? "bg-fest-gold text-black shadow font-bold"
-                      : "text-gray-300 hover:text-white hover:bg-fest-cardHover"
+                      ? "bg-amber-500 text-stone-950 font-bold"
+                      : "text-stone-300 hover:text-white hover:bg-fest-cardHover"
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? "text-black" : "text-gray-400"}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? "text-stone-950" : "text-stone-400"}`} />
                   <span>{item.label}</span>
                 </Link>
               );
@@ -139,26 +179,30 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
 
         {/* Bottom actions */}
-        <div className="pt-4 border-t border-fest-border space-y-2">
+        <div className="pt-4 border-t border-fest-border space-y-1.5">
           <Link
             href="/"
-            className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-gray-400 hover:text-white hover:bg-fest-cardHover transition"
+            onClick={() => setSidebarOpen(false)}
+            className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-stone-400 hover:text-white hover:bg-fest-cardHover transition"
           >
-            <span>← Public Festival Site</span>
+            <span>← Public Festival</span>
           </Link>
 
           <button
+            type="button"
             onClick={handleLogout}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-red-400 hover:bg-red-500/10 transition text-left"
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-red-400 hover:text-red-300 hover:bg-fest-cardHover transition"
           >
             <LogOut className="w-4 h-4" />
-            <span>Log Out Admin</span>
+            <span>Log out</span>
           </button>
         </div>
       </aside>
 
-      {/* Main Admin Content */}
-      <main className="flex-1 p-4 sm:p-8 overflow-y-auto">{children}</main>
+      {/* Main admin content area */}
+      <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+        {children}
+      </main>
     </div>
   );
 }

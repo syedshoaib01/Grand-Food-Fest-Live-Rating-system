@@ -39,11 +39,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={inter.variable}>
-      <body className="font-sans bg-[#FAF8F5] text-stone-900 flex flex-col min-h-screen selection:bg-amber-500 selection:text-stone-900 pb-20 md:pb-0">
+      <body className="font-sans bg-[#FAF8F5] text-stone-900 flex flex-col min-h-screen selection:bg-amber-500 selection:text-stone-900 pb-20 md:pb-0 overflow-x-hidden w-full">
         <SessionProvider>
           <DevBar />
           <Navbar />
-          <main className="flex-1">{children}</main>
+          <main className="flex-1 w-full max-w-full overflow-x-hidden">{children}</main>
           <BottomNav />
           <footer className="border-t border-stone-200 bg-white/80 py-8 px-4 text-center text-xs text-stone-500">
             <div className="max-w-7xl mx-auto space-y-1.5">

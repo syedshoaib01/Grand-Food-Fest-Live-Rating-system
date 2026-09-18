@@ -4,14 +4,11 @@ import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  Star,
-  MapPin,
-  Trophy,
   ArrowLeft,
   CheckCircle2,
   AlertCircle,
-  Clock,
   Ticket,
+  Trophy,
 } from "lucide-react";
 import StarRating from "@/components/StarRating";
 import RatingDistribution from "@/components/RatingDistribution";
@@ -21,7 +18,7 @@ export default function VendorDetailPage() {
   const params = useParams();
   const router = useRouter();
   const slug = params.slug as string;
-  const { authenticated, passToken, remainingQuota, ratedVendors, refreshSession } = useSession();
+  const { authenticated, remainingQuota, ratedVendors, refreshSession } = useSession();
 
   const [data, setData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -95,9 +92,9 @@ export default function VendorDetailPage() {
   if (isLoading) {
     return (
       <div className="max-w-xl mx-auto px-4 py-12 space-y-4 animate-pulse">
-        <div className="h-4 bg-stone-200 rounded w-24" />
+        <div className="h-4 bg-stone-100 rounded w-20" />
         <div className="h-8 bg-stone-200 rounded w-48" />
-        <div className="h-48 bg-stone-200 rounded-2xl" />
+        <div className="h-24 bg-stone-100 rounded-xl" />
       </div>
     );
   }
@@ -109,7 +106,7 @@ export default function VendorDetailPage() {
         <p className="text-xs text-stone-500">The requested food stall could not be found.</p>
         <Link
           href="/vendors"
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-600 text-white font-bold text-xs"
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-600 text-white font-semibold text-xs"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to Directory</span>
@@ -118,153 +115,120 @@ export default function VendorDetailPage() {
     );
   }
 
-  const { vendor, stats, nominations, awardsWon } = data;
+  const { vendor, stats } = data;
   const isFood = vendor.vendorType === "FOOD";
 
   return (
-    <div className="max-w-xl mx-auto px-4 sm:px-6 py-6 space-y-5">
+    <div className="max-w-xl mx-auto px-4 sm:px-6 py-6 space-y-6">
       {/* Back button */}
       <div>
         <Link
           href="/vendors"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-stone-500 hover:text-stone-900 transition"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-stone-400 hover:text-stone-800 transition"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to Stalls</span>
         </Link>
       </div>
 
-      {/* Main Vendor Header Card */}
-      <div className="bg-white rounded-2xl p-5 border border-stone-200 shadow-sm space-y-4">
-        {/* Stall & Rank Pills */}
-        <div className="flex items-center justify-between gap-2 flex-wrap">
-          <div className="flex items-center gap-1.5">
-            <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-stone-100 text-stone-800">
+      {/* Simplified Vendor Header */}
+      <div className="space-y-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="font-mono text-xs font-bold text-stone-600 bg-stone-100 px-2 py-0.5 rounded">
               Stall {vendor.stallNumber}
             </span>
-            <span className="text-xs font-semibold text-stone-600 bg-stone-50 px-2 py-0.5 rounded border border-stone-200">
-              {vendor.category}
+            <span className="text-xs font-medium text-stone-500">
+              {vendor.cuisine || vendor.category}
             </span>
-            {vendor.cuisine && (
-              <span className="text-xs text-amber-800 font-medium">
-                {vendor.cuisine}
-              </span>
-            )}
           </div>
 
-          {stats.rank && (
-            <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
-              <Trophy className="w-3.5 h-3.5 text-amber-600" />
-              <span>#{stats.rank} right now</span>
-            </span>
-          )}
-        </div>
-
-        {/* Vendor Name */}
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold text-stone-950 tracking-tight">
             {vendor.name}
           </h1>
+
           {vendor.description && (
-            <p className="text-xs sm:text-sm text-stone-600 mt-1 leading-relaxed">
+            <p className="text-xs sm:text-sm text-stone-500 mt-1.5 leading-relaxed">
               {vendor.description}
             </p>
           )}
         </div>
 
-        {/* Rating Overview */}
+        {/* Rating and Rank Overview */}
         {isFood && (
-          <div className="flex items-center justify-between p-3.5 bg-stone-50 rounded-xl border border-stone-200/80">
-            <div>
-              <div className="text-[11px] font-semibold text-stone-500 uppercase tracking-wide">
-                Live Rating
-              </div>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <Star className="w-5 h-5 fill-amber-400 text-amber-500" />
-                <span className="text-2xl font-extrabold text-stone-900 font-mono">
-                  {stats.totalRatings > 0 ? stats.averageRating.toFixed(2) : "New"}
-                </span>
-                <span className="text-xs text-stone-500">/ 5.0</span>
-              </div>
+          <div className="flex items-baseline gap-3 flex-wrap pt-1">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-2xl sm:text-3xl font-bold text-stone-950 font-mono">
+                ⭐ {stats.totalRatings > 0 ? stats.averageRating.toFixed(2) : "New"}
+              </span>
+              <span className="text-xs text-stone-500">
+                ({stats.totalRatings.toLocaleString()} ratings)
+              </span>
             </div>
 
-            <div className="text-right">
-              <div className="text-xs font-bold text-stone-800">
-                {stats.totalRatings.toLocaleString()}
+            {stats.rank && (
+              <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/70">
+                <Trophy className="w-3 h-3 text-amber-600" />
+                <span>#{stats.rank} right now</span>
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Rating action area */}
+        {isFood && (
+          <div className="pt-2">
+            {submitMessage && (
+              <div className="mb-3 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+                <span>{submitMessage}</span>
               </div>
-              <div className="text-[11px] text-stone-500">total ratings</div>
-            </div>
+            )}
+
+            {errorMessage && (
+              <div className="mb-3 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
+                <span>{errorMessage}</span>
+              </div>
+            )}
+
+            {authenticated ? (
+              <div className="p-4 bg-white rounded-xl border border-stone-200/80 shadow-2xs space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-stone-900">
+                    {userRating > 0 ? "Your active rating:" : "How was it?"}
+                  </span>
+                  <span className="text-[11px] text-stone-400">
+                    {remainingQuota} ratings left today
+                  </span>
+                </div>
+
+                <StarRating
+                  value={userRating}
+                  size="lg"
+                  showLabel
+                  onChange={(stars) => handleRateVendor(stars)}
+                />
+              </div>
+            ) : (
+              <Link
+                href={`/vote?vendorId=${vendor.id}`}
+                className="w-full flex items-center justify-center gap-2 h-12 rounded-xl bg-amber-600 hover:bg-amber-700 active:scale-[0.98] text-white font-semibold text-sm shadow-2xs transition"
+              >
+                <Ticket className="w-4 h-4" />
+                <span>Rate this vendor</span>
+              </Link>
+            )}
           </div>
         )}
       </div>
 
-      {/* Interactive Rate This Stall Box */}
-      {isFood && (
-        <div className="bg-white rounded-2xl p-5 border border-stone-200 shadow-sm space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold text-stone-900 flex items-center gap-1.5">
-              <Star className="w-4 h-4 text-amber-600 fill-amber-500" />
-              <span>Rate this stall</span>
-            </h2>
-            {authenticated && (
-              <span className="text-[11px] text-stone-500">
-                {remainingQuota} votes left today
-              </span>
-            )}
-          </div>
-
-          {submitMessage && (
-            <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
-              <span>{submitMessage}</span>
-            </div>
-          )}
-
-          {errorMessage && (
-            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
-              <span>{errorMessage}</span>
-            </div>
-          )}
-
-          {authenticated ? (
-            <div className="space-y-3 pt-1">
-              <p className="text-xs text-stone-500">
-                Tap stars to record your rating:
-              </p>
-              <StarRating
-                value={userRating}
-                size="lg"
-                showLabel
-                onChange={(stars) => handleRateVendor(stars)}
-              />
-              {userRating > 0 && (
-                <p className="text-[11px] text-emerald-700 font-semibold">
-                  ✓ Your active vote: {userRating} stars (tap to change)
-                </p>
-              )}
-            </div>
-          ) : (
-            <div className="pt-1">
-              <p className="text-xs text-stone-600 mb-3">
-                Identify with your festival pass to vote for {vendor.name}.
-              </p>
-              <Link
-                href={`/vote?vendorId=${vendor.id}`}
-                className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl bg-amber-600 hover:bg-amber-700 active:scale-[0.98] text-white font-bold text-xs shadow-sm transition"
-              >
-                <Ticket className="w-4 h-4" />
-                <span>Rate this stall with pass</span>
-              </Link>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Rating Distribution */}
+      {/* Rating Distribution Breakdown */}
       {isFood && stats.totalRatings > 0 && (
-        <div className="bg-white rounded-2xl p-5 border border-stone-200 shadow-sm space-y-3">
-          <h2 className="text-sm font-bold text-stone-900">Rating Breakdown</h2>
+        <div className="pt-4 border-t border-stone-200/80 space-y-3">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-stone-500">
+            Rating breakdown
+          </h2>
           <RatingDistribution
             distribution={stats.distribution}
             percentages={stats.percentages}

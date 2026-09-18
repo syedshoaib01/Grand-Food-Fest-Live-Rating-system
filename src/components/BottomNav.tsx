@@ -30,8 +30,7 @@ export default function BottomNav() {
       href: "/vote",
       label: "Rate",
       icon: Star,
-      isPrimary: true,
-      badge: authenticated && remainingQuota > 0 ? `${remainingQuota}` : null,
+      badge: authenticated && remainingQuota > 0 ? remainingQuota : null,
     },
     {
       href: "/awards",
@@ -43,55 +42,36 @@ export default function BottomNav() {
   return (
     <nav
       aria-label="Mobile Navigation"
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-stone-200 shadow-[0_-4px_12px_rgba(0,0,0,0.04)] pb-safe"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-stone-200/80 shadow-[0_-2px_10px_rgba(0,0,0,0.03)] pb-safe"
     >
-      <div className="grid grid-cols-4 h-16 max-w-lg mx-auto">
+      <div className="grid grid-cols-4 h-14 max-w-md mx-auto px-2">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
-
-          if (item.isPrimary) {
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="relative flex flex-col items-center justify-center -top-2"
-              >
-                <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center shadow-md transition-transform active:scale-95 ${
-                    isActive
-                      ? "bg-gradient-to-tr from-amber-600 to-orange-500 text-white shadow-amber-500/30"
-                      : "bg-stone-900 text-amber-400 hover:bg-stone-800"
-                  }`}
-                >
-                  <Icon className="w-5 h-5 fill-current" />
-                  {item.badge && (
-                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 text-stone-900 font-bold text-[10px] rounded-full flex items-center justify-center border-2 border-white shadow-sm">
-                      {item.badge}
-                    </span>
-                  )}
-                </div>
-                <span
-                  className={`text-[11px] font-semibold mt-0.5 ${
-                    isActive ? "text-amber-700" : "text-stone-700"
-                  }`}
-                >
-                  {item.label}
-                </span>
-              </Link>
-            );
-          }
 
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center justify-center transition-colors active:scale-95 ${
-                isActive ? "text-amber-700 font-bold" : "text-stone-500 hover:text-stone-800"
+              className={`flex flex-col items-center justify-center py-1 transition-colors active:scale-95 relative ${
+                isActive ? "text-amber-700 font-semibold" : "text-stone-400 hover:text-stone-700"
               }`}
             >
-              <Icon className={`w-5 h-5 ${isActive ? "text-amber-600" : "text-stone-400"}`} />
-              <span className="text-[11px] font-medium mt-1">{item.label}</span>
+              <div className="relative">
+                <Icon
+                  className={`w-5 h-5 transition-transform ${
+                    isActive ? "text-amber-600 scale-105 stroke-[2.25]" : "text-stone-400 stroke-[1.75]"
+                  }`}
+                />
+                {item.badge !== null && item.badge !== undefined && (
+                  <span className="absolute -top-1 -right-2 min-w-[15px] h-[15px] px-1 bg-amber-600 text-white font-bold text-[9px] rounded-full flex items-center justify-center leading-none shadow-xs">
+                    {item.badge}
+                  </span>
+                )}
+              </div>
+              <span className={`text-[10px] tracking-tight mt-1 ${isActive ? "text-stone-900 font-semibold" : "text-stone-500 font-medium"}`}>
+                {item.label}
+              </span>
             </Link>
           );
         })}

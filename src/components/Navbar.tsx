@@ -39,8 +39,8 @@ export default function Navbar() {
           {/* Brand Logo & Live Pill */}
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-600 to-orange-500 flex items-center justify-center shadow-sm text-white font-bold group-hover:scale-105 transition-transform">
-                <UtensilsCrossed className="w-5 h-5" />
+              <div className="w-8 h-8 rounded-lg bg-amber-600 flex items-center justify-center text-white font-bold transition-transform">
+                <UtensilsCrossed className="w-4 h-4" />
               </div>
               <div className="flex flex-col">
                 <span className="font-extrabold text-base tracking-tight text-stone-900 leading-tight">
