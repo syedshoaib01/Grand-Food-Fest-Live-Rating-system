@@ -25,3 +25,12 @@ This guide diagnoses and resolves common operational, database, and authenticati
 ### Issue: Leaderboard displays "—" for all vendors
 * **Cause**: No historical `RankSnapshot` records exist for comparison yet.
 * **Resolution**: Wait for the first snapshot interval or run `npx prisma db seed` to generate baseline snapshots.
+
+### Issue: "Cannot find module './<chunk>.js'" on localhost:3000
+* **Cause**: Running `npm run build` while `npm run dev` is active in the background overwrites development webpack chunks in `.next` with production artifacts.
+* **Resolution**: Stop the dev server, purge the build cache, and restart:
+  ```bash
+  rm -rf .next
+  npm run dev
+  ```
+

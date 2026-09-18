@@ -30,3 +30,5 @@ All notable changes in this iteration are documented in this file.
 * **Comprehensive Test Suite**: Added `src/tests/hardening-and-security.test.ts` covering password hashing, `requireAdmin()` 401/403 status codes, pass anonymization, closed day rejection, and `RankSnapshot` movement. Total 24 automated tests passing with zero failures.
 * **AI Agent Handover Suite**: Created root `context.md` and `AGENTS.md` to ensure future AI agents preserve all business invariants and architecture patterns.
 * **Complete Documentation Suite**: Created 21 technical and operational guides in `docs/`.
+* **Troubleshooting Guide**: Documented resolution for webpack module chunk cache collision (`rm -rf .next`) when executing production build concurrently with active dev server.
+
