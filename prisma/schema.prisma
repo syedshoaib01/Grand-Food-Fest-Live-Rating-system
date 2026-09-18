@@ -1,0 +1,181 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Event {
+  id                           String            @id @default(cuid())
+  name                         String
+  slug                         String            @unique
+  startDate                    DateTime
+  endDate                      DateTime
+  status                       String            @default("LIVE") // UPCOMING, LIVE, CLOSING, FINALIZED
+  ratingLimitPerAttendeePerDay Int               @default(5)
+  minimumRatingsForLeaderboard Int               @default(20)
+  createdAt                    DateTime          @default(now())
+  updatedAt                    DateTime          @updatedAt
+
+  days                         EventDay[]
+  vendors                      Vendor[]
+  sessions                     AttendeeSession[]
+  ratings                      Rating[]
+  awards                       Award[]
+  anomalies                    AnomalyLog[]
+}
+
+model EventDay {
+  id        String            @id @default(cuid())
+  eventId   String
+  dayNumber Int
+  date      DateTime
+  status    String            @default("UPCOMING") // UPCOMING, LIVE, CLOSED
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  event     Event             @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  sessions  AttendeeSession[]
+  ratings   Rating[]
+
+  @@unique([eventId, date])
+  @@index([eventId])
+  @@index([status])
+}
+
+model Vendor {
+  id          String         @id @default(cuid())
+  eventId     String
+  name        String
+  slug        String         @unique
+  description String?
+  logoUrl     String?
+  category    String         // e.g. Biryani, Street Food, Desserts, Beverages, Lifestyle
+  cuisine     String?        // e.g. Hyderabadi, Andhra, Mughlai, Pan-Asian, Continental
+  stallNumber String
+  vendorType  String         @default("FOOD") // FOOD, LIFESTYLE, OTHER
+  status      String         @default("ACTIVE") // DRAFT, ACTIVE, PAUSED, CLOSED, WITHDRAWN
+  activeFrom  DateTime?
+  activeUntil DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  event       Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  ratings     Rating[]
+  nominees    AwardNominee[]
+  awardsWon   Award[]        @relation("VendorAwardsWon")
+  anomalies   AnomalyLog[]
+
+  @@index([eventId])
+  @@index([vendorType])
+  @@index([status])
+  @@index([category])
+}
+
+model AttendeeSession {
+  id          String   @id @default(cuid())
+  eventId     String
+  eventDayId  String
+  passHash    String
+  passToken   String   // Masked or demo pass token e.g. "PASS-000001"
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+  lastSeenAt  DateTime @default(now())
+
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventDay    EventDay @relation(fields: [eventDayId], references: [id], onDelete: Cascade)
+  ratings     Rating[]
+
+  @@unique([passHash, eventDayId])
+  @@index([eventId])
+  @@index([eventDayId])
+}
+
+model Rating {
+  id                String          @id @default(cuid())
+  eventId           String
+  eventDayId        String
+  attendeeSessionId String
+  vendorId          String
+  rating            Int             // 1 to 5
+  isValid           Boolean         @default(true)
+  idempotencyKey    String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  event             Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventDay          EventDay        @relation(fields: [eventDayId], references: [id], onDelete: Cascade)
+  attendeeSession   AttendeeSession @relation(fields: [attendeeSessionId], references: [id], onDelete: Cascade)
+  vendor            Vendor          @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@unique([attendeeSessionId, vendorId, eventDayId])
+  @@index([eventId])
+  @@index([eventDayId])
+  @@index([vendorId])
+  @@index([createdAt])
+  @@index([isValid])
+}
+
+model Award {
+  id             String         @id @default(cuid())
+  eventId        String
+  name           String
+  description    String?
+  category       String
+  status         String         @default("DRAFT") // DRAFT, NOMINEES_REVEALED, WINNER_ANNOUNCED
+  winnerVendorId String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  event          Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  winnerVendor   Vendor?        @relation("VendorAwardsWon", fields: [winnerVendorId], references: [id])
+  nominees       AwardNominee[]
+
+  @@index([eventId])
+}
+
+model AwardNominee {
+  id        String   @id @default(cuid())
+  awardId   String
+  vendorId  String
+  createdAt DateTime @default(now())
+
+  award     Award    @relation(fields: [awardId], references: [id], onDelete: Cascade)
+  vendor    Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@unique([awardId, vendorId])
+  @@index([awardId])
+  @@index([vendorId])
+}
+
+model AnomalyLog {
+  id         String    @id @default(cuid())
+  eventId    String
+  vendorId   String
+  type       String    // VELOCITY_SPIKE, UNUSUAL_DISTRIBUTION, SESSION_CLUSTER
+  severity   String    @default("MEDIUM") // LOW, MEDIUM, HIGH
+  details    String    // JSON description
+  resolved   Boolean   @default(false)
+  resolvedAt DateTime?
+  resolvedBy String?
+  createdAt  DateTime  @default(now())
+
+  event      Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  vendor     Vendor    @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@index([vendorId])
+  @@index([resolved])
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("ADMIN")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
