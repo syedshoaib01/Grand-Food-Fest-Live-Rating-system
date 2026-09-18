@@ -42,7 +42,7 @@ export default function BottomNav() {
   return (
     <nav
       aria-label="Mobile Navigation"
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-stone-200/80 shadow-[0_-2px_10px_rgba(0,0,0,0.03)] pb-safe"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-bottomNav bg-white/95 backdrop-blur-md border-t border-stone-200/80 shadow-[0_-2px_10px_rgba(0,0,0,0.03)] pb-safe"
     >
       <div className="grid grid-cols-4 h-14 max-w-md mx-auto px-2">
         {navItems.map((item) => {

@@ -99,9 +99,9 @@ export default function AdminAwardsPage() {
 
       {/* Create Modal */}
       {isCreating && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-fest-card border border-fest-border rounded-3xl p-6 sm:p-8 max-w-lg w-full space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-fest-border pb-3">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-xs z-modal flex items-center justify-center p-4">
+          <div className="bg-[#1C1917] border border-stone-800 rounded-2xl p-6 sm:p-8 max-w-lg w-full space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-stone-800 pb-3">
               <h2 className="text-lg font-black text-white">Create Festival Award</h2>
               <button onClick={() => setIsCreating(false)} className="text-gray-400 hover:text-white">
                 <X className="w-5 h-5" />

@@ -3,10 +3,43 @@
 @tailwind utilities;
 
 :root {
+  /* Public Warm Food Festival Palette */
   --background: #FAF8F5;
   --foreground: #1C1917;
-  --card: #FFFFFF;
+  --surface: #FFFFFF;
+  --surface-muted: #F5F3EF;
+  --text-primary: #1C1917;
+  --text-secondary: #78716C;
+  --text-tertiary: #A8A29E;
   --border: #E7E5E4;
+  --accent: #D97706;
+  --accent-soft: #FEF3C7;
+  --accent-orange: #EA580C;
+  --success: #16A34A;
+  --error: #DC2626;
+
+  /* Global Stacking System */
+  --z-content: 0;
+  --z-sticky: 10;
+  --z-bottom-nav: 20;
+  --z-header: 30;
+  --z-dev-tools: 40;
+  --z-backdrop: 50;
+  --z-drawer: 60;
+  --z-modal: 70;
+  --z-toast: 80;
+}
+
+/* Dark Theme Tokens (Admin & High-Contrast Surfaces) */
+.dark, [data-theme="dark"] {
+  --background: #121110;
+  --foreground: #F5F5F4;
+  --surface: #1C1917;
+  --surface-muted: #292524;
+  --text-primary: #F5F5F4;
+  --text-secondary: #A8A29E;
+  --text-tertiary: #78716C;
+  --border: #292524;
 }
 
 body {
@@ -18,7 +51,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Safe area padding for mobile notches and bottom bars */
+/* Safe area padding for mobile notches and bottom home indicator */
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom, 16px);
 }
@@ -33,61 +66,20 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #F5F3EF;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
   background: #D6D3D1;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #D97706;
+  background: #A8A29E;
 }
 
-/* Subtle warm card */
-.fest-card {
-  background-color: #FFFFFF;
-  border: 1px solid #E7E5E4;
-  border-radius: 14px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
-
-.fest-card:hover {
-  border-color: #D6D3D1;
-}
-
-/* Live pulse indicator */
-.live-dot {
-  position: relative;
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 9999px;
-  background-color: #16A34A;
-}
-
-.live-dot::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border-radius: 9999px;
-  background-color: #16A34A;
-  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse-ring {
-  0% {
-    transform: scale(0.95);
-    opacity: 0.8;
-  }
-  70% {
-    transform: scale(2.4);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(2.4);
-    opacity: 0;
-  }
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

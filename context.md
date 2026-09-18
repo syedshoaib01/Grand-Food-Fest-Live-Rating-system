@@ -197,7 +197,32 @@ model RankSnapshot {
 
 ---
 
-## 7. ENVIRONMENT VARIABLES
+## 7. LAYOUT ARCHITECTURE & GLOBAL STACKING SYSTEM
+
+The application shell establishes a strict vertical and stacking architecture:
+
+### Global Z-Index Hierarchy
+```text
+page/content       z-content   (0)   Default document flow, cards, text
+sticky content     z-sticky    (10)  In-page sub-navigation, category filter bars
+bottom navigation  z-bottomNav (20)  Fixed mobile bottom tab bar (BottomNav.tsx, h-14, pb-safe)
+global header      z-header    (30)  Sticky festival navbar (Navbar.tsx, h-14) & admin top bar
+dev tools          z-devTools  (40)  Developer toolbar (DevBar.tsx, document flow)
+drawer backdrop    z-backdrop  (50)  Dimmed overlay (bg-black/80 backdrop-blur-xs)
+drawer             z-drawer    (60)  Slide-in navigation drawer (AdminLayout, solid opaque #1C1917)
+modal              z-modal     (70)  Interactive modal dialogs (create/edit stall, awards)
+toast              z-toast     (80)  Floating transient alerts and notifications
+```
+
+### Layout Stacking Invariants:
+1. **DevBar & Header Isolation**: `DevBar` is rendered in normal document flow above `Navbar`. When scrolling, `DevBar` scrolls off naturally while `Navbar` (`sticky top-0 z-header: 30`) sticks cleanly with zero overlap. Expanding `DevBar` pushes `Navbar` down naturally by reserving actual layout space.
+2. **Admin Mobile Drawer**: Operates as a true off-canvas drawer (`z-drawer: 60`, `w-[85%] max-w-xs`, solid opaque `bg-[#1C1917]`) over a dimmed backdrop (`z-backdrop: 50`). Underlying content cannot bleed through. Body scroll is locked when open. On desktop, it renders as a persistent `w-64` sidebar.
+3. **Zero Horizontal Overflow**: The root layout enforces `overflow-x-hidden w-full max-w-full` on `body` and `main`. All horizontal scroll components (e.g. category chips) must be contained in bounded wrappers (`overflow-x-auto no-scrollbar w-full`).
+4. **Theme Defaults**: Public consumer UI defaults to Light (`#FAF8F5` cream with `#FFFFFF` surfaces and `#1C1917` text); Admin defaults to Dark (`#121110` with `#1C1917` cards).
+
+---
+
+## 8. ENVIRONMENT VARIABLES
 
 | Variable Name | Purpose | Production Requirement |
 | :--- | :--- | :--- |
@@ -210,7 +235,7 @@ model RankSnapshot {
 
 ---
 
-## 8. LOCAL SETUP & COMMANDS
+## 9. LOCAL SETUP & COMMANDS
 
 ```bash
 # 1. Install dependencies
@@ -234,14 +259,18 @@ npm run build
 
 ---
 
-## 9. AI INSTRUCTIONS (HANDOVER CHECKLIST)
+## 10. AI INSTRUCTIONS (HANDOVER CHECKLIST)
 
 When continuing work on this repository:
 1. **Read `context.md` first.**
 2. **Preserve all business invariants** (never allow >5 stalls/day, never trust client-supplied session IDs, never default new ratings to 5 stars).
 3. **Never weaken server-side validation** in `/api/admin/*` or `/api/voting/*`.
-4. **Keep the public consumer experience mobile-first**, thumb-friendly, and warm festival themed.
-5. **Never invent fake metrics**: rank movement and trending must come from actual data (`RankSnapshot` and rolling activity).
-6. **Run `npm test`** after any business logic change.
-7. **Run `npm run build`** after major architectural updates.
-8. **Update `docs/` and `context.md`** whenever domain logic or endpoints change.
+4. **Adhere to the global z-index system** (`z-content: 0` to `z-toast: 80`). Never use arbitrary `z-*` values.
+5. **Never make DevBar and Navbar siblings with sticky top-0**; keep DevBar in normal flow above Navbar.
+6. **Keep admin drawer solid and opaque** (`bg-[#1C1917]`) at `z-drawer: 60` with `z-backdrop: 50`.
+7. **Keep the public consumer experience mobile-first**, thumb-friendly, and warm festival themed.
+8. **Never invent fake metrics**: rank movement and trending must come from actual data (`RankSnapshot` and rolling activity).
+9. **Run `npm test`** after any business logic change.
+10. **Run `npm run build`** after major architectural updates.
+11. **Update `docs/` and `context.md`** whenever domain logic or layout architecture changes.
+

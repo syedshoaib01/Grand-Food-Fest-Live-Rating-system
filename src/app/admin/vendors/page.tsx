@@ -305,9 +305,9 @@ export default function AdminVendorsPage() {
 
       {/* Edit / Create Vendor Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-fest-card border border-fest-border rounded-3xl p-6 sm:p-8 max-w-lg w-full space-y-5 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-fest-border pb-4">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-xs z-modal flex items-center justify-center p-4">
+          <div className="bg-[#1C1917] border border-stone-800 rounded-2xl p-6 sm:p-8 max-w-lg w-full space-y-5 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-stone-800 pb-4">
               <h2 className="text-lg font-black text-white">
                 {editingVendor ? "Edit Vendor Stall" : "Add New Festival Stall"}
               </h2>

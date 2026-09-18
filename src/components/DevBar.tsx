@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useSession } from "@/lib/SessionContext";
-import { Sparkles, Calendar, Key, ShieldCheck, ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, ShieldCheck } from "lucide-react";
 
 export default function DevBar() {
   const isDevMode = process.env.NEXT_PUBLIC_DEV_MODE === "true";
@@ -10,8 +10,7 @@ export default function DevBar() {
     return null;
   }
 
-  const { passToken, loginWithPass, authenticated, remainingQuota, ratedCount, refreshSession } =
-    useSession();
+  const { passToken, loginWithPass, ratedCount, refreshSession } = useSession();
   const [isOpen, setIsOpen] = useState(false);
   const [eventData, setEventData] = useState<any>(null);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -70,60 +69,68 @@ export default function DevBar() {
     "PASS-000010",
   ];
 
+  const activeDayNumber = eventData?.activeDay?.dayNumber || 1;
+  const eventStatus = eventData?.event?.status || "LIVE";
+
   return (
-    <div className="bg-fest-card border-b border-fest-border text-xs z-50 sticky top-0">
-      <div className="max-w-7xl mx-auto px-4 py-1.5 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1 font-semibold text-fest-gold">
-            <Sparkles className="w-3.5 h-3.5" />
+    <div
+      aria-label="Developer Toolbar"
+      className="relative z-devTools w-full bg-stone-900 border-b border-stone-800 text-stone-300 font-mono text-xs select-none"
+    >
+      {/* Compact DevBar Strip (in normal document flow, reserving its own height) */}
+      <div className="max-w-7xl mx-auto px-4 py-1.5 flex items-center justify-between gap-2 flex-wrap">
+        <div className="flex items-center gap-2 text-[11px]">
+          <span className="px-1.5 py-0.5 rounded bg-amber-500 text-stone-950 font-sans font-bold text-[10px] tracking-wider">
             DEV MODE
           </span>
-          <span className="hidden sm:inline text-gray-400">|</span>
-          <span className="hidden sm:inline text-gray-300">
-            Active: <strong className="text-white">{eventData?.activeDay ? `Day ${eventData.activeDay.dayNumber} (Oct ${8 + eventData.activeDay.dayNumber})` : "Day 1"}</strong>
+          <span className="hidden sm:inline text-stone-600">|</span>
+          <span className="text-stone-300">
+            Day {activeDayNumber} ({eventStatus})
           </span>
-          <span className="hidden md:inline text-gray-400">|</span>
-          <span className="hidden md:inline text-gray-300">
-            Pass: <strong className="text-white">{passToken || "None"}</strong> ({ratedCount}/5 rated)
+          <span className="hidden sm:inline text-stone-600">|</span>
+          <span className="text-stone-400">
+            Pass: <strong className="text-stone-200">{passToken || "None"}</strong> ({ratedCount}/5)
           </span>
         </div>
 
         <div className="flex items-center gap-2">
           <a
             href="/admin"
-            className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-fest-border hover:bg-fest-cardHover text-gray-200 transition"
+            className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-stone-800 hover:bg-stone-700 text-stone-300 text-[11px] transition"
           >
-            <ShieldCheck className="w-3 h-3 text-fest-gold" />
-            Admin
+            <ShieldCheck className="w-3 h-3 text-amber-400" />
+            <span>Admin</span>
           </a>
           <button
+            type="button"
             onClick={() => setIsOpen(!isOpen)}
-            className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/10 hover:bg-amber-500/20 text-fest-gold transition"
+            className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-stone-800 hover:bg-stone-700 text-amber-400 text-[11px] transition"
           >
-            Switchers
+            <span>{isOpen ? "Close" : "Controls"}</span>
             {isOpen ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
           </button>
         </div>
       </div>
 
+      {/* Expanded Controls Panel (expands in document flow, pushing header down naturally) */}
       {isOpen && (
-        <div className="bg-fest-dark/95 border-t border-fest-border px-4 py-3 space-y-3">
-          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-stone-950 border-t border-stone-800 px-4 py-3 space-y-3">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 text-[11px]">
             {/* Pass Switcher */}
             <div>
-              <label className="text-gray-400 block mb-1 font-medium flex items-center gap-1">
-                <Key className="w-3 h-3 text-fest-gold" />
-                Quick Attendee Pass
-              </label>
-              <div className="flex flex-wrap gap-1.5">
+              <span className="text-stone-400 block mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                Quick Attendee
+              </span>
+              <div className="flex flex-wrap gap-1">
                 {samplePasses.map((p) => (
                   <button
                     key={p}
+                    type="button"
                     onClick={() => handleSelectPass(p)}
-                    className={`px-2 py-1 rounded text-xs transition ${
+                    className={`px-2 py-0.5 rounded text-[11px] transition ${
                       passToken === p
-                        ? "bg-fest-gold text-black font-bold"
-                        : "bg-fest-card hover:bg-fest-cardHover text-gray-300 border border-fest-border"
+                        ? "bg-amber-500 text-stone-950 font-bold"
+                        : "bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-700"
                     }`}
                   >
                     {p}
@@ -134,20 +141,20 @@ export default function DevBar() {
 
             {/* Event Day Switcher */}
             <div>
-              <label className="text-gray-400 block mb-1 font-medium flex items-center gap-1">
-                <Calendar className="w-3 h-3 text-fest-gold" />
-                Active Event Day
-              </label>
+              <span className="text-stone-400 block mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                Event Day
+              </span>
               <div className="flex gap-1.5">
                 {eventData?.days?.map((day: any) => (
                   <button
                     key={day.id}
+                    type="button"
                     disabled={isUpdating}
                     onClick={() => handleSwitchDay(day.id)}
-                    className={`px-2.5 py-1 rounded text-xs font-medium transition ${
+                    className={`px-2.5 py-0.5 rounded text-[11px] transition ${
                       day.status === "LIVE"
-                        ? "bg-green-600 text-white shadow-sm"
-                        : "bg-fest-card hover:bg-fest-cardHover text-gray-300 border border-fest-border"
+                        ? "bg-emerald-600 text-white font-bold"
+                        : "bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-700"
                     }`}
                   >
                     Day {day.dayNumber} {day.status === "LIVE" && "(LIVE)"}
@@ -158,17 +165,20 @@ export default function DevBar() {
 
             {/* Event Status Switcher */}
             <div>
-              <label className="text-gray-400 block mb-1 font-medium">Festival Status</label>
+              <span className="text-stone-400 block mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                Event Status
+              </span>
               <div className="flex gap-1.5">
                 {["LIVE", "CLOSING", "FINALIZED"].map((s) => (
                   <button
                     key={s}
+                    type="button"
                     disabled={isUpdating}
                     onClick={() => handleSwitchStatus(s)}
-                    className={`px-2.5 py-1 rounded text-xs font-medium transition ${
+                    className={`px-2.5 py-0.5 rounded text-[11px] transition ${
                       eventData?.event?.status === s
-                        ? "bg-amber-600 text-white"
-                        : "bg-fest-card hover:bg-fest-cardHover text-gray-300 border border-fest-border"
+                        ? "bg-amber-600 text-white font-bold"
+                        : "bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-700"
                     }`}
                   >
                     {s}

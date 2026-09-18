@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "@/lib/SessionContext";
-import { Trophy, UtensilsCrossed, Award, Ticket, Star, Sparkles } from "lucide-react";
+import { Trophy, UtensilsCrossed, Award, Star } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -33,30 +33,30 @@ export default function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-stone-200 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-15 py-2.5">
+    <header className="sticky top-0 z-header bg-white/95 backdrop-blur-md border-b border-stone-200/80 shadow-subtle h-14">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+        <div className="flex items-center justify-between h-full gap-2">
           {/* Brand Logo & Live Pill */}
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-8 h-8 rounded-lg bg-amber-600 flex items-center justify-center text-white font-bold transition-transform">
+          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+            <Link href="/" className="flex items-center gap-2 group">
+              <div className="w-7 h-7 rounded-lg bg-amber-600 flex items-center justify-center text-white shrink-0">
                 <UtensilsCrossed className="w-4 h-4" />
               </div>
-              <div className="flex flex-col">
-                <span className="font-extrabold text-base tracking-tight text-stone-900 leading-tight">
+              <div className="flex flex-col leading-tight">
+                <span className="font-bold text-xs sm:text-sm tracking-tight text-stone-950">
                   GRAND FOOD FEST
                 </span>
-                <span className="text-[10px] tracking-wider text-amber-700 font-semibold uppercase">
+                <span className="text-[9px] tracking-wider text-amber-700 font-semibold uppercase">
                   HYDERABAD 2026
                 </span>
               </div>
             </Link>
 
             {/* Live Indicator */}
-            <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/80">
-              <span className={`w-2 h-2 rounded-full ${isLive ? "bg-emerald-600 animate-pulse" : "bg-stone-400"}`} />
-              <span className="text-[11px] font-bold">
-                {isLive ? `Day ${activeDay?.dayNumber || 1} LIVE` : "Voting Closed"}
+            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/70">
+              <span className={`w-1.5 h-1.5 rounded-full ${isLive ? "bg-emerald-600 animate-pulse" : "bg-stone-400"}`} />
+              <span>
+                {isLive ? `Day ${activeDay?.dayNumber || 1} LIVE` : "Closed"}
               </span>
             </div>
           </div>
@@ -70,42 +70,41 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition ${
                     isActive
-                      ? "bg-amber-50 text-amber-900 font-semibold"
-                      : "text-stone-600 hover:text-stone-950 hover:bg-stone-100"
+                      ? "bg-stone-100 text-stone-950 font-semibold"
+                      : "text-stone-600 hover:text-stone-950 hover:bg-stone-50"
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? "text-amber-600" : "text-stone-400"}`} />
-                  {link.label}
+                  <Icon className={`w-3.5 h-3.5 ${isActive ? "text-amber-600" : "text-stone-400"}`} />
+                  <span>{link.label}</span>
                 </Link>
               );
             })}
           </nav>
 
           {/* Right Action / Pass status */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             {authenticated ? (
               <Link
                 href="/vote"
-                className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold bg-amber-50 text-amber-900 border border-amber-200/60 hover:bg-amber-100/70 transition"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs bg-amber-50 text-amber-900 border border-amber-200/70 hover:bg-amber-100/70 transition"
               >
-                <div className="flex flex-col text-right">
-                  <span className="font-mono text-[11px] font-bold text-stone-800 leading-none">
+                <div className="flex flex-col text-right leading-none">
+                  <span className="font-mono text-[10px] font-bold text-stone-800">
                     {passToken}
                   </span>
-                  <span className="text-[10px] text-amber-700 font-medium">
-                    {remainingQuota} votes left
+                  <span className="text-[9px] text-amber-700 font-medium mt-0.5">
+                    {remainingQuota} left
                   </span>
                 </div>
-                <Star className="w-4 h-4 text-amber-600 fill-amber-500" />
+                <Star className="w-3.5 h-3.5 text-amber-600 fill-amber-500 shrink-0" />
               </Link>
             ) : (
               <Link
                 href="/vote"
-                className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white shadow-sm transition active:scale-95"
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white shadow-xs transition active:scale-95"
               >
-                <Ticket className="w-3.5 h-3.5" />
                 <span>Rate Food</span>
               </Link>
             )}
