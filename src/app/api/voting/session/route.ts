@@ -5,8 +5,6 @@ import { verifySessionPayload } from "@/lib/auth";
 export async function GET(req: NextRequest) {
   try {
     const cookie = req.cookies.get("gff_session")?.value;
-    const headerSessionId = req.headers.get("x-session-id");
-
     let sessionId: string | null = null;
 
     if (cookie) {
@@ -14,10 +12,6 @@ export async function GET(req: NextRequest) {
       if (decoded?.sessionId) {
         sessionId = decoded.sessionId;
       }
-    }
-
-    if (!sessionId && headerSessionId) {
-      sessionId = headerSessionId;
     }
 
     if (!sessionId) {

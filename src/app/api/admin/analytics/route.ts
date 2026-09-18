@@ -2,8 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getLiveLeaderboard } from "@/lib/ranking-engine";
 import { getTrendingVendors } from "@/lib/trending-engine";
+import { requireAdmin } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (!auth.authorized) {
+    return auth.response;
+  }
+
   try {
     const event = await prisma.event.findFirst({
       orderBy: { createdAt: "desc" },

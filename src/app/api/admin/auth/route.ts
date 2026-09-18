@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { signSessionPayload, verifySessionPayload } from "@/lib/auth";
+import { signSessionPayload, verifySessionPayload, verifyPassword } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@grandfoodfest.com";
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,16 +11,28 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
     }
 
-    const isValid =
-      (email.toLowerCase() === ADMIN_EMAIL.toLowerCase() && password === ADMIN_PASSWORD) ||
-      (await checkDbAdmin(email, password));
+    const cleanEmail = String(email).trim().toLowerCase();
+    const isProd = process.env.NODE_ENV === "production";
+
+    // 1. Check database AdminUser with secure password hash
+    const admin = await prisma.adminUser.findUnique({ where: { email: cleanEmail } });
+    let isValid = false;
+
+    if (admin && admin.passwordHash) {
+      isValid = verifyPassword(password, admin.passwordHash);
+    } else if (!isProd) {
+      // Development fallback ONLY: check configured dev environment variables
+      const devEmail = (process.env.ADMIN_EMAIL || "admin@grandfoodfest.com").toLowerCase();
+      const devPassword = process.env.ADMIN_PASSWORD || "admin123";
+      isValid = cleanEmail === devEmail && password === devPassword;
+    }
 
     if (!isValid) {
       return NextResponse.json({ error: "Invalid admin credentials" }, { status: 401 });
     }
 
     const token = signSessionPayload({
-      email,
+      email: cleanEmail,
       role: "ADMIN",
       timestamp: Date.now(),
     });
@@ -31,7 +40,7 @@ export async function POST(req: NextRequest) {
     const response = NextResponse.json({
       success: true,
       message: "Admin authenticated successfully",
-      user: { email, role: "ADMIN" },
+      user: { email: cleanEmail, role: "ADMIN" },
     });
 
     response.cookies.set({
@@ -70,10 +79,4 @@ export async function DELETE() {
   const response = NextResponse.json({ success: true, message: "Logged out" });
   response.cookies.delete("gff_admin");
   return response;
-}
-
-async function checkDbAdmin(email: string, password: string):Promise<boolean> {
-  const admin = await prisma.adminUser.findUnique({ where: { email } });
-  if (!admin) return false;
-  return password === "admin123";
 }

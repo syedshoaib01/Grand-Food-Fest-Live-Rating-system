@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Flame, Star, TrendingUp, Sparkles } from "lucide-react";
+import { Flame, Star } from "lucide-react";
 
 export interface TrendingVendor {
   vendorId: string;
@@ -23,7 +23,7 @@ export default function TrendingSection() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/trending?window=60&limit=4")
+    fetch("/api/trending?window=30&limit=4")
       .then((res) => res.json())
       .then((data) => {
         setTrending(data.trending || []);
@@ -37,73 +37,65 @@ export default function TrendingSection() {
   }
 
   return (
-    <section className="my-8">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center">
-            <Flame className="w-5 h-5 text-orange-500 fill-orange-500 animate-pulse" />
-          </div>
-          <div>
-            <h2 className="font-extrabold text-xl text-white flex items-center gap-2">
-              <span>🔥 TRENDING NOW</span>
-            </h2>
-            <p className="text-xs text-gray-400">
-              Highest rating velocity in the last 60 minutes
-            </p>
-          </div>
+    <section className="space-y-3">
+      <div className="flex items-center gap-2">
+        <div className="w-7 h-7 rounded-lg bg-orange-100 text-orange-700 flex items-center justify-center">
+          <Flame className="w-4 h-4 fill-current" />
+        </div>
+        <div>
+          <h2 className="font-extrabold text-base sm:text-lg text-stone-900">
+            Trending now
+          </h2>
+          <p className="text-[11px] text-stone-500">
+            Highest rating activity in the last 30 minutes
+          </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3.5">
         {isLoading
           ? [1, 2, 3, 4].map((i) => (
               <div
                 key={i}
-                className="glass-panel p-4 rounded-xl border border-fest-border animate-pulse space-y-3"
+                className="bg-white p-3.5 rounded-xl border border-stone-200 animate-pulse space-y-2"
               >
-                <div className="h-4 bg-gray-800 rounded w-1/2" />
-                <div className="h-3 bg-gray-800/60 rounded w-3/4" />
-                <div className="h-8 bg-gray-800 rounded" />
+                <div className="h-3 bg-stone-200 rounded w-16" />
+                <div className="h-4 bg-stone-200 rounded w-28" />
+                <div className="h-3 bg-stone-100 rounded w-20" />
               </div>
             ))
-          : trending.map((item, idx) => (
+          : trending.map((item) => (
               <Link
                 key={item.vendorId}
                 href={`/vendors/${item.slug}`}
-                className="group glass-panel p-4 rounded-2xl border border-fest-border hover:border-orange-500/50 hover:bg-fest-cardHover transition duration-200 shadow-lg relative overflow-hidden flex flex-col justify-between"
+                className="group bg-white p-3.5 rounded-xl border border-stone-200 hover:border-amber-400 shadow-sm hover:shadow transition flex flex-col justify-between"
               >
-                {/* Glow accent */}
-                <div className="absolute -top-10 -right-10 w-24 h-24 bg-orange-500/10 rounded-full blur-xl group-hover:bg-orange-500/20 transition" />
-
                 <div>
-                  <div className="flex items-center justify-between gap-2 mb-2">
-                    <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-orange-500/15 text-orange-400 border border-orange-500/30 flex items-center gap-1">
-                      <TrendingUp className="w-3 h-3" />
-                      {item.velocityLabel}
+                  <div className="flex items-center justify-between gap-1 mb-1">
+                    <span className="text-[10px] font-mono font-bold text-stone-500 bg-stone-100 px-1.5 py-0.5 rounded">
+                      {item.stallNumber}
                     </span>
-                    <span className="text-[11px] font-mono text-gray-400">
-                      Stall {item.stallNumber}
+                    <span className="text-[10px] font-bold text-orange-700 bg-orange-50 px-1.5 py-0.5 rounded">
+                      +{item.recentRatingCount} in 30m
                     </span>
                   </div>
 
-                  <h3 className="font-extrabold text-base text-white group-hover:text-amber-400 transition truncate">
+                  <h3 className="font-bold text-sm text-stone-900 group-hover:text-amber-700 transition truncate">
                     {item.name}
                   </h3>
-                  <p className="text-xs text-gray-400 truncate mt-0.5">
-                    {item.category} {item.cuisine && `• ${item.cuisine}`}
+                  <p className="text-[11px] text-stone-500 truncate">
+                    {item.category}
                   </p>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-fest-border/50 flex items-center justify-between">
+                <div className="mt-2 pt-2 border-t border-stone-100 flex items-center justify-between text-xs">
+                  <span className="text-stone-500 text-[11px]">Avg:</span>
                   <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4 fill-fest-gold text-fest-gold" />
-                    <span className="font-bold text-sm text-white">
-                      {item.recentAverage.toFixed(2)}
+                    <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
+                    <span className="font-bold text-stone-900 font-mono text-xs">
+                      {item.recentAverage.toFixed(1)}
                     </span>
                   </div>
-                  <span className="text-xs text-amber-400/90 font-medium">
-                    {item.recentRatingCount} recent votes
-                  </span>
                 </div>
               </Link>
             ))}

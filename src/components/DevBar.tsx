@@ -5,6 +5,11 @@ import { useSession } from "@/lib/SessionContext";
 import { Sparkles, Calendar, Key, ShieldCheck, ChevronDown, ChevronUp } from "lucide-react";
 
 export default function DevBar() {
+  const isDevMode = process.env.NEXT_PUBLIC_DEV_MODE === "true";
+  if (!isDevMode) {
+    return null;
+  }
+
   const { passToken, loginWithPass, authenticated, remainingQuota, ratedCount, refreshSession } =
     useSession();
   const [isOpen, setIsOpen] = useState(false);

@@ -25,6 +25,7 @@ model Event {
   ratings                      Rating[]
   awards                       Award[]
   anomalies                    AnomalyLog[]
+  rankSnapshots                RankSnapshot[]
 }
 
 model EventDay {
@@ -67,6 +68,7 @@ model Vendor {
   nominees    AwardNominee[]
   awardsWon   Award[]        @relation("VendorAwardsWon")
   anomalies   AnomalyLog[]
+  rankSnapshots RankSnapshot[]
 
   @@index([eventId])
   @@index([vendorType])
@@ -179,3 +181,20 @@ model AdminUser {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
+
+model RankSnapshot {
+  id           String   @id @default(cuid())
+  eventId      String
+  vendorId     String
+  rank         Int
+  score        Float
+  ratingsCount Int
+  snapshotAt   DateTime @default(now())
+
+  event        Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  vendor       Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@index([eventId, snapshotAt])
+  @@index([vendorId, snapshotAt])
+}
+

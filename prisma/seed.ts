@@ -9,13 +9,16 @@ function hashPass(pass: string): string {
 }
 
 function hashPassword(password: string): string {
-  return crypto.createHash("sha256").update(password + "salt").digest("hex");
+  const salt = crypto.randomBytes(16).toString("hex");
+  const hash = crypto.pbkdf2Sync(password, salt, 100000, 64, "sha512").toString("hex");
+  return `${salt}:${hash}`;
 }
 
 async function main() {
   console.log("🌱 Starting Grand Food Fest Database Seeding...");
 
   // Clean existing records
+  await prisma.rankSnapshot.deleteMany();
   await prisma.anomalyLog.deleteMany();
   await prisma.awardNominee.deleteMany();
   await prisma.award.deleteMany();
@@ -532,6 +535,28 @@ async function main() {
   }
 
   console.log(`🏆 Created 3 Awards with Nominees and Announced Winner.`);
+
+  // 6. Seed Baseline Historical RankSnapshot (from 45 mins ago)
+  const historicalSnapshotTime = new Date(Date.now() - 45 * 60 * 1000);
+  if (spiceRoute && hydHouse) {
+    const shadab = createdFoodVendors.find((v) => v.slug === "shadab-express");
+    const tandoor = createdFoodVendors.find((v) => v.slug === "tandoor-theory");
+    const bawarchi = createdFoodVendors.find((v) => v.slug === "bawarchi-legacy");
+
+    const snapshotsToCreate = [
+      { eventId: event.id, vendorId: hydHouse.id, rank: 1, score: 4.80, ratingsCount: 140, snapshotAt: historicalSnapshotTime },
+      { eventId: event.id, vendorId: bawarchi ? bawarchi.id : hydHouse.id, rank: 2, score: 4.75, ratingsCount: 120, snapshotAt: historicalSnapshotTime },
+      { eventId: event.id, vendorId: spiceRoute.id, rank: 3, score: 4.72, ratingsCount: 130, snapshotAt: historicalSnapshotTime },
+      ...(shadab ? [{ eventId: event.id, vendorId: shadab.id, rank: 4, score: 4.68, ratingsCount: 110, snapshotAt: historicalSnapshotTime }] : []),
+      ...(tandoor ? [{ eventId: event.id, vendorId: tandoor.id, rank: 5, score: 4.65, ratingsCount: 100, snapshotAt: historicalSnapshotTime }] : []),
+    ];
+
+    await prisma.rankSnapshot.createMany({
+      data: snapshotsToCreate,
+    });
+    console.log(`📸 Seeded ${snapshotsToCreate.length} historical RankSnapshots for truthful movement testing.`);
+  }
+
   console.log("✅ Grand Food Fest Seeding Complete!");
 }
 

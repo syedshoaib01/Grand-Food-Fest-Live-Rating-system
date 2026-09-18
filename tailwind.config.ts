@@ -10,36 +10,43 @@ const config: Config = {
     extend: {
       colors: {
         fest: {
-          dark: "#0F0F13",
-          card: "#181820",
-          cardHover: "#22222D",
-          border: "#2E2E3E",
+          cream: "#FAF8F5",
+          surface: "#FFFFFF",
+          surfaceMuted: "#F5F3EF",
+          border: "#E7E5E4",
+          borderDark: "#D6D3D1",
+          charcoal: "#1C1917",
+          charcoalMuted: "#78716C",
+          saffron: "#D97706",
           gold: "#F59E0B",
-          goldLight: "#FBBF24",
-          orange: "#F97316",
-          amber: "#D97706",
-          red: "#EF4444",
-          cyan: "#06B6D4",
-          purple: "#8B5CF6",
-          textMuted: "#9CA3AF"
-        }
+          goldLight: "#FEF3C7",
+          orange: "#EA580C",
+          orangeLight: "#FFEDD5",
+          green: "#16A34A",
+          greenLight: "#DCFCE7",
+          red: "#DC2626",
+          // Dark palette for admin & contrast
+          dark: "#141312",
+          cardDark: "#1E1C1A",
+          cardHoverDark: "#2B2824",
+          borderDarkTheme: "#36322D",
+        },
       },
       fontFamily: {
-        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
-        display: ["var(--font-display)", "system-ui", "sans-serif"],
+        sans: ["var(--font-inter)", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
       },
-      animation: {
-        "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-        "glow": "glow 2s ease-in-out infinite alternate",
+      boxShadow: {
+        card: "0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03)",
+        elevated: "0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04)",
+        float: "0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.03)",
       },
-      keyframes: {
-        glow: {
-          "0%": { boxShadow: "0 0 10px rgba(245, 158, 11, 0.2)" },
-          "100%": { boxShadow: "0 0 25px rgba(245, 158, 11, 0.6)" },
-        }
-      }
+      borderRadius: {
+        card: "12px",
+        cardLg: "16px",
+      },
     },
   },
   plugins: [],
 };
+
 export default config;

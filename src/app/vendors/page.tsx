@@ -2,9 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import VendorCard from "@/components/VendorCard";
-import { Search, Filter, Utensils, ShoppingBag, X } from "lucide-react";
+import { Search, Utensils, ShoppingBag, X } from "lucide-react";
 import { useSession } from "@/lib/SessionContext";
-import Link from "next/link";
 
 export default function VendorsPage() {
   const { ratedVendors } = useSession();
@@ -56,124 +55,131 @@ export default function VendorsPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-5">
       {/* Title & Type Switcher */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-fest-border pb-6">
+      <div className="space-y-3 pb-3 border-b border-stone-200">
         <div>
-          <h1 className="text-3xl font-black text-white">
-            Festival <span className="gold-gradient-text">Vendor Directory</span>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
+            Festival Stalls Directory
           </h1>
-          <p className="text-sm text-gray-400 mt-1">
-            Browse 150+ food & lifestyle stalls at Grand Food Fest Hyderabad 2026.
+          <p className="text-xs sm:text-sm text-stone-600 mt-0.5">
+            Discover 160+ food stalls and lifestyle showcases at Gachibowli Stadium.
           </p>
         </div>
 
         {/* Food vs Lifestyle toggle */}
-        <div className="flex items-center gap-1.5 p-1 bg-fest-card rounded-xl border border-fest-border self-start">
+        <div className="flex items-center gap-1.5 p-1 bg-stone-100 rounded-xl max-w-xs">
           <button
+            type="button"
             onClick={() => {
               setVendorType("FOOD");
               setSelectedCategory("All");
             }}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition ${
+            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-bold transition active:scale-95 ${
               vendorType === "FOOD"
-                ? "bg-fest-gold text-black shadow"
-                : "text-gray-300 hover:text-white"
+                ? "bg-white text-stone-900 shadow-sm"
+                : "text-stone-600 hover:text-stone-900"
             }`}
           >
-            <Utensils className="w-3.5 h-3.5" />
-            Food Vendors (110+)
+            <Utensils className="w-3.5 h-3.5 text-amber-600" />
+            <span>Food Stalls</span>
           </button>
           <button
+            type="button"
             onClick={() => {
               setVendorType("LIFESTYLE");
               setSelectedCategory("All");
             }}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition ${
+            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-bold transition active:scale-95 ${
               vendorType === "LIFESTYLE"
-                ? "bg-fest-gold text-black shadow"
-                : "text-gray-300 hover:text-white"
+                ? "bg-white text-stone-900 shadow-sm"
+                : "text-stone-600 hover:text-stone-900"
             }`}
           >
-            <ShoppingBag className="w-3.5 h-3.5" />
-            Lifestyle & Crafts (40+)
+            <ShoppingBag className="w-3.5 h-3.5 text-stone-500" />
+            <span>Lifestyle</span>
           </button>
         </div>
       </div>
 
       {/* Search and Category Filter Bar */}
-      <div className="space-y-3">
+      <div className="space-y-2.5">
         {/* Search Input */}
         <div className="relative max-w-md">
-          <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search vendor name, stall (e.g. A-01), cuisine..."
-            className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-fest-card border border-fest-border text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-fest-gold"
+            placeholder="Search by stall name, number (e.g. A-12), or cuisine..."
+            className="w-full pl-9 pr-8 py-2.5 rounded-xl bg-white border border-stone-300 text-xs text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
           />
           {search && (
             <button
+              type="button"
               onClick={() => setSearch("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
             >
-              <X className="w-4 h-4" />
+              <X className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
 
-        {/* Category Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition ${
-                selectedCategory === cat
-                  ? "bg-amber-500 text-black shadow-md shadow-amber-500/20"
-                  : "bg-fest-card hover:bg-fest-cardHover border border-fest-border text-gray-300 hover:text-white"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
+        {/* Category Pills (Horizontal scroll on phone) */}
+        {categories.length > 0 && (
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1.5 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition active:scale-95 ${
+                  selectedCategory === cat
+                    ? "bg-amber-600 text-white shadow-sm"
+                    : "bg-white border border-stone-200 text-stone-700 hover:bg-stone-50"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Vendors Grid */}
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div
               key={i}
-              className="glass-panel p-5 rounded-2xl border border-fest-border animate-pulse space-y-4 h-48"
+              className="bg-white p-4 rounded-xl border border-stone-200 animate-pulse space-y-3 h-36"
             >
-              <div className="h-4 bg-gray-800 rounded w-1/3" />
-              <div className="h-6 bg-gray-800 rounded w-2/3" />
-              <div className="h-3 bg-gray-800/60 rounded w-full" />
+              <div className="h-3 bg-stone-200 rounded w-16" />
+              <div className="h-4 bg-stone-200 rounded w-36" />
+              <div className="h-3 bg-stone-100 rounded w-24" />
             </div>
           ))}
         </div>
       ) : vendors.length === 0 ? (
-        <div className="glass-panel rounded-2xl p-12 text-center text-gray-400 space-y-3">
-          <Utensils className="w-10 h-10 mx-auto text-amber-500/50" />
-          <h3 className="font-bold text-lg text-white">No stalls match your search</h3>
-          <p className="text-xs max-w-sm mx-auto">
-            Try adjusting your search terms or picking another category.
+        <div className="bg-white rounded-2xl p-10 text-center border border-stone-200 space-y-2">
+          <Utensils className="w-8 h-8 mx-auto text-amber-500/60" />
+          <h3 className="font-bold text-stone-900 text-base">No stalls match your search</h3>
+          <p className="text-xs text-stone-500 max-w-sm mx-auto">
+            Try searching for a different keyword or resetting the category filter.
           </p>
           <button
+            type="button"
             onClick={() => {
               setSearch("");
               setSelectedCategory("All");
             }}
-            className="px-4 py-2 rounded-xl bg-fest-card hover:bg-fest-cardHover border border-fest-border text-sm font-semibold text-white"
+            className="mt-2 px-3.5 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold"
           >
             Clear Filters
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
           {vendors.map((vendor) => (
             <VendorCard
               key={vendor.id}

@@ -15,12 +15,12 @@ export interface TrendingVendor {
 }
 
 export interface TrendingOptions {
-  windowMinutes?: number; // default 60 minutes
+  windowMinutes?: number; // default 30 minutes
   limit?: number; // default 6
 }
 
 export async function getTrendingVendors(options?: TrendingOptions): Promise<TrendingVendor[]> {
-  const windowMinutes = options?.windowMinutes || 60;
+  const windowMinutes = options?.windowMinutes || 30;
   const limit = options?.limit || 6;
   const windowStart = new Date(Date.now() - windowMinutes * 60 * 1000);
 
@@ -40,7 +40,7 @@ export async function getTrendingVendors(options?: TrendingOptions): Promise<Tre
   });
 
   if (recentRatings.length === 0) {
-    // Fallback: If event just started or window is quiet, pull the most recently rated vendors
+    // Fallback: If window is quiet, pull the most recently rated food vendors
     const latestRatings = await prisma.rating.findMany({
       where: {
         isValid: true,
@@ -51,13 +51,13 @@ export async function getTrendingVendors(options?: TrendingOptions): Promise<Tre
       take: 60,
     });
 
-    return aggregateTrending(latestRatings, limit);
+    return aggregateTrending(latestRatings, limit, windowMinutes);
   }
 
-  return aggregateTrending(recentRatings, limit);
+  return aggregateTrending(recentRatings, limit, windowMinutes);
 }
 
-function aggregateTrending(ratings: any[], limit: number): TrendingVendor[] {
+function aggregateTrending(ratings: any[], limit: number, windowMinutes: number): TrendingVendor[] {
   const map: Record<
     string,
     { vendor: any; count: number; sum: number; recentTimestamps: number[] }
@@ -75,13 +75,8 @@ function aggregateTrending(ratings: any[], limit: number): TrendingVendor[] {
 
   const items: TrendingVendor[] = Object.values(map).map(({ vendor, count, sum }) => {
     const avg = Number((sum / count).toFixed(2));
-    // Score combines velocity and positive rating sentiment
+    // Score combines velocity and positive rating sentiment: count * (avg / 3.0)
     const score = Number((count * (avg / 3.0)).toFixed(2));
-
-    let positions = 2;
-    if (count > 15) positions = 7;
-    else if (count > 8) positions = 4;
-    else if (count > 4) positions = 3;
 
     return {
       vendorId: vendor.id,
@@ -93,8 +88,8 @@ function aggregateTrending(ratings: any[], limit: number): TrendingVendor[] {
       recentRatingCount: count,
       recentAverage: avg,
       trendingScore: score,
-      velocityLabel: `↑ ${positions} positions`,
-      surgeReason: `${count} ratings in the last hour`,
+      velocityLabel: `+${count} ratings in ${windowMinutes} min`,
+      surgeReason: `+${count} ratings in last ${windowMinutes} min (avg ${avg}★)`,
     };
   });
 

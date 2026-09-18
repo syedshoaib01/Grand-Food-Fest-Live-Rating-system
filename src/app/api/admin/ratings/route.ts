@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { requireAdmin, anonymizePassToken } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (!auth.authorized) {
+    return auth.response;
+  }
+
   try {
     const { searchParams } = new URL(req.url);
     const vendorId = searchParams.get("vendorId") || undefined;
@@ -34,7 +40,7 @@ export async function GET(req: NextRequest) {
         include: {
           vendor: { select: { name: true, stallNumber: true, category: true } },
           eventDay: { select: { dayNumber: true, date: true } },
-          attendeeSession: { select: { passToken: true, passHash: true } },
+          attendeeSession: { select: { passToken: true, passHash: true, id: true } },
         },
       }),
     ]);
@@ -55,7 +61,7 @@ export async function GET(req: NextRequest) {
         dayNumber: r.eventDay.dayNumber,
       },
       attendee: {
-        passToken: r.attendeeSession.passToken,
+        passToken: anonymizePassToken(r.attendeeSession.passToken),
         anonymousHash: r.attendeeSession.passHash.substring(0, 10) + "...",
       },
     }));
@@ -75,6 +81,11 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (!auth.authorized) {
+    return auth.response;
+  }
+
   try {
     const body = await req.json();
     const { ratingId, isValid } = body;

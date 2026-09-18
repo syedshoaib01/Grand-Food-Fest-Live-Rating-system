@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getLiveLeaderboard } from "@/lib/ranking-engine";
+import { requireAdmin, anonymizePassToken } from "@/lib/auth";
 
 function convertToCSV(rows: Record<string, any>[]): string {
   if (rows.length === 0) return "";
@@ -21,6 +22,11 @@ function convertToCSV(rows: Record<string, any>[]): string {
 }
 
 export async function GET(req: NextRequest, { params }: { params: { type: string } }) {
+  const auth = await requireAdmin(req);
+  if (!auth.authorized) {
+    return auth.response;
+  }
+
   try {
     const { type } = params;
     const { searchParams } = new URL(req.url);
@@ -85,7 +91,7 @@ export async function GET(req: NextRequest, { params }: { params: { type: string
         VendorName: r.vendor.name,
         Stall: r.vendor.stallNumber,
         RatingStars: r.rating,
-        PassToken: r.attendeeSession.passToken,
+        AttendeeIdentifier: anonymizePassToken(r.attendeeSession.passToken),
         IsValid: r.isValid ? "TRUE" : "FALSE",
       }));
     } else if (type === "summary") {

@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Trophy, Star, TrendingUp, TrendingDown, Minus, RefreshCw, Crown, ShieldAlert } from "lucide-react";
-import StarRating from "./StarRating";
+import { Trophy, Star, ArrowUp, ArrowDown, Minus, RefreshCw, Crown, Sparkles, ShieldAlert } from "lucide-react";
 
 export interface LeaderboardItem {
   rank: number;
@@ -66,178 +65,173 @@ export default function LeaderboardTable({ initialData }: { initialData?: Leader
     };
   }, []);
 
-  const getRankBadge = (rank: number) => {
-    if (rank === 1) {
+  const renderTrendBadge = (trendFormatted: string, rankChange: number) => {
+    if (trendFormatted === "NEW") {
       return (
-        <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-yellow-500 via-amber-400 to-yellow-200 text-black flex items-center justify-center font-extrabold shadow-lg shadow-yellow-500/30">
-          <Crown className="w-5 h-5 fill-black" />
-        </div>
+        <span className="inline-flex items-center text-[10px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300">
+          NEW
+        </span>
       );
     }
-    if (rank === 2) {
-      return (
-        <div className="w-8 h-8 rounded-full bg-slate-300 text-slate-900 flex items-center justify-center font-extrabold text-sm shadow">
-          #2
-        </div>
-      );
-    }
-    if (rank === 3) {
-      return (
-        <div className="w-8 h-8 rounded-full bg-amber-700 text-amber-100 flex items-center justify-center font-extrabold text-sm shadow">
-          #3
-        </div>
-      );
-    }
-    return (
-      <div className="w-8 h-8 rounded-full bg-fest-card border border-fest-border text-gray-400 flex items-center justify-center font-bold text-sm">
-        #{rank}
-      </div>
-    );
-  };
-
-  const renderTrend = (trendFormatted: string, rankChange: number) => {
     if (rankChange > 0) {
       return (
-        <span className="inline-flex items-center gap-1 font-bold text-green-400 text-xs bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">
-          <TrendingUp className="w-3 h-3" />
-          {trendFormatted}
+        <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+          <ArrowUp className="w-3 h-3 stroke-[2.5]" />
+          <span>{rankChange}</span>
         </span>
       );
     }
     if (rankChange < 0) {
       return (
-        <span className="inline-flex items-center gap-1 font-bold text-red-400 text-xs bg-red-500/10 px-2 py-0.5 rounded-full border border-red-500/20">
-          <TrendingDown className="w-3 h-3" />
-          {trendFormatted}
+        <span className="inline-flex items-center gap-0.5 text-xs font-bold text-rose-800 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
+          <ArrowDown className="w-3 h-3 stroke-[2.5]" />
+          <span>{Math.abs(rankChange)}</span>
         </span>
       );
     }
     return (
-      <span className="inline-flex items-center gap-0.5 text-gray-400 text-xs px-2 py-0.5">
-        <Minus className="w-3 h-3 text-gray-500" />
+      <span className="inline-flex items-center text-xs text-stone-400 font-bold px-1.5 py-0.5">
+        —
       </span>
     );
   };
 
   return (
-    <div className="glass-panel rounded-2xl overflow-hidden border border-fest-border shadow-2xl">
-      {/* Header with Live pulse and refresh */}
-      <div className="px-5 py-4 border-b border-fest-border flex items-center justify-between bg-fest-card/60">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-fest-gold flex items-center justify-center">
-            <Trophy className="w-5 h-5" />
-          </div>
-          <div>
-            <h2 className="font-extrabold text-lg sm:text-xl text-white flex items-center gap-2">
-              <span>OFFICIAL TOP 10 FOOD LEADERBOARD</span>
-              <span className="w-2 h-2 rounded-full bg-green-500 live-pulse inline-block" />
+    <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
+      {/* Header */}
+      <div className="p-4 sm:px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/70">
+        <div>
+          <div className="flex items-center gap-2">
+            <h2 className="text-base sm:text-lg font-extrabold text-stone-900 flex items-center gap-1.5">
+              <span>🔥 Top 10 right now</span>
             </h2>
-            <p className="text-xs text-gray-400">
-              Ranked with Bayesian confidence rating • {totalVotes.toLocaleString()} votes counted
-            </p>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+              LIVE
+            </span>
           </div>
+          <p className="text-xs text-stone-500 mt-0.5">
+            Live ranking based on attendee ratings • {totalVotes.toLocaleString()} votes counted
+          </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
-          <span className="text-[11px] text-gray-400 hidden sm:inline">
-            Refresh in <strong className="text-amber-400">{countdown}s</strong>
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-stone-400 hidden sm:inline">
+            Updates in <strong className="text-stone-700">{countdown}s</strong>
           </span>
           <button
+            type="button"
             onClick={() => fetchLeaderboard(true)}
             disabled={isRefreshing}
-            className="p-2 rounded-lg bg-fest-card hover:bg-fest-cardHover border border-fest-border text-gray-300 hover:text-white transition disabled:opacity-50"
-            title="Refresh Leaderboard Now"
+            className="p-2 rounded-lg bg-white border border-stone-200 text-stone-600 hover:text-stone-900 transition active:scale-95 disabled:opacity-50"
+            title="Refresh Leaderboard"
           >
-            <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-fest-gold" : ""}`} />
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-amber-600" : ""}`} />
           </button>
         </div>
       </div>
 
-      {/* Leaderboard Items */}
-      <div className="divide-y divide-fest-border/60">
+      {/* Leaderboard Rows */}
+      <div className="divide-y divide-stone-100">
         {isLoading ? (
-          <div className="p-8 space-y-4">
+          <div className="p-6 space-y-3">
             {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="animate-pulse flex items-center gap-4">
-                <div className="w-8 h-8 rounded-full bg-gray-800" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-gray-800 rounded w-1/3" />
-                  <div className="h-3 bg-gray-800/60 rounded w-1/4" />
+              <div key={i} className="animate-pulse flex items-center justify-between py-2">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-stone-200" />
+                  <div className="space-y-1">
+                    <div className="h-4 bg-stone-200 rounded w-28" />
+                    <div className="h-3 bg-stone-100 rounded w-16" />
+                  </div>
                 </div>
-                <div className="w-16 h-8 bg-gray-800 rounded" />
+                <div className="h-6 bg-stone-200 rounded w-14" />
               </div>
             ))}
           </div>
         ) : items.length === 0 ? (
-          <div className="p-12 text-center text-gray-400 space-y-3">
-            <ShieldAlert className="w-12 h-12 mx-auto text-amber-500/60" />
-            <h3 className="font-bold text-lg text-white">No Official Leaderboard Yet</h3>
-            <p className="text-sm max-w-sm mx-auto">
-              Vendors require a minimum of 20 ratings to enter the official Top 10. Start rating your favorite food stalls to push them onto the leaderboard!
+          <div className="p-10 text-center space-y-2">
+            <ShieldAlert className="w-10 h-10 text-amber-500/70 mx-auto" />
+            <h3 className="font-bold text-stone-900 text-base">Threshold in Progress</h3>
+            <p className="text-xs text-stone-500 max-w-sm mx-auto">
+              Food stalls require at least 20 verified ratings to qualify for the official Top 10. Start rating your favorites!
             </p>
             <Link
               href="/vote"
-              className="inline-block mt-2 px-5 py-2 rounded-xl bg-fest-gold text-black font-bold text-sm"
+              className="inline-block mt-3 px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs"
             >
-              Rate a Vendor Now
+              Rate Stalls Now
             </Link>
           </div>
         ) : (
-          items.map((item) => {
+          items.map((item, idx) => {
+            const isFirst = item.rank === 1;
+
             return (
               <div
                 key={item.vendorId}
-                className={`p-4 sm:px-6 flex items-center justify-between hover:bg-fest-cardHover/50 transition duration-150 ${
-                  item.rank === 1 ? "bg-amber-500/[0.04]" : ""
+                className={`p-3.5 sm:px-6 flex items-center justify-between transition ${
+                  isFirst
+                    ? "bg-amber-50/60 border-l-4 border-l-amber-500"
+                    : "hover:bg-stone-50/80"
                 }`}
               >
-                {/* Left: Rank & Vendor details */}
-                <div className="flex items-center gap-3.5 sm:gap-4 flex-1 min-w-0 pr-3">
+                {/* Left: Rank, Name, Stall, Category */}
+                <div className="flex items-center gap-3 min-w-0 pr-2">
                   <div className="shrink-0 flex items-center justify-center">
-                    {getRankBadge(item.rank)}
+                    {isFirst ? (
+                      <div className="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center font-extrabold shadow-sm">
+                        <Crown className="w-4 h-4 fill-current" />
+                      </div>
+                    ) : (
+                      <span className="font-mono text-sm sm:text-base font-extrabold text-stone-400 w-6 text-center">
+                        {String(item.rank).padStart(2, "0")}
+                      </span>
+                    )}
                   </div>
 
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 flex-wrap">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
                       <Link
                         href={`/vendors/${item.slug}`}
-                        className="font-bold text-base sm:text-lg text-white hover:text-fest-gold transition truncate"
+                        className={`font-bold text-sm sm:text-base hover:text-amber-700 transition truncate ${
+                          isFirst ? "text-stone-950 font-extrabold" : "text-stone-900"
+                        }`}
                       >
                         {item.name}
                       </Link>
-                      <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-800 text-gray-300 border border-gray-700">
-                        Stall {item.stallNumber}
+                      <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-stone-100 text-stone-600">
+                        {item.stallNumber}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2 mt-0.5 text-xs text-gray-400">
+                    <div className="flex items-center gap-1.5 text-[11px] text-stone-500 mt-0.5">
                       <span>{item.category}</span>
                       {item.cuisine && (
                         <>
                           <span>•</span>
-                          <span className="text-amber-400/80">{item.cuisine}</span>
+                          <span>{item.cuisine}</span>
                         </>
                       )}
                     </div>
                   </div>
                 </div>
 
-                {/* Right: Score, Stars & Trend */}
-                <div className="flex items-center gap-3 sm:gap-6 shrink-0">
-                  <div className="text-right">
+                {/* Right: Score, Ratings count, Movement */}
+                <div className="flex items-center gap-3 sm:gap-5 shrink-0 text-right">
+                  <div>
                     <div className="flex items-center justify-end gap-1">
-                      <Star className="w-4 h-4 fill-fest-gold text-fest-gold" />
-                      <span className="font-extrabold text-base sm:text-lg text-white">
+                      <Star className="w-4 h-4 fill-amber-400 text-amber-500" />
+                      <span className="font-extrabold text-sm sm:text-base text-stone-900 font-mono">
                         {item.ratingAverage.toFixed(2)}
                       </span>
                     </div>
-                    <div className="text-[11px] text-gray-400">
-                      {item.ratingCount.toLocaleString()} {item.ratingCount === 1 ? "rating" : "ratings"}
+                    <div className="text-[11px] text-stone-500">
+                      {item.ratingCount.toLocaleString()} ratings
                     </div>
                   </div>
 
-                  <div className="w-14 text-right">
-                    {renderTrend(item.trendFormatted, item.rankChange)}
+                  <div className="w-12 text-right">
+                    {renderTrendBadge(item.trendFormatted, item.rankChange)}
                   </div>
                 </div>
               </div>
@@ -246,9 +240,9 @@ export default function LeaderboardTable({ initialData }: { initialData?: Leader
         )}
       </div>
 
-      {/* Footer disclaimer */}
-      <div className="p-3 bg-fest-dark/60 text-center border-t border-fest-border/50 text-[11px] text-gray-400">
-        Rankings update in real-time. Only vendors with ≥ 20 ratings compete on the official Top 10.
+      {/* Footer info */}
+      <div className="p-3 bg-stone-50 text-center border-t border-stone-100 text-[11px] text-stone-500">
+        Leaderboard updates in real-time. Minimum 20 ratings required for Top 10 eligibility.
       </div>
     </div>
   );
