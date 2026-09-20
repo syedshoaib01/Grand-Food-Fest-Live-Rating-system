@@ -76,11 +76,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "anomalyId is required" }, { status: 400 });
     }
 
+    const adminEmail = auth.admin.email || "admin@grandfoodfest.com";
+
     if (action === "INVALIDATE_RECENT_RATINGS") {
       // Invalidate ratings for this vendor over the last 1 hour
       const result = await invalidateRatings({
         vendorId,
-        adminEmail: "admin@grandfoodfest.com",
+        adminEmail,
         anomalyId,
       });
 
@@ -95,7 +97,7 @@ export async function POST(req: NextRequest) {
         data: {
           resolved: true,
           resolvedAt: new Date(),
-          resolvedBy: "admin@grandfoodfest.com (Dismissed as benign)",
+          resolvedBy: `${adminEmail} (Dismissed as benign)`,
         },
       });
 

@@ -343,7 +343,7 @@ async function main() {
         eventId: event.id,
         eventDayId: day1.id,
         passHash: hash,
-        passToken: token,
+        passToken: `ATT-••••-${String(i).padStart(4, "0")}`,
         createdAt: new Date(Date.now() - Math.floor(Math.random() * 8 * 3600 * 1000)),
       },
     });

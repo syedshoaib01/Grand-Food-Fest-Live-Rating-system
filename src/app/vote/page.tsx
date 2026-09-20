@@ -35,6 +35,7 @@ function VoteContent() {
     ratedCount,
     ratedVendors,
     loginWithPass,
+    logout,
     refreshSession,
   } = useSession();
 
@@ -67,18 +68,21 @@ function VoteContent() {
   useEffect(() => {
     if (preselectedVendorId && availableVendors.length > 0) {
       const found = availableVendors.find((v) => v.id === preselectedVendorId);
-      if (found && !selectedVendors.some((s) => s.id === found.id)) {
-        const prevRating = ratedVendors.find((r) => r.vendorId === found.id)?.rating || 0;
-        setSelectedVendors([
-          {
-            id: found.id,
-            name: found.name,
-            stall: found.stallNumber,
-            category: found.category,
-            rating: prevRating,
-            isUpdate: prevRating > 0,
-          },
-        ]);
+      if (found) {
+        setSelectedVendors((prev) => {
+          if (prev.some((s) => s.id === found.id)) return prev;
+          const prevRating = ratedVendors.find((r) => r.vendorId === found.id)?.rating || 0;
+          return [
+            {
+              id: found.id,
+              name: found.name,
+              stall: found.stallNumber,
+              category: found.category,
+              rating: prevRating,
+              isUpdate: prevRating > 0,
+            },
+          ];
+        });
       }
     }
   }, [preselectedVendorId, availableVendors, ratedVendors]);
@@ -159,11 +163,20 @@ function VoteContent() {
     setIsSubmitting(true);
     setSubmitError(null);
 
+    const idempotencyKey =
+      typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+        ? crypto.randomUUID()
+        : `sub-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
     try {
       const res = await fetch("/api/voting/ratings", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Idempotency-Key": idempotencyKey,
+        },
         body: JSON.stringify({
+          idempotencyKey,
           ratings: selectedVendors.map((s) => ({
             vendorId: s.id,
             rating: s.rating,
@@ -321,16 +334,20 @@ function VoteContent() {
                   : "You have used all 5 ratings today"}
               </p>
               <p className="text-[11px] text-stone-400">
-                Pass: {passToken}
+                Pass: {passToken?.startsWith("ATT-") ? passToken : passToken ? `ATT-••••-${passToken.slice(-4)}` : "Verified"}
               </p>
             </div>
 
             <button
               type="button"
-              onClick={() => loginWithPass("PASS-" + Math.floor(Math.random() * 900000 + 100000))}
+              onClick={async () => {
+                await logout();
+                setPassInput("");
+                setSelectedVendors([]);
+              }}
               className="text-xs text-stone-500 hover:text-stone-900 underline"
             >
-              Switch
+              Switch Pass
             </button>
           </div>
 

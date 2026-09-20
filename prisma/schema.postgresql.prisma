@@ -1,5 +1,5 @@
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -197,4 +197,3 @@ model RankSnapshot {
   @@index([eventId, snapshotAt])
   @@index([vendorId, snapshotAt])
 }
-

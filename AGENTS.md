@@ -26,11 +26,12 @@ Future agents must NEVER break these invariants:
 3. **Multi-Day Reset**: Each event day gives attendees a fresh 5-vendor quota.
 4. **Food-Only Leaderboard**: Lifestyle vendors (`vendorType: LIFESTYLE`) must NEVER receive food ratings or appear on the leaderboard.
 5. **No 5-Star Default**: Newly selected unrated stalls must initialize to **0 stars** (`no rating selected`). Submission must remain disabled until every selected stall has an explicit 1–5 rating.
-6. **Zero Session Spoofing**: Never trust client-provided `sessionId` in request bodies or headers. Session identity is strictly derived from the verified `gff_session` HMAC cookie.
-7. **No Raw Pass Exposure**: Production attendee pass tokens must NEVER be exposed in UI, admin views, or exports (`anonymizePassToken()` -> `ATT-••••-XXXX`).
+6. **Zero Session Spoofing**: Never trust client-provided `sessionId` in request bodies or headers. Session identity is strictly derived from the verified `gff_session` HMAC cookie. Tokens enforce 24h (admin) and 72h (attendee) server-side TTL.
+7. **No Raw Pass Exposure**: Production attendee pass tokens must NEVER be exposed in UI, admin views, or exports (`anonymizePassToken()` -> `ATT-••••-XXXX`). Persist only anonymized pass tokens in the database.
 8. **Truthful Rank Movement**: Never simulate fake rank movement (`↑ 7 positions`). Rank movement must come from `RankSnapshot` comparisons (`↑ X`, `↓ Y`, `—`, `NEW`).
-9. **Truthful Trending**: Trending metrics must reflect actual ratings in a rolling 30-minute window (`+X ratings in 30 min`), never synthetic positions.
+9. **Truthful Trending**: Trending metrics must reflect actual ratings in a rolling 30-minute window (`+X ratings in 30 min`), or be labeled as recent festival reviews if the rolling window is quiet.
 10. **Protected Admin APIs**: Every `/api/admin/*` endpoint must enforce `requireAdmin(req)`. Passwords use salted PBKDF2.
+11. **Concurrency Quota Locking**: Quota checks must lock the attendee session row inside `prisma.$transaction` to serialize parallel submissions.
 
 ---
 

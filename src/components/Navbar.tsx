@@ -92,7 +92,11 @@ export default function Navbar() {
               >
                 <div className="flex flex-col text-right leading-none">
                   <span className="font-mono text-[10px] font-bold text-stone-800">
-                    {passToken}
+                    {passToken?.startsWith("ATT-")
+                      ? passToken
+                      : passToken
+                      ? `ATT-••••-${passToken.slice(-4)}`
+                      : "Verified"}
                   </span>
                   <span className="text-[9px] text-amber-700 font-medium mt-0.5">
                     {remainingQuota} left

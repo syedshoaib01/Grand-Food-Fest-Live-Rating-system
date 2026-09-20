@@ -1,15 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { submitRatings, getSessionStatus } from "@/lib/voting-engine";
 import { verifySessionPayload, signSessionPayload } from "@/lib/auth";
+import logger from "@/lib/logger";
 
 export async function POST(req: NextRequest) {
+  let sessionId: string | undefined = undefined;
+
   try {
     const body = await req.json();
     const cookie = req.cookies.get("gff_session")?.value;
     const idempotencyKey =
       req.headers.get("Idempotency-Key") || req.headers.get("idempotency-key") || body.idempotencyKey;
-
-    let sessionId: string | undefined = undefined;
 
     if (cookie) {
       const decoded = verifySessionPayload<{ sessionId: string }>(cookie);
@@ -72,6 +73,7 @@ export async function POST(req: NextRequest) {
     if (!cookie && result.sessionId) {
       const token = signSessionPayload({
         sessionId: result.sessionId,
+        role: "ATTENDEE",
       });
       response.cookies.set({
         name: "gff_session",
@@ -79,16 +81,20 @@ export async function POST(req: NextRequest) {
         httpOnly: true,
         path: "/",
         sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
         maxAge: 60 * 60 * 24 * 3,
       });
     }
 
     return response;
   } catch (error: any) {
-    const isLimit = error.message.includes("limit reached") || error.message.includes("quota");
+    const isLimit = error.message?.includes("limit reached") || error.message?.includes("quota");
+    if (!isLimit) {
+      logger.error("Rating submission error", error, { sessionId });
+    }
     return NextResponse.json(
       { error: error.message || "Failed to submit ratings." },
-      { status: isLimit ? 400 : 400 }
+      { status: 400 }
     );
   }
 }

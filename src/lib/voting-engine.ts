@@ -1,5 +1,5 @@
 import prisma from "./prisma";
-import { hashPassToken } from "./auth";
+import { hashPassToken, anonymizePassToken } from "./auth";
 
 export interface RatingInput {
   vendorId: string;
@@ -93,7 +93,7 @@ export async function getOrCreateAttendeeSession(
       eventId: eventDay.eventId,
       eventDayId: eventDay.id,
       passHash,
-      passToken: normalizedPass,
+      passToken: anonymizePassToken(normalizedPass),
     },
     include: {
       eventDay: true,
@@ -132,7 +132,7 @@ export async function getSessionStatus(sessionId: string): Promise<AttendeeSessi
   return {
     session: {
       id: session.id,
-      passToken: session.passToken,
+      passToken: anonymizePassToken(session.passToken),
       eventDayId: session.eventDayId,
       dayNumber: session.eventDay.dayNumber,
       dayDate: session.eventDay.date.toISOString(),
@@ -232,6 +232,12 @@ export async function submitRatings(params: SubmitRatingsParams) {
 
   // 5. Atomic Transaction: Check Quota & Upsert Ratings
   return await prisma.$transaction(async (tx) => {
+    // Acquire row-level lock on attendee session to serialize concurrent submissions
+    await tx.attendeeSession.update({
+      where: { id: session.id },
+      data: { lastSeenAt: new Date() },
+    });
+
     // Check idempotency if key is supplied
     if (idempotencyKey) {
       const existingWithKey = await tx.rating.findFirst({

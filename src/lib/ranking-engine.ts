@@ -101,41 +101,53 @@ export async function getLiveLeaderboard(options?: {
     },
   });
 
-  // Fetch all ratings matching criteria
-  const ratings = await prisma.rating.findMany({
-    where: ratingWhere,
-    select: {
-      vendorId: true,
-      rating: true,
-      createdAt: true,
-    },
-  });
+  const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
 
-  const totalVotesCounted = ratings.length;
+  // Execute database-level aggregations instead of loading all individual rating rows
+  const [overallAgg, vendorGroups, recentVendorGroups] = await Promise.all([
+    prisma.rating.aggregate({
+      where: ratingWhere,
+      _count: { rating: true },
+      _sum: { rating: true },
+    }),
+    prisma.rating.groupBy({
+      by: ["vendorId"],
+      where: ratingWhere,
+      _count: { rating: true },
+      _sum: { rating: true },
+    }),
+    prisma.rating.groupBy({
+      by: ["vendorId"],
+      where: {
+        ...ratingWhere,
+        createdAt: { gte: thirtyMinutesAgo },
+      },
+      _count: { rating: true },
+    }),
+  ]);
 
-  // Calculate Festival-wide Global Average C
-  const totalStarSum = ratings.reduce((sum: number, r: { rating: number }) => sum + r.rating, 0);
+  const totalVotesCounted = overallAgg._count.rating || 0;
+  const totalStarSum = overallAgg._sum.rating || 0;
   const festivalAverage =
     totalVotesCounted > 0 ? Number((totalStarSum / totalVotesCounted).toFixed(3)) : 4.0;
 
-  // Group ratings by vendor
+  // Build vendor stats lookup
   const vendorRatingMap: Record<
     string,
-    { count: number; sum: number; recentCount: number; recentSum: number }
+    { count: number; sum: number; recentCount: number }
   > = {};
 
-  const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+  for (const g of vendorGroups) {
+    vendorRatingMap[g.vendorId] = {
+      count: g._count.rating || 0,
+      sum: g._sum.rating || 0,
+      recentCount: 0,
+    };
+  }
 
-  for (const r of ratings) {
-    if (!vendorRatingMap[r.vendorId]) {
-      vendorRatingMap[r.vendorId] = { count: 0, sum: 0, recentCount: 0, recentSum: 0 };
-    }
-    vendorRatingMap[r.vendorId].count += 1;
-    vendorRatingMap[r.vendorId].sum += r.rating;
-
-    if (r.createdAt >= thirtyMinutesAgo) {
-      vendorRatingMap[r.vendorId].recentCount += 1;
-      vendorRatingMap[r.vendorId].recentSum += r.rating;
+  for (const rg of recentVendorGroups) {
+    if (vendorRatingMap[rg.vendorId]) {
+      vendorRatingMap[rg.vendorId].recentCount = rg._count.rating || 0;
     }
   }
 

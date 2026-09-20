@@ -49,20 +49,34 @@ export async function GET(req: NextRequest) {
         skip,
         take: limit,
         orderBy: [{ stallNumber: "asc" }, { name: "asc" }],
-        include: {
-          ratings: {
-            where: { isValid: true },
-            select: { rating: true },
-          },
-        },
       }),
     ]);
 
+    const vendorIds = vendors.map((v: any) => v.id);
+    const ratingAggs = vendorIds.length > 0
+      ? await prisma.rating.groupBy({
+          by: ["vendorId"],
+          where: {
+            vendorId: { in: vendorIds },
+            isValid: true,
+          },
+          _count: { rating: true },
+          _sum: { rating: true },
+        })
+      : [];
+
+    const ratingMap = new Map<string, { count: number; sum: number }>();
+    for (const a of ratingAggs) {
+      ratingMap.set(a.vendorId, {
+        count: a._count.rating || 0,
+        sum: a._sum.rating || 0,
+      });
+    }
+
     // Format vendors with rating summary
     const formatted = vendors.map((v: any) => {
-      const count = v.ratings.length;
-      const sum = v.ratings.reduce((acc: number, r: { rating: number }) => acc + r.rating, 0);
-      const avg = count > 0 ? Number((sum / count).toFixed(2)) : 0;
+      const stats = ratingMap.get(v.id) || { count: 0, sum: 0 };
+      const avg = stats.count > 0 ? Number((stats.sum / stats.count).toFixed(2)) : 0;
 
       return {
         id: v.id,
@@ -74,7 +88,7 @@ export async function GET(req: NextRequest) {
         stallNumber: v.stallNumber,
         vendorType: v.vendorType,
         status: v.status,
-        ratingCount: count,
+        ratingCount: stats.count,
         ratingAverage: avg,
       };
     });

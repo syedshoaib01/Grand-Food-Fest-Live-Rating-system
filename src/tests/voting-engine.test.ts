@@ -104,7 +104,7 @@ describe("Grand Food Fest — Voting Engine & Business Rules", () => {
   it("creates an anonymous session with valid pass format", async () => {
     const session = await getOrCreateAttendeeSession("PASS-TEST01", testDay1.id);
     expect(session).toBeDefined();
-    expect(session.passToken).toBe("PASS-TEST01");
+    expect(session.passToken).toBe("ATT-••••-ST01");
     expect(session.passHash).toBeDefined();
     expect(session.eventDayId).toBe(testDay1.id);
   });

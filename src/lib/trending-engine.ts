@@ -51,13 +51,18 @@ export async function getTrendingVendors(options?: TrendingOptions): Promise<Tre
       take: 60,
     });
 
-    return aggregateTrending(latestRatings, limit, windowMinutes);
+    return aggregateTrending(latestRatings, limit, windowMinutes, true);
   }
 
-  return aggregateTrending(recentRatings, limit, windowMinutes);
+  return aggregateTrending(recentRatings, limit, windowMinutes, false);
 }
 
-function aggregateTrending(ratings: any[], limit: number, windowMinutes: number): TrendingVendor[] {
+function aggregateTrending(
+  ratings: any[],
+  limit: number,
+  windowMinutes: number,
+  isFallback: boolean = false
+): TrendingVendor[] {
   const map: Record<
     string,
     { vendor: any; count: number; sum: number; recentTimestamps: number[] }
@@ -78,6 +83,14 @@ function aggregateTrending(ratings: any[], limit: number, windowMinutes: number)
     // Score combines velocity and positive rating sentiment: count * (avg / 3.0)
     const score = Number((count * (avg / 3.0)).toFixed(2));
 
+    const velocityLabel = isFallback
+      ? `+${count} recent ratings`
+      : `+${count} ratings in ${windowMinutes} min`;
+
+    const surgeReason = isFallback
+      ? `${count} recent festival reviews (avg ${avg}★)`
+      : `+${count} ratings in last ${windowMinutes} min (avg ${avg}★)`;
+
     return {
       vendorId: vendor.id,
       name: vendor.name,
@@ -88,8 +101,8 @@ function aggregateTrending(ratings: any[], limit: number, windowMinutes: number)
       recentRatingCount: count,
       recentAverage: avg,
       trendingScore: score,
-      velocityLabel: `+${count} ratings in ${windowMinutes} min`,
-      surgeReason: `+${count} ratings in last ${windowMinutes} min (avg ${avg}★)`,
+      velocityLabel,
+      surgeReason,
     };
   });
 

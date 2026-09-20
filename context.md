@@ -270,7 +270,13 @@ When continuing work on this repository:
 6. **Keep admin drawer solid and opaque** (`bg-[#1C1917]`) at `z-drawer: 60` with `z-backdrop: 50`.
 7. **Keep the public consumer experience mobile-first**, thumb-friendly, and warm festival themed.
 8. **Never invent fake metrics**: rank movement and trending must come from actual data (`RankSnapshot` and rolling activity).
-9. **Run `npm test`** after any business logic change.
-10. **Run `npm run build`** after major architectural updates.
-11. **Update `docs/` and `context.md`** whenever domain logic or layout architecture changes.
+9. **Lock session rows during quota transactions** to prevent concurrent over-voting.
+10. **Run `npm test`** after any business logic change.
+11. **Run `npm run build`** after major architectural updates.
+12. **Consult key documentation**:
+    - [FIRST-PRINCIPLES.md](file:///home/shoaib/projects/my_projects/Grand-Food-Fest-Live-Rating-system/docs/FIRST-PRINCIPLES.md): Real-world festival constraints & mathematical foundations.
+    - [AUDIT.md](file:///home/shoaib/projects/my_projects/Grand-Food-Fest-Live-Rating-system/docs/AUDIT.md): Comprehensive system audit & vulnerability review.
+    - [IMPROVEMENT-PLAN.md](file:///home/shoaib/projects/my_projects/Grand-Food-Fest-Live-Rating-system/docs/IMPROVEMENT-PLAN.md): Prioritized improvements and status.
+    - [OPEN-QUESTIONS.md](file:///home/shoaib/projects/my_projects/Grand-Food-Fest-Live-Rating-system/docs/OPEN-QUESTIONS.md): 8 key organizer decisions and trade-offs.
+    - [PRODUCTION-READINESS.md](file:///home/shoaib/projects/my_projects/Grand-Food-Fest-Live-Rating-system/docs/PRODUCTION-READINESS.md): Production checklist, PostgreSQL migration, & runbooks.
 

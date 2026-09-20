@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
       sessionId: session.id,
       passToken: session.passToken,
       eventDayId: session.eventDayId,
+      role: "ATTENDEE",
     });
 
     const response = NextResponse.json({
@@ -31,13 +32,14 @@ export async function POST(req: NextRequest) {
       ...sessionStatus,
     });
 
-    // Set HTTP-only cookie
+    // Set HTTP-only cookie with secure flag in production
     response.cookies.set({
       name: "gff_session",
       value: token,
       httpOnly: true,
       path: "/",
       sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 24 * 3, // 3 days
     });
 
