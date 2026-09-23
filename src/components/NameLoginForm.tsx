@@ -1,14 +1,24 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/SessionContext";
 import { Utensils, ArrowRight, Sparkles, AlertCircle } from "lucide-react";
 
 interface NameLoginFormProps {
   onSuccess?: () => void;
+  redirectTo?: string;
+  title?: string;
+  subtitle?: string;
 }
 
-export default function NameLoginForm({ onSuccess }: NameLoginFormProps) {
+export default function NameLoginForm({
+  onSuccess,
+  redirectTo,
+  title = "Grand Food Fest 2026",
+  subtitle = "Enter your name to explore 160+ stadium stalls and score live tastings across Gachibowli.",
+}: NameLoginFormProps) {
+  const router = useRouter();
   const { loginWithName } = useSession();
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -16,6 +26,7 @@ export default function NameLoginForm({ onSuccess }: NameLoginFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     const trimmed = name.trim();
     if (!trimmed) {
       setError("Please enter your name to continue.");
@@ -29,7 +40,12 @@ export default function NameLoginForm({ onSuccess }: NameLoginFormProps) {
     setIsSubmitting(false);
 
     if (result.success) {
-      if (onSuccess) onSuccess();
+      if (onSuccess) {
+        onSuccess();
+      }
+      if (redirectTo) {
+        router.push(redirectTo);
+      }
     } else {
       setError(result.error || "Could not log in. Please try again.");
     }

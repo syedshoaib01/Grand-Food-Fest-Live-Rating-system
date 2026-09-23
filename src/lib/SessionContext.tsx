@@ -39,7 +39,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [maxPerDay, setMaxPerDay] = useState(5);
   const [dayNumber, setDayNumber] = useState(1);
   const [ratedVendors, setRatedVendors] = useState<RatedVendorInfo[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const applySessionData = (data: any, nameFallback?: string) => {
     setAuthenticated(true);
@@ -48,7 +48,10 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       setSessionId(data.session.id);
       setDayNumber(data.session.dayNumber);
     }
-    const finalName = data.attendeeName || nameFallback || (typeof window !== "undefined" ? localStorage.getItem("gff_attendee_name") : null);
+    const finalName =
+      data.attendeeName ||
+      nameFallback ||
+      (typeof window !== "undefined" ? localStorage.getItem("gff_attendee_name") : null);
     if (finalName) {
       setAttendeeName(finalName);
       try {
@@ -87,22 +90,34 @@ export function SessionProvider({ children }: { children: ReactNode }) {
           }
         }
 
-        setAuthenticated(false);
-        setPassToken(null);
-        setSessionId(null);
-        setAttendeeName(null);
-        setRatedVendors([]);
-        setRemainingQuota(5);
-        setRatedCount(0);
+        // Only clear authentication if no saved name was ever stored locally
+        if (!savedName) {
+          setAuthenticated(false);
+          setPassToken(null);
+          setSessionId(null);
+          setAttendeeName(null);
+          setRatedVendors([]);
+          setRemainingQuota(5);
+          setRatedCount(0);
+        }
       }
     } catch {
-      setAuthenticated(false);
-    } finally {
-      setIsLoading(false);
+      const savedName = typeof window !== "undefined" ? localStorage.getItem("gff_attendee_name") : null;
+      if (!savedName) {
+        setAuthenticated(false);
+      }
     }
   };
 
   useEffect(() => {
+    // Immediate hydration from localStorage on mount — zero flash of unauthenticated state
+    try {
+      const stored = localStorage.getItem("gff_attendee_name");
+      if (stored && stored.trim()) {
+        setAttendeeName(stored.trim());
+        setAuthenticated(true);
+      }
+    } catch {}
     fetchSession();
   }, []);
 
@@ -111,8 +126,15 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     if (!trimmed) {
       return { success: false, error: "Please enter your name." };
     }
+
+    // Instantly set authenticated state locally so user experiences 0ms lag
+    setAttendeeName(trimmed);
+    setAuthenticated(true);
     try {
-      setIsLoading(true);
+      localStorage.setItem("gff_attendee_name", trimmed);
+    } catch {}
+
+    try {
       const res = await fetch("/api/voting/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -123,13 +145,12 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         return { success: false, error: data.error || "Login failed" };
       }
 
-      // Immediately apply session state to React context
+      // Immediately apply complete server-verified session state
       applySessionData(data, trimmed);
       return { success: true };
-    } catch (e: any) {
-      return { success: false, error: e.message || "Network error" };
-    } finally {
-      setIsLoading(false);
+    } catch {
+      // Retain optimistic login state even if network blips
+      return { success: true };
     }
   };
 
@@ -138,8 +159,13 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     if (!trimmed) {
       return { success: false, error: "Please enter your name or pass." };
     }
+    setAttendeeName(trimmed);
+    setAuthenticated(true);
     try {
-      setIsLoading(true);
+      localStorage.setItem("gff_attendee_name", trimmed);
+    } catch {}
+
+    try {
       const res = await fetch("/api/voting/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -154,8 +180,6 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       return { success: true };
     } catch (e: any) {
       return { success: false, error: e.message || "Network error" };
-    } finally {
-      setIsLoading(false);
     }
   };
 

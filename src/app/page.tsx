@@ -4,7 +4,6 @@ import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/SessionContext";
-import NameLoginForm from "@/components/NameLoginForm";
 import {
   Search,
   X,
@@ -85,11 +84,13 @@ const RECENTLY_VOTED_STALLS = [
 
 export default function HomePage() {
   const router = useRouter();
-  const { authenticated, attendeeName, logout, isLoading: isSessionLoading } = useSession();
+  const { authenticated, attendeeName, logout, remainingQuota, loginWithName } = useSession();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [allVendors, setAllVendors] = useState<any[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
+  const [inlineName, setInlineName] = useState("");
+  const [isInlineLoggingIn, setIsInlineLoggingIn] = useState(false);
+  const [inlineError, setInlineError] = useState<string | null>(null);
 
   // Fetch all vendors for the live search bar
   useEffect(() => {
@@ -114,24 +115,23 @@ export default function HomePage() {
     });
   }, [searchQuery, allVendors]);
 
-  // If session is still loading, show a warm festival spinner
-  if (isSessionLoading) {
-    return (
-      <div className="max-w-md mx-auto px-4 py-20 text-center space-y-3">
-        <div className="w-10 h-10 rounded-full border-4 border-fest-terracotta border-t-transparent animate-spin mx-auto" />
-        <p className="font-display font-bold text-fest-charcoal text-xs">
-          Loading Grand Food Fest...
-        </p>
-      </div>
-    );
-  }
+  const handleInlineLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const trimmed = inlineName.trim();
+    if (!trimmed) {
+      setInlineError("Please enter your name.");
+      return;
+    }
+    setIsInlineLoggingIn(true);
+    setInlineError(null);
+    const res = await loginWithName(trimmed);
+    setIsInlineLoggingIn(false);
+    if (!res.success) {
+      setInlineError(res.error || "Could not log in.");
+    }
+  };
 
-  // 1. If NOT authenticated: Show the Name Login Screen
-  if (!authenticated) {
-    return <NameLoginForm />;
-  }
-
-  // 2. If authenticated: Show the Landing Page
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 space-y-6 pb-20">
       {/* Top Welcome Bar - Luminous Stadium Scoreboard Hero */}
@@ -139,27 +139,94 @@ export default function HomePage() {
         {/* Glow Accent */}
         <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-amber-500/15 via-orange-500/10 to-transparent blur-2xl pointer-events-none" />
 
-        <div className="flex items-center justify-between gap-3 relative z-10">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#10B981]" />
-              <span className="text-[10px] font-display font-bold uppercase tracking-wider text-amber-400">
-                Live Festival Stadium Feed
+        {authenticated ? (
+          <div className="flex items-center justify-between gap-3 relative z-10">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#10B981]" />
+                <span className="text-[10px] font-display font-bold uppercase tracking-wider text-amber-400">
+                  Live Festival Stadium Feed
+                </span>
+              </div>
+              <h1 className="text-xl sm:text-2xl font-display font-black text-white tracking-tight">
+                Welcome, {attendeeName || "Attendee"}
+              </h1>
+              <p className="text-xs text-slate-400 mt-0.5">
+                You have <span className="text-amber-400 font-bold">{remainingQuota ?? 5} of 5</span> tasting ratings left today
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Link
+                href="/vote"
+                className="px-3.5 py-1.5 rounded-full text-xs font-display font-bold bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-xs hover:opacity-95 transition active-press flex items-center gap-1.5"
+              >
+                <span>Rate Stalls</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+              <button
+                type="button"
+                onClick={() => logout()}
+                className="text-xs font-display font-medium text-slate-400 hover:text-white px-2.5 py-1.5 rounded-full border border-white/10 hover:border-white/20 bg-white/5 transition active-press"
+                title="Change Name"
+              >
+                Change
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-3 relative z-10">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#10B981]" />
+                  <span className="text-[10px] font-display font-bold uppercase tracking-wider text-amber-400">
+                    Live Festival Stadium Feed
+                  </span>
+                </div>
+                <h1 className="text-xl sm:text-2xl font-display font-black text-white tracking-tight">
+                  Grand Food Fest 2026
+                </h1>
+              </div>
+              <span className="text-[10px] font-mono font-bold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20">
+                Gachibowli Stadium
               </span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-display font-black text-white tracking-tight">
-              Welcome, {attendeeName || "Attendee"}
-            </h1>
-          </div>
 
-          <button
-            type="button"
-            onClick={() => logout()}
-            className="text-xs font-display font-medium text-slate-400 hover:text-white px-3 py-1.5 rounded-full border border-white/10 hover:border-white/20 bg-white/5 transition active-press"
-          >
-            Change Name
-          </button>
-        </div>
+            {/* Inline Quick Attendee Check-In */}
+            <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-display font-bold text-white flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Taste & Rate Stalls</span>
+                </span>
+                <span className="text-[11px] text-slate-400">5 tasting stamps today</span>
+              </div>
+
+              {inlineError && (
+                <p className="text-[11px] text-rose-400 font-medium">{inlineError}</p>
+              )}
+
+              <form onSubmit={handleInlineLogin} className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={inlineName}
+                  onChange={(e) => setInlineName(e.target.value)}
+                  placeholder="Enter your name (e.g. Alex, Ruwaiz)..."
+                  className="flex-1 px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-xs font-sans text-white placeholder:text-slate-500 focus:outline-hidden focus:border-amber-400/60 transition"
+                />
+                <button
+                  type="submit"
+                  disabled={isInlineLoggingIn || !inlineName.trim()}
+                  className="px-4 py-2.5 rounded-xl font-display font-bold text-xs bg-gradient-to-r from-orange-500 to-amber-500 hover:opacity-95 text-white transition disabled:opacity-40 disabled:cursor-not-allowed shrink-0 flex items-center gap-1.5 shadow-sm active-press cursor-pointer"
+                >
+                  <span>{isInlineLoggingIn ? "Entering..." : "Check In"}</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
 
         {/* Live Stadium Quick Stats Strip */}
         <div className="grid grid-cols-3 gap-2 pt-2 border-t border-white/8 text-center">
