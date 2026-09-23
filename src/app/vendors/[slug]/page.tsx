@@ -127,7 +127,7 @@ export default function VendorDetailPage() {
       <div>
         <Link
           href="/vendors"
-          className="inline-flex items-center gap-1.5 text-xs font-display font-bold text-fest-charcoalMuted hover:text-fest-charcoal transition"
+          className="inline-flex items-center gap-1.5 text-xs font-display font-bold text-slate-400 hover:text-white transition"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to All Stalls</span>
@@ -135,34 +135,34 @@ export default function VendorDetailPage() {
       </div>
 
       {/* Festival Stall Board Banner */}
-      <div className="ticket-stub p-6 sm:p-7 border border-fest-border shadow-card space-y-5">
+      <div className="glass-panel float-card p-6 sm:p-7 rounded-2xl border border-white/10 space-y-5">
         {/* Top Badges */}
-        <div className="flex items-center justify-between gap-2 flex-wrap pb-3 border-b border-fest-parchment">
+        <div className="flex items-center justify-between gap-2 flex-wrap pb-3 border-b border-white/8">
           <div className="flex items-center gap-2">
-            <span className="font-display text-xs font-black text-fest-charcoal bg-fest-parchment px-2.5 py-1 rounded-lg border border-fest-border shadow-2xs">
+            <span className="font-display text-xs font-bold text-white bg-white/5 px-2.5 py-1 rounded-lg border border-white/10">
               Stall {vendor.stallNumber}
             </span>
-            <span className="text-xs font-display font-bold text-fest-saffronDark bg-fest-saffronLight/70 px-2.5 py-1 rounded-full border border-fest-saffron/20">
+            <span className="text-xs font-display font-medium text-slate-300 bg-white/5 px-2.5 py-1 rounded-full border border-white/5">
               {vendor.cuisine ? `${vendor.cuisine} • ${vendor.category}` : vendor.category}
             </span>
           </div>
 
           {stats.rank && (
-            <span className="inline-flex items-center gap-1.5 text-xs font-display font-black text-fest-terracotta bg-fest-terracottaLight px-3 py-1 rounded-full border border-fest-terracotta/30">
-              <Trophy className="w-3.5 h-3.5" />
-              <span>#{stats.rank} on Leaderboard</span>
+            <span className="inline-flex items-center gap-1.5 text-xs font-display font-bold text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20 shadow-[0_0_12px_rgba(245,158,11,0.2)]">
+              <Trophy className="w-3.5 h-3.5 stroke-[1.5]" />
+              <span>#{stats.rank} Leaderboard</span>
             </span>
           )}
         </div>
 
         {/* Title & Description */}
         <div>
-          <h1 className="text-2xl sm:text-3xl font-display font-black text-fest-charcoal tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-display font-black text-white tracking-tight">
             {vendor.name}
           </h1>
 
           {vendor.description && (
-            <p className="text-sm text-fest-charcoalMuted mt-2.5 leading-relaxed font-sans">
+            <p className="text-sm text-slate-400 mt-2.5 leading-relaxed font-sans">
               {vendor.description}
             </p>
           )}
@@ -170,47 +170,47 @@ export default function VendorDetailPage() {
 
         {/* Live Score Summary */}
         {isFood && (
-          <div className="flex items-baseline gap-4 pt-2">
+          <div className="flex items-baseline gap-4 pt-1">
             <div className="flex items-baseline gap-2">
-              <Star className="w-6 h-6 fill-fest-turmeric text-fest-saffron self-center" />
-              <span className="text-3xl font-display font-black text-fest-charcoal">
+              <Star className="w-6 h-6 fill-amber-400 text-amber-300 stroke-[1.5] self-center drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]" />
+              <span className="text-3xl font-display font-black text-white">
                 {stats.totalRatings > 0 ? stats.averageRating.toFixed(2) : "New"}
               </span>
-              <span className="text-xs text-fest-charcoalMuted font-medium">
+              <span className="text-xs text-slate-400 font-medium">
                 out of 5 stars
               </span>
             </div>
 
-            <div className="text-xs text-fest-charcoalMuted">
-              • <strong className="text-fest-charcoal">{stats.totalRatings.toLocaleString()}</strong> verified festival ratings
+            <div className="text-xs text-slate-500">
+              • <strong className="text-slate-300 font-semibold">{stats.totalRatings.toLocaleString()}</strong> verified festival ratings
             </div>
           </div>
         )}
 
         {/* In-Place Passport Rating Area */}
         {isFood && (
-          <div className="pt-2 border-t border-fest-parchment">
+          <div className="pt-2 border-t border-white/8">
             {submitMessage && (
-              <div className="mb-3 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+              <div className="mb-3 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
                 <span className="font-semibold">{submitMessage}</span>
               </div>
             )}
 
             {errorMessage && (
-              <div className="mb-3 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
+              <div className="mb-3 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
                 <span className="font-medium">{errorMessage}</span>
               </div>
             )}
 
             {authenticated ? (
-              <div className="p-4 bg-fest-parchment/70 rounded-xl border border-fest-border space-y-2">
+              <div className="p-4 bg-slate-900/60 rounded-xl border border-white/10 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-display font-bold text-fest-charcoal">
+                  <span className="text-xs font-display font-bold text-slate-200">
                     {userRating > 0 ? "Your current score:" : "How was this dish?"}
                   </span>
-                  <span className="text-[11px] font-display font-extrabold text-fest-terracotta">
+                  <span className="text-[11px] font-display font-bold text-amber-400">
                     {remainingQuota} stamps left today
                   </span>
                 </div>
@@ -225,7 +225,7 @@ export default function VendorDetailPage() {
             ) : (
               <Link
                 href={`/vote?vendorId=${vendor.id}`}
-                className="w-full flex items-center justify-center gap-2 h-12 rounded-xl bg-gradient-to-r from-fest-terracotta to-fest-ember hover:opacity-95 active:scale-[0.98] text-white font-display font-extrabold text-sm shadow-ticket transition"
+                className="w-full flex items-center justify-center gap-2 h-12 rounded-xl bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 active-press text-slate-950 font-display font-black text-sm shadow-[0_0_20px_rgba(245,158,11,0.3)] transition"
               >
                 <Ticket className="w-4 h-4" />
                 <span>Rate this stall with your pass</span>
@@ -237,12 +237,12 @@ export default function VendorDetailPage() {
 
       {/* Rating Distribution Breakdown */}
       {isFood && stats.totalRatings > 0 && (
-        <div className="bg-white rounded-2xl p-6 border border-fest-border shadow-card space-y-4">
+        <div className="glass-panel float-card rounded-2xl p-6 border border-white/10 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="font-display font-extrabold text-sm text-fest-charcoal uppercase tracking-wider">
+            <h2 className="font-display font-bold text-xs uppercase tracking-wider text-slate-200">
               Rating Distribution
             </h2>
-            <span className="text-xs text-fest-charcoalMuted">
+            <span className="text-xs text-slate-500">
               {stats.totalRatings} total scores
             </span>
           </div>

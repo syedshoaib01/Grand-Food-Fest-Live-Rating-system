@@ -5,26 +5,26 @@
 @tailwind utilities;
 
 :root {
-  /* Grand Food Fest Warm Culinary Palette */
+  /* Luminous Stadium Glass Palette — Cinematic Mobile Festival Experience */
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-display: 'Outfit', 'Plus Jakarta Sans', sans-serif;
   
-  --background: #FAF7F2;
-  --foreground: #1A1614;
-  --surface: #FFFFFF;
-  --surface-muted: #F7F3EE;
-  --text-primary: #1A1614;
-  --text-secondary: #6E6761;
-  --text-tertiary: #9E948B;
-  --border: #E8DFD5;
-  --border-strong: #D5C7B8;
+  --background: #08090D;
+  --foreground: #F8FAFC;
+  --surface: rgba(16, 20, 30, 0.8);
+  --surface-muted: rgba(24, 30, 44, 0.65);
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-tertiary: #64748B;
+  --border: rgba(255, 255, 255, 0.09);
+  --border-strong: rgba(255, 255, 255, 0.18);
   
-  --accent: #D97706;
-  --accent-soft: #FEF3C7;
-  --accent-orange: #E05326;
-  --accent-dark: #9A3412;
-  --success: #15803D;
-  --error: #DC2626;
+  --accent: #F59E0B;
+  --accent-soft: rgba(245, 158, 11, 0.15);
+  --accent-orange: #FF5722;
+  --accent-dark: #B45309;
+  --success: #10B981;
+  --error: #EF4444;
 
   /* Global Stacking System */
   --z-content: 0;
@@ -38,18 +38,6 @@
   --z-toast: 80;
 }
 
-/* Dark Theme Tokens (Admin & High-Contrast Surfaces) */
-.dark, [data-theme="dark"] {
-  --background: #12100E;
-  --foreground: #F7F3EE;
-  --surface: #1C1815;
-  --surface-muted: #28231F;
-  --text-primary: #F7F3EE;
-  --text-secondary: #A89F95;
-  --text-tertiary: #6E6761;
-  --border: #2E2722;
-}
-
 body {
   color: var(--foreground);
   background-color: var(--background);
@@ -58,8 +46,13 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-family: var(--font-sans);
-  background-image: radial-gradient(#E8DFD5 0.75px, transparent 0.75px);
-  background-size: 24px 24px;
+  background-image: 
+    radial-gradient(circle at 15% 10%, rgba(255, 87, 34, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 85% 20%, rgba(245, 158, 11, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 50% 80%, rgba(217, 119, 6, 0.05) 0%, transparent 50%),
+    radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 32px 32px;
+  background-attachment: fixed;
 }
 
 /* Headings use Display Font */
@@ -176,18 +169,18 @@ h1, h2, h3, .font-display {
 
 /* Custom Clean Scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #D5C7B8;
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #B8A99A;
+  background: rgba(255, 255, 255, 0.24);
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -196,4 +189,91 @@ h1, h2, h3, .font-display {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* ══════════════════════════════════════════════════════════
+   ANTIGRAVITY DESIGN SYSTEM UTILITIES
+   Luminous Stadium Glass • Weightlessness • 120fps Smooth Motion
+   ══════════════════════════════════════════════════════════ */
+
+/* Weightless Floating Card */
+.float-card {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+.float-card:hover {
+  transform: translate3d(0, -3px, 0);
+  box-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.7), 0 0 24px -6px rgba(245, 158, 11, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+/* Glassmorphism Panel — Frosted Obsidian Crystal */
+.glass-panel {
+  background: rgba(14, 18, 28, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+}
+
+/* Gold Luminous Podium Panel */
+.glass-panel-gold {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(14, 18, 28, 0.8) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  box-shadow: 0 16px 40px -10px rgba(245, 158, 11, 0.15), inset 0 1px 0 0 rgba(245, 158, 11, 0.2);
+}
+
+/* Antigravity Pure Arrow Hover & Spring Levitation */
+.antigravity-arrow-hover {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+.antigravity-arrow-hover:hover {
+  transform: translate3d(0, -4px, 0) scale(1.08);
+  filter: drop-shadow(0 0 12px currentColor);
+}
+.antigravity-arrow-hover:active {
+  transform: translate3d(0, 1px, 0) scale(0.94);
+  transition-duration: 0.1s;
+}
+
+/* Fluid Staggered Drop-In Keyframe with GPU acceleration */
+@keyframes antigravity-enter {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-stagger-1 {
+  animation: antigravity-enter 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.04s;
+}
+
+.animate-stagger-2 {
+  animation: antigravity-enter 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.08s;
+}
+
+.animate-stagger-3 {
+  animation: antigravity-enter 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.12s;
+}
+
+/* Global Prefers-Reduced-Motion Guard */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

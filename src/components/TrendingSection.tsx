@@ -38,14 +38,14 @@ export default function TrendingSection() {
     <section className="space-y-3.5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-lg bg-fest-terracottaLight flex items-center justify-center text-fest-terracotta">
-            <Flame className="w-3.5 h-3.5 fill-fest-terracotta" />
+          <div className="w-7 h-7 rounded-xl bg-orange-500/15 border border-orange-500/30 flex items-center justify-center text-orange-400 shadow-xs">
+            <Flame className="w-4 h-4 fill-orange-400" />
           </div>
-          <h2 className="font-display font-black text-base sm:text-lg text-fest-charcoal tracking-tight">
+          <h2 className="font-display font-black text-base sm:text-lg text-white tracking-tight">
             Buzzing Right Now
           </h2>
         </div>
-        <span className="text-[11px] font-medium text-fest-charcoalMuted bg-fest-parchment px-2.5 py-0.5 rounded-full border border-fest-border">
+        <span className="text-[11px] font-medium text-slate-400 bg-white/5 px-2.5 py-0.5 rounded-full border border-white/10">
           Rolling 30-min rush
         </span>
       </div>
@@ -55,44 +55,43 @@ export default function TrendingSection() {
           ? [1, 2, 3, 4].map((i) => (
               <div
                 key={i}
-                className="bg-white p-4 rounded-2xl border border-fest-border animate-pulse space-y-3 h-24"
+                className="glass-panel p-4 rounded-2xl border border-white/10 animate-pulse space-y-3 h-24"
               >
-                <div className="h-4 bg-fest-parchment rounded w-3/4" />
-                <div className="h-3 bg-fest-parchment rounded w-1/2" />
+                <div className="h-4 bg-white/10 rounded w-3/4" />
+                <div className="h-3 bg-white/5 rounded w-1/2" />
               </div>
             ))
           : trending.map((item) => (
               <Link
                 key={item.vendorId}
                 href={`/vendors/${item.slug}`}
-                className="group bg-white p-4 rounded-2xl border border-fest-border hover:border-fest-terracotta/60 shadow-card hover:shadow-warm transition-all duration-200 flex flex-col justify-between active-press"
+                className="glass-panel float-card p-4 rounded-2xl border border-white/10 hover:border-amber-400/40 flex flex-col justify-between active-press group"
               >
                 <div>
                   <div className="flex items-center justify-between gap-1 mb-1.5">
-                    <span className="font-display text-[10px] font-black text-fest-charcoal bg-fest-parchment px-1.5 py-0.5 rounded border border-fest-border">
+                    <span className="font-display text-[10px] font-bold text-slate-300 bg-white/10 px-1.5 py-0.5 rounded border border-white/10">
                       Stall {item.stallNumber}
                     </span>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-fest-charcoalTertiary group-hover:text-fest-terracotta transition-colors" />
+                    <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-400 transition-colors stroke-[1.75]" />
                   </div>
 
-                  <h3 className="font-display font-extrabold text-sm text-fest-charcoal group-hover:text-fest-terracotta transition-colors truncate">
+                  <h3 className="font-display font-extrabold text-sm text-white group-hover:text-amber-400 transition-colors truncate">
                     {item.name}
                   </h3>
 
                   <div className="mt-1 flex items-center gap-1.5">
-                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-fest-terracotta bg-fest-terracottaLight/70 px-2 py-0.5 rounded-md">
-                      <Flame className="w-3 h-3 fill-fest-terracotta text-fest-terracotta" />
+                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-full border border-orange-500/20">
                       +{item.recentRatingCount} tastings
                     </span>
                   </div>
                 </div>
 
-                <div className="mt-3 pt-2.5 border-t border-fest-parchment flex items-center justify-between text-xs">
-                  <span className="text-fest-charcoalMuted text-[11px] truncate font-medium">
+                <div className="mt-3 pt-2.5 border-t border-white/8 flex items-center justify-between text-xs">
+                  <span className="text-slate-400 text-[11px] truncate font-medium">
                     {item.cuisine || item.category}
                   </span>
-                  <div className="flex items-center gap-1 font-display font-bold text-fest-charcoal text-xs">
-                    <Star className="w-3 h-3 fill-fest-turmeric text-fest-saffron" />
+                  <div className="flex items-center gap-1 font-display font-bold text-white text-xs">
+                    <Star className="w-3 h-3 fill-amber-400 text-amber-400 stroke-[1.5]" />
                     <span>{item.recentAverage.toFixed(1)}</span>
                   </div>
                 </div>

@@ -256,22 +256,22 @@ export default function RateStallPage() {
     );
   }
 
-  // Real-time expressive text feedback
+  // Real-time expressive professional feedback
   const getChargeLabel = () => {
     if (chargingDirection === "up") {
-      if (chargePercentage < 20) return "Decent bite 👍";
-      if (chargePercentage < 45) return "Tasty food 😋";
-      if (chargePercentage < 75) return "Very delicious! ✨";
-      if (chargePercentage < 95) return "Outstanding flavor! 🔥";
-      return "Hyderabad Hall of Fame! 🏆";
+      if (chargePercentage < 20) return "Pleasant Flavor";
+      if (chargePercentage < 45) return "Very Flavorful";
+      if (chargePercentage < 75) return "Festival Standout";
+      if (chargePercentage < 95) return "Exceptional Dish";
+      return "Hyderabad Culinary Gold";
     }
     if (chargingDirection === "down") {
-      if (chargePercentage < 25) return "Needs more flavor 🌶️";
-      if (chargePercentage < 55) return "Below expectations 👎";
-      if (chargePercentage < 85) return "Disappointing bite ⚠️";
-      return "Terrible / Avoid ❌";
+      if (chargePercentage < 25) return "Needs Seasoning";
+      if (chargePercentage < 55) return "Below Expectation";
+      if (chargePercentage < 85) return "Major Shortcoming";
+      return "Unsatisfactory";
     }
-    return "Tap arrow to vote, or hold to charge";
+    return "Tap arrow to score, or hold to charge";
   };
 
   return (
@@ -280,30 +280,31 @@ export default function RateStallPage() {
       <div className="flex items-center justify-between">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-xs font-display font-bold text-fest-charcoalMuted hover:text-fest-charcoal transition active-press"
+          className="inline-flex items-center gap-1.5 text-xs font-display font-medium text-slate-400 hover:text-white transition active-press"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4 stroke-[1.75]" />
           <span>Back to Stalls</span>
         </Link>
 
-        <span className="font-display text-[10px] font-black uppercase tracking-wider text-fest-terracotta bg-fest-terracottaLight px-2.5 py-1 rounded-full border border-fest-terracotta/20">
-          Stall #{vendor?.stallNumber}
+        <span className="font-display text-[10px] font-bold uppercase tracking-wider text-slate-300 bg-white/10 px-2.5 py-1 rounded-full border border-white/10">
+          Stall {vendor?.stallNumber}
         </span>
       </div>
 
-      {/* Stall Hero Board */}
-      <div className="ticket-stub p-5 border border-fest-border shadow-card bg-white space-y-2 text-center">
-        <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-fest-saffronDark bg-fest-saffronLight/70 px-2.5 py-0.5 rounded-full border border-fest-saffron/20">
-          <Sparkles className="w-3 h-3 text-fest-saffron" />
+      {/* Stall Hero Board - Antigravity Glassmorphism & Minimalist */}
+      <div className="glass-panel float-card p-6 rounded-3xl space-y-2 text-center border border-white/10 shadow-xl relative overflow-hidden">
+        <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-orange-500 via-amber-400 to-transparent" />
+
+        <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
           <span>{vendor?.cuisine ? `${vendor.cuisine} • ${vendor.category}` : vendor?.category}</span>
         </div>
 
-        <h1 className="text-2xl font-display font-black text-fest-charcoal tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-display font-black text-white tracking-tight">
           {vendor?.name}
         </h1>
 
         {vendor?.description && (
-          <p className="text-xs text-fest-charcoalMuted leading-relaxed line-clamp-2 max-w-sm mx-auto">
+          <p className="text-xs text-slate-400 leading-relaxed line-clamp-2 max-w-sm mx-auto">
             {vendor.description}
           </p>
         )}
@@ -311,86 +312,94 @@ export default function RateStallPage() {
 
       {/* Submission Success View */}
       {isSubmitted && submittedData ? (
-        <div className="ticket-stub p-6 border border-fest-border shadow-warm bg-white text-center space-y-5 animate-in fade-in zoom-in-95 duration-200">
-          <div
-            className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto shadow-xs ${
-              submittedData.direction === "up"
-                ? "bg-emerald-100 text-emerald-800 border-2 border-emerald-300"
-                : "bg-red-100 text-red-800 border-2 border-red-300"
-            }`}
-          >
-            {submittedData.direction === "up" ? (
-              <ThumbsUp className="w-8 h-8 stroke-[2.5]" />
-            ) : (
-              <ThumbsDown className="w-8 h-8 stroke-[2.5]" />
-            )}
-          </div>
-
+        <div className="glass-panel p-6 sm:p-8 rounded-3xl text-center space-y-5 animate-stagger-1 border border-white/12 shadow-2xl">
           <div className="space-y-1">
             <span
-              className={`stamp-badge text-xs ${
+              className={`inline-block text-[11px] font-display font-bold uppercase tracking-wider px-3 py-1 rounded-full ${
                 submittedData.direction === "up"
-                  ? "text-emerald-800 border-emerald-700"
-                  : "text-red-800 border-red-700"
+                  ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                  : "bg-rose-500/15 text-rose-400 border border-rose-500/30"
               }`}
             >
-              {submittedData.direction === "up" ? "POSITIVE RATING RECORDED" : "BAD REVIEW RECORDED"}
+              {submittedData.direction === "up" ? "Positive Rating Recorded" : "Critique Recorded"}
             </span>
 
-            <h2 className="text-4xl font-display font-black text-fest-charcoal pt-2 tabular-nums">
+            <h2 className="text-5xl font-display font-black text-white pt-3 tabular-nums drop-shadow-md">
               {submittedData.direction === "up" ? `+${submittedData.percentage}%` : `-${submittedData.percentage}%`}
             </h2>
 
-            <p className="text-xs font-semibold text-fest-charcoalMuted">
-              Equivalent to {"★".repeat(submittedData.stars)}{"☆".repeat(5 - submittedData.stars)} ({submittedData.stars}/5 stars)
+            <p className="text-xs font-medium text-slate-400">
+              Recorded as <strong className="text-white">{submittedData.stars}</strong> of 5 stars
             </p>
           </div>
 
           <div className="space-y-2 pt-2 max-w-xs mx-auto">
             <Link
               href="/"
-              className="w-full flex items-center justify-center gap-2 h-12 rounded-xl bg-gradient-to-r from-fest-terracotta to-fest-ember text-white font-display font-extrabold text-sm shadow-xs transition active-press"
+              className="w-full flex items-center justify-center gap-2 h-12 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:opacity-95 text-white font-display font-bold text-xs tracking-wide transition active-press shadow-lg shadow-amber-500/10"
             >
               <span>Rate Another Stall</span>
             </Link>
 
             <Link
               href="/leaderboard"
-              className="w-full flex items-center justify-center gap-2 h-11 rounded-xl bg-fest-parchment hover:bg-fest-linen text-fest-charcoal font-display font-bold text-xs transition border border-fest-border"
+              className="w-full flex items-center justify-center gap-2 h-11 rounded-xl bg-white/5 hover:bg-white/10 text-white font-display font-semibold text-xs transition border border-white/10"
             >
-              <Trophy className="w-3.5 h-3.5 text-fest-saffron" />
+              <Trophy className="w-3.5 h-3.5 text-amber-400 stroke-[1.75]" />
               <span>See Live Leaderboard</span>
             </Link>
           </div>
         </div>
       ) : (
-        /* The Two Hold-to-Charge Arrow Controls */
-        <div className="space-y-5">
-          {/* Active Charging Percentage Meter Display (No layout shifts, crisp numbers) */}
+        /* Pure Arrows (No Box Around Them) */
+        <div className="space-y-6 pt-2">
+          {/* Active Charging Percentage Meter Display */}
           <div className="text-center h-14 flex flex-col items-center justify-center">
             {chargingDirection ? (
-              <div>
+              <div className="space-y-0.5">
                 <div
-                  className={`font-display font-black text-4xl tracking-tight leading-none tabular-nums transition-colors ${
-                    chargingDirection === "up" ? "text-emerald-800" : "text-fest-terracotta"
+                  className={`font-display font-black text-4xl tracking-tight leading-none tabular-nums ${
+                    chargingDirection === "up" ? "text-emerald-400 drop-shadow-[0_0_12px_rgba(16,185,129,0.5)]" : "text-rose-400 drop-shadow-[0_0_12px_rgba(244,63,94,0.5)]"
                   }`}
                 >
                   {chargingDirection === "up" ? `+${chargePercentage}%` : `-${chargePercentage}%`}
                 </div>
-                <p className="text-xs font-display font-bold text-fest-charcoal mt-1">
+                <p className="text-[11px] font-display font-semibold text-slate-300">
                   {getChargeLabel()}
                 </p>
               </div>
             ) : (
-              <div className="text-xs font-display font-semibold text-fest-charcoalMuted bg-fest-parchment px-3.5 py-1.5 rounded-full border border-fest-border">
-                {isSubmitting ? "Submitting rating..." : "Tap arrow to vote, or hold to charge"}
-              </div>
+              <span className="text-xs font-display font-medium text-slate-400">
+                {isSubmitting ? "Submitting rating..." : "Hold arrow to charge • Release to submit"}
+              </span>
             )}
           </div>
 
-          {/* Up & Down Arrows Container */}
-          <div className="grid grid-cols-2 gap-4">
-            {/* UPWARD ARROW (POSITIVE RATING) */}
+          {/* SVG Definitions for Dynamic Arrow Fill */}
+          <svg width="0" height="0" className="absolute pointer-events-none" aria-hidden="true">
+            <defs>
+              <clipPath id="upvote-arrow-clip">
+                <rect
+                  x="0"
+                  y={64 - (64 * (chargingDirection === "up" ? chargePercentage : 0)) / 100}
+                  width="64"
+                  height={(64 * (chargingDirection === "up" ? chargePercentage : 0)) / 100}
+                />
+              </clipPath>
+              <clipPath id="downvote-arrow-clip">
+                <rect
+                  x="0"
+                  y="0"
+                  width="64"
+                  height={(64 * (chargingDirection === "down" ? chargePercentage : 0)) / 100}
+                />
+              </clipPath>
+            </defs>
+          </svg>
+
+          {/* Up & Down Arrows (Pure Arrows, No Surrounding Box) */}
+          <div className="grid grid-cols-2 gap-8 max-w-xs mx-auto py-2">
+            {/* UPWARD ARROW (PURE ARROW, NO BOX) */}
             <button
               type="button"
               disabled={isSubmitting}
@@ -398,56 +407,55 @@ export default function RateStallPage() {
               onPointerUp={() => handlePointerUp("up")}
               onPointerLeave={handlePointerCancel}
               onPointerCancel={handlePointerCancel}
-              className={`relative overflow-hidden rounded-3xl h-64 flex flex-col items-center justify-between p-5 border-2 touch-none active:scale-[0.98] transition-colors duration-150 ${
-                chargingDirection === "up"
-                  ? "bg-emerald-600 text-white border-emerald-700 shadow-warm ring-4 ring-emerald-300/50"
-                  : "bg-white text-emerald-800 border-emerald-300 hover:border-emerald-500 shadow-card"
-              }`}
+              aria-label="Upvote food stall"
+              className="flex flex-col items-center justify-center py-4 bg-transparent border-0 outline-none focus:outline-none cursor-pointer touch-none select-none transition-transform active:scale-95 group antigravity-arrow-hover"
             >
-              {/* Internal Dynamic Fill Bar (Smooth GPU-accelerated height, no CSS transition lag) */}
-              {chargingDirection === "up" && (
-                <div
-                  className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-emerald-800 to-emerald-700/90 pointer-events-none"
-                  style={{
-                    height: `${chargePercentage}%`,
-                    willChange: "height",
-                  }}
-                />
-              )}
-
-              {/* Up Indicator Label */}
-              <div className="relative z-10 font-display font-extrabold text-xs uppercase tracking-wider">
-                Upvote
-              </div>
-
-              {/* Central Arrow Graphic (Scales up smoothly with charge) */}
-              <div className="relative z-10 my-auto flex flex-col items-center">
-                <div
-                  className={`w-20 h-20 rounded-full flex items-center justify-center ${
-                    chargingDirection === "up"
-                      ? "bg-white text-emerald-700 shadow-lg"
-                      : "bg-emerald-50 text-emerald-700"
-                  }`}
-                  style={{
-                    transform: chargingDirection === "up" ? `scale(${1 + (chargePercentage / 100) * 0.18})` : "scale(1)",
-                    transition: chargingDirection === "up" ? "none" : "transform 0.15s ease",
-                    willChange: "transform",
-                  }}
+              {/* Pure SVG Arrow Icon */}
+              <div
+                className="relative transition-transform duration-100"
+                style={{
+                  transform: chargingDirection === "up" ? `scale(${1 + (chargePercentage / 100) * 0.14})` : "scale(1)",
+                  filter: chargingDirection === "up" ? "drop-shadow(0 0 20px rgba(16, 185, 129, 0.6))" : undefined,
+                }}
+              >
+                <svg
+                  viewBox="0 0 64 64"
+                  className="w-20 h-24 overflow-visible"
                 >
-                  <ArrowUp className="w-10 h-10 stroke-[3]" />
-                </div>
+                  {/* Unfilled Base Arrow */}
+                  <path
+                    d="M 32 6 L 56 30 H 42 V 58 H 22 V 30 H 8 Z"
+                    fill={chargingDirection === "up" ? "rgba(255, 255, 255, 0.12)" : "rgba(255, 255, 255, 0.05)"}
+                    stroke={chargingDirection === "up" ? "#34D399" : "rgba(255, 255, 255, 0.25)"}
+                    strokeWidth="2.5"
+                    strokeLinejoin="round"
+                    className="transition-colors group-hover:stroke-emerald-400"
+                  />
 
-                <span className="font-display font-black text-sm mt-3 tabular-nums">
-                  {chargingDirection === "up" ? `${chargePercentage}%` : "Delicious"}
-                </span>
+                  {/* Filled Dynamic Layer (Clipped to charge percentage) */}
+                  <path
+                    d="M 32 6 L 56 30 H 42 V 58 H 22 V 30 H 8 Z"
+                    fill="#10B981"
+                    stroke="#34D399"
+                    strokeWidth="2.5"
+                    strokeLinejoin="round"
+                    clipPath="url(#upvote-arrow-clip)"
+                  />
+                </svg>
               </div>
 
-              <div className="relative z-10 text-[10px] font-mono font-medium opacity-80">
-                Hold to Charge
+              {/* Minimalist Label */}
+              <div className="text-center mt-3 space-y-0.5">
+                <span className="block font-display font-extrabold text-xs uppercase tracking-wider text-emerald-400">
+                  Upvote
+                </span>
+                <span className="block text-[11px] font-medium text-slate-400 tabular-nums">
+                  {chargingDirection === "up" ? `+${chargePercentage}%` : "Tasty"}
+                </span>
               </div>
             </button>
 
-            {/* DOWNWARD ARROW (BAD REVIEW) */}
+            {/* DOWNWARD ARROW (PURE ARROW, NO BOX) */}
             <button
               type="button"
               disabled={isSubmitting}
@@ -455,65 +463,59 @@ export default function RateStallPage() {
               onPointerUp={() => handlePointerUp("down")}
               onPointerLeave={handlePointerCancel}
               onPointerCancel={handlePointerCancel}
-              className={`relative overflow-hidden rounded-3xl h-64 flex flex-col items-center justify-between p-5 border-2 touch-none active:scale-[0.98] transition-colors duration-150 ${
-                chargingDirection === "down"
-                  ? "bg-red-600 text-white border-red-700 shadow-warm ring-4 ring-red-300/50"
-                  : "bg-white text-red-800 border-red-200 hover:border-red-400 shadow-card"
-              }`}
+              aria-label="Downvote food stall"
+              className="flex flex-col items-center justify-center py-4 bg-transparent border-0 outline-none focus:outline-none cursor-pointer touch-none select-none transition-transform active:scale-95 group antigravity-arrow-hover"
             >
-              {/* Internal Dynamic Fill Bar (Smooth GPU-accelerated height, no CSS transition lag) */}
-              {chargingDirection === "down" && (
-                <div
-                  className="absolute top-0 left-0 right-0 bg-gradient-to-b from-red-800 to-red-700/90 pointer-events-none"
-                  style={{
-                    height: `${chargePercentage}%`,
-                    willChange: "height",
-                  }}
-                />
-              )}
-
-              {/* Down Indicator Label */}
-              <div className="relative z-10 font-display font-extrabold text-xs uppercase tracking-wider">
-                Bad Review
-              </div>
-
-              {/* Central Arrow Graphic (Scales up smoothly with charge) */}
-              <div className="relative z-10 my-auto flex flex-col items-center">
-                <div
-                  className={`w-20 h-20 rounded-full flex items-center justify-center ${
-                    chargingDirection === "down"
-                      ? "bg-white text-red-700 shadow-lg"
-                      : "bg-red-50 text-red-700"
-                  }`}
-                  style={{
-                    transform: chargingDirection === "down" ? `scale(${1 + (chargePercentage / 100) * 0.18})` : "scale(1)",
-                    transition: chargingDirection === "down" ? "none" : "transform 0.15s ease",
-                    willChange: "transform",
-                  }}
+              {/* Pure SVG Arrow Icon */}
+              <div
+                className="relative transition-transform duration-100"
+                style={{
+                  transform: chargingDirection === "down" ? `scale(${1 + (chargePercentage / 100) * 0.14})` : "scale(1)",
+                  filter: chargingDirection === "down" ? "drop-shadow(0 0 20px rgba(244, 63, 94, 0.6))" : undefined,
+                }}
+              >
+                <svg
+                  viewBox="0 0 64 64"
+                  className="w-20 h-24 overflow-visible"
                 >
-                  <ArrowDown className="w-10 h-10 stroke-[3]" />
-                </div>
+                  {/* Unfilled Base Arrow */}
+                  <path
+                    d="M 32 58 L 8 34 H 22 V 6 H 42 V 34 H 56 Z"
+                    fill={chargingDirection === "down" ? "rgba(255, 255, 255, 0.12)" : "rgba(255, 255, 255, 0.05)"}
+                    stroke={chargingDirection === "down" ? "#FB7185" : "rgba(255, 255, 255, 0.25)"}
+                    strokeWidth="2.5"
+                    strokeLinejoin="round"
+                    className="transition-colors group-hover:stroke-rose-400"
+                  />
 
-                <span className="font-display font-black text-sm mt-3 tabular-nums">
-                  {chargingDirection === "down" ? `${chargePercentage}%` : "Disliked"}
-                </span>
+                  {/* Filled Dynamic Layer (Clipped to charge percentage) */}
+                  <path
+                    d="M 32 58 L 8 34 H 22 V 6 H 42 V 34 H 56 Z"
+                    fill="#F43F5E"
+                    stroke="#FB7185"
+                    strokeWidth="2.5"
+                    strokeLinejoin="round"
+                    clipPath="url(#downvote-arrow-clip)"
+                  />
+                </svg>
               </div>
 
-              <div className="relative z-10 text-[10px] font-mono font-medium opacity-80">
-                Hold to Charge
+              {/* Minimalist Label */}
+              <div className="text-center mt-3 space-y-0.5">
+                <span className="block font-display font-extrabold text-xs uppercase tracking-wider text-rose-400 group-hover:text-rose-300 transition-colors">
+                  Downvote
+                </span>
+                <span className="block text-[11px] font-medium text-slate-400 tabular-nums">
+                  {chargingDirection === "down" ? `-${chargePercentage}%` : "Critique"}
+                </span>
               </div>
             </button>
           </div>
 
-          {/* Guidance Info */}
-          <div className="p-3.5 rounded-2xl bg-fest-parchment/60 border border-fest-border text-center text-xs text-fest-charcoalMuted space-y-1">
-            <p className="font-display font-bold text-fest-charcoal">
-              ⚡ How Arrow Voting Works:
-            </p>
-            <p className="text-[11px] leading-relaxed">
-              Quick tap = 100% instant vote. <strong>Press & hold</strong> = device vibrates as the arrow charges up smoothly from 0% to 100% — release anytime to submit!
-            </p>
-          </div>
+          {/* Minimalist Helper Line */}
+          <p className="text-center text-[11px] text-slate-500">
+            Tap arrow for instant 100% vote • Press and hold to adjust intensity
+          </p>
         </div>
       )}
     </div>

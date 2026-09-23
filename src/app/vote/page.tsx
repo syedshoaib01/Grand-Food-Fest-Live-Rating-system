@@ -238,22 +238,22 @@ function VoteContent() {
 
       {/* Success View */}
       {submissionSuccess ? (
-        <div className="ticket-stub p-6 sm:p-8 border border-fest-border text-center space-y-5 shadow-card">
+        <div className="glass-panel float-card p-6 sm:p-8 rounded-2xl border border-stone-200/90 text-center space-y-5 shadow-sm">
           <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center mx-auto border border-emerald-200 shadow-2xs">
-            <Check className="w-7 h-7 stroke-[3]" />
+            <Check className="w-7 h-7 stroke-[2.5]" />
           </div>
 
           <div className="space-y-1.5">
-            <span className="stamp-badge text-emerald-800 border-emerald-800 text-xs">
-              BALLOT STAMPED & VERIFIED
+            <span className="inline-block text-[11px] font-display font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+              Ratings Recorded & Verified
             </span>
             <h2 className="text-2xl font-display font-black text-fest-charcoal pt-2">
               Tasting Ratings Recorded!
             </h2>
-            <p className="text-xs sm:text-sm text-fest-charcoalMuted max-w-sm mx-auto">
+            <p className="text-xs sm:text-sm text-stone-500 max-w-sm mx-auto">
               Your votes have updated the festival live standings in real-time.
             </p>
-            <p className="text-xs font-display font-extrabold text-fest-terracotta pt-2">
+            <p className="text-xs font-display font-bold text-fest-terracotta pt-2">
               {remainingQuota} of 5 tasting stamps remaining today
             </p>
           </div>
@@ -261,9 +261,9 @@ function VoteContent() {
           <div className="flex flex-col gap-2.5 pt-3 max-w-xs mx-auto">
             <Link
               href="/leaderboard"
-              className="w-full flex items-center justify-center gap-2 h-12 px-4 rounded-xl bg-gradient-to-r from-fest-terracotta to-fest-ember active:scale-[0.98] text-white font-display font-extrabold text-sm shadow-xs transition"
+              className="w-full flex items-center justify-center gap-2 h-11 px-4 rounded-xl bg-fest-charcoal hover:bg-black active:scale-[0.98] text-white font-display font-bold text-xs tracking-wide shadow-xs transition"
             >
-              <Trophy className="w-4 h-4" />
+              <Trophy className="w-3.5 h-3.5 stroke-[1.75]" />
               <span>View Updated Top 10</span>
             </Link>
             <button
@@ -272,7 +272,7 @@ function VoteContent() {
                 setSubmissionSuccess(false);
                 setSelectedVendors([]);
               }}
-              className="w-full h-11 rounded-xl bg-fest-parchment hover:bg-fest-linen active:scale-[0.98] text-fest-charcoal font-display font-bold text-xs transition border border-fest-border"
+              className="w-full h-11 rounded-xl bg-white hover:bg-stone-50 active:scale-[0.98] text-fest-charcoal font-display font-semibold text-xs transition border border-stone-200"
             >
               Rate another stall
             </button>
@@ -280,22 +280,22 @@ function VoteContent() {
         </div>
       ) : !authenticated ? (
         /* Unauthenticated: Physical Wristband Pass Card */
-        <div className="ticket-stub p-6 sm:p-7 border border-fest-border shadow-ticket space-y-5">
-          <div className="flex items-center justify-between pb-3 border-b border-fest-parchment">
+        <div className="glass-panel float-card p-6 sm:p-7 rounded-2xl border border-stone-200/90 shadow-sm space-y-5">
+          <div className="flex items-center justify-between pb-3 border-b border-stone-100">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-fest-terracottaLight flex items-center justify-center text-fest-terracotta">
-                <Ticket className="w-4 h-4" />
+              <div className="w-8 h-8 rounded-lg bg-stone-100 flex items-center justify-center text-stone-700">
+                <Ticket className="w-4 h-4 stroke-[1.75]" />
               </div>
               <div>
-                <h2 className="font-display font-black text-sm text-fest-charcoal">
+                <h2 className="font-display font-bold text-sm text-fest-charcoal">
                   Connect Your Wristband
                 </h2>
-                <p className="text-[11px] text-fest-charcoalMuted">
+                <p className="text-[11px] text-stone-400">
                   Anonymous attendee pass • 100% private
                 </p>
               </div>
             </div>
-            <span className="text-[10px] font-mono font-bold bg-fest-parchment px-2 py-0.5 rounded border border-fest-border text-fest-charcoal">
+            <span className="text-[10px] font-mono font-medium bg-stone-100 px-2 py-0.5 rounded border border-stone-200 text-stone-600">
               VENUE PASS
             </span>
           </div>
@@ -367,13 +367,15 @@ function VoteContent() {
         /* Authenticated: Tasting Passport Experience */
         <div className="space-y-5">
           {/* Physical Tasting Passport Card with 5 Punch Slots */}
-          <div className="ticket-stub p-5 sm:p-6 border border-fest-border shadow-card space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-fest-parchment">
+          <div className="glass-panel float-card p-5 sm:p-6 rounded-3xl border border-white/10 shadow-2xl space-y-4 relative overflow-hidden">
+            <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-500 via-orange-500 to-transparent" />
+
+            <div className="flex items-center justify-between pb-3 border-b border-white/8">
               <div>
-                <span className="text-[10px] font-display font-black uppercase tracking-wider text-fest-terracotta">
+                <span className="text-[10px] font-display font-bold uppercase tracking-wider text-amber-400">
                   OFFICIAL ATTENDEE PASSPORT
                 </span>
-                <h2 className="font-display font-extrabold text-base text-fest-charcoal">
+                <h2 className="font-display font-extrabold text-base text-white">
                   {passToken?.startsWith("ATT-")
                     ? passToken
                     : passToken
@@ -389,7 +391,7 @@ function VoteContent() {
                   setPassInput("");
                   setSelectedVendors([]);
                 }}
-                className="text-xs font-display font-bold text-fest-charcoalMuted hover:text-fest-charcoal px-2.5 py-1 rounded-lg bg-fest-parchment border border-fest-border transition active-press"
+                className="text-xs font-display font-medium text-slate-400 hover:text-white px-3 py-1 rounded-full border border-white/10 hover:bg-white/10 transition active-press"
               >
                 Switch Pass
               </button>
@@ -398,10 +400,10 @@ function VoteContent() {
             {/* 5 Tactile Punch Card Slots */}
             <div>
               <div className="flex items-center justify-between text-xs mb-2">
-                <span className="font-display font-bold text-fest-charcoal">
+                <span className="font-display font-bold text-white">
                   Today's Tasting Stamps
                 </span>
-                <span className="font-display font-extrabold text-fest-terracotta">
+                <span className="font-display font-bold text-amber-400">
                   {ratedCount}/5 Used
                 </span>
               </div>
@@ -415,29 +417,27 @@ function VoteContent() {
                   return (
                     <div
                       key={slotIdx}
-                      className={`h-16 rounded-xl border-2 flex flex-col items-center justify-center p-1 text-center transition-all ${
+                      className={`h-16 rounded-2xl border flex flex-col items-center justify-center p-1 text-center transition-all ${
                         isFilled
-                          ? "bg-fest-saffronLight/70 border-fest-saffron text-fest-saffronDark shadow-2xs"
-                          : "bg-fest-parchment/40 border-dashed border-fest-border text-fest-charcoalTertiary"
+                          ? "bg-amber-500/15 border-amber-400/40 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.25)]"
+                          : "bg-white/5 border-dashed border-white/10 text-slate-500"
                       }`}
                     >
                       {isFilled ? (
                         <>
-                          <Star className="w-4 h-4 fill-fest-turmeric text-fest-saffron" />
-                          <span className="text-[10px] font-display font-black leading-tight mt-0.5 truncate w-full">
+                          <Star className="w-4 h-4 fill-amber-400 text-amber-400 stroke-[1.5]" />
+                          <span className="text-[10px] font-display font-bold leading-tight mt-0.5 truncate w-full text-white">
                             {ratedItem?.rating}★
                           </span>
-                          <span className="text-[8px] font-mono text-fest-charcoalMuted truncate w-full">
-                            {stallNum ? `Stall ${stallNum}` : ratedItem?.vendorName || "Rated"}
+                          <span className="text-[8px] font-mono text-amber-300/80 truncate w-full">
+                            {stallNum ? `Stall ${stallNum}` : "Rated"}
                           </span>
                         </>
                       ) : (
                         <>
-                          <div className="w-5 h-5 rounded-full border border-dashed border-fest-border flex items-center justify-center text-[10px] font-mono">
-                            {slotIdx + 1}
-                          </div>
-                          <span className="text-[9px] font-display font-semibold mt-0.5">
-                            Open
+                          <div className="w-3.5 h-3.5 rounded-full border border-dashed border-slate-600 mb-1" />
+                          <span className="text-[9px] font-display font-medium text-slate-500">
+                            #{slotIdx + 1}
                           </span>
                         </>
                       )}
@@ -449,24 +449,24 @@ function VoteContent() {
           </div>
 
           {submitError && (
-            <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2.5">
-              <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
+            <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-center gap-2.5">
+              <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
               <span className="font-medium">{submitError}</span>
             </div>
           )}
 
           {/* Section: Stalls Selected for Rating */}
           {selectedVendors.length > 0 && (
-            <div className="bg-white p-5 rounded-2xl border border-fest-border shadow-card space-y-4">
-              <div className="flex items-center justify-between pb-2 border-b border-fest-parchment">
-                <h3 className="font-display font-extrabold text-sm text-fest-charcoal flex items-center gap-2">
+            <div className="glass-panel float-card p-5 sm:p-6 rounded-3xl border border-white/10 shadow-xl space-y-4">
+              <div className="flex items-center justify-between pb-2 border-b border-white/8">
+                <h3 className="font-display font-extrabold text-sm text-white flex items-center gap-2">
                   <span>Review Stalls</span>
-                  <span className="px-2 py-0.5 rounded-full bg-fest-parchment text-[11px] font-bold text-fest-terracotta">
+                  <span className="px-2 py-0.5 rounded-full bg-amber-500/15 text-[11px] font-bold text-amber-400 border border-amber-500/20">
                     {selectedVendors.length}
                   </span>
                 </h3>
                 {unratedCount > 0 && (
-                  <span className="text-[11px] font-bold text-fest-terracotta bg-fest-terracottaLight px-2 py-0.5 rounded-md">
+                  <span className="text-[11px] font-bold text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-md border border-orange-500/20">
                     {unratedCount} needs stars
                   </span>
                 )}
@@ -476,25 +476,25 @@ function VoteContent() {
                 {selectedVendors.map((item) => (
                   <div
                     key={item.id}
-                    className="p-4 rounded-xl bg-fest-parchment/60 border border-fest-border space-y-2.5"
+                    className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2.5"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-display font-extrabold text-sm text-fest-charcoal">
+                          <span className="font-display font-extrabold text-sm text-white">
                             {item.name}
                           </span>
-                          <span className="font-display text-[10px] font-black text-fest-charcoal bg-white px-2 py-0.5 rounded border border-fest-border">
+                          <span className="font-display text-[10px] font-bold text-slate-300 bg-white/10 px-2 py-0.5 rounded border border-white/10">
                             Stall {item.stall}
                           </span>
                         </div>
                         {item.category && (
-                          <span className="text-[11px] text-fest-charcoalMuted">
+                          <span className="text-[11px] text-slate-400">
                             {item.category}
                           </span>
                         )}
                         {item.isUpdate && (
-                          <span className="ml-2 text-[10px] font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                          <span className="ml-2 text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
                             Updating today&apos;s score
                           </span>
                         )}
@@ -503,7 +503,7 @@ function VoteContent() {
                       <button
                         type="button"
                         onClick={() => toggleVendor(item)}
-                        className="text-fest-charcoalTertiary hover:text-fest-charcoal p-1 rounded-lg hover:bg-white transition"
+                        className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition"
                         aria-label={`Remove ${item.name}`}
                       >
                         <X className="w-4 h-4" />
@@ -525,31 +525,31 @@ function VoteContent() {
           )}
 
           {/* Section: Stall Search & Picker */}
-          <div className="bg-white p-5 rounded-2xl border border-fest-border shadow-card space-y-4">
+          <div className="glass-panel float-card p-5 sm:p-6 rounded-3xl border border-white/10 shadow-xl space-y-4">
             <div>
-              <h3 className="font-display font-extrabold text-base text-fest-charcoal">
+              <h3 className="font-display font-extrabold text-base text-white">
                 Which Stalls Did You Taste?
               </h3>
-              <p className="text-xs text-fest-charcoalMuted">
+              <p className="text-xs text-slate-400">
                 Search stalls across stadium food zones to add to your ballot.
               </p>
             </div>
 
             {/* Search Input */}
             <div className="relative">
-              <Search className="w-4 h-4 text-fest-charcoalTertiary absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={vendorSearch}
                 onChange={(e) => setVendorSearch(e.target.value)}
                 placeholder="Search by stall name, number (e.g. Spice Route, 042)..."
-                className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-fest-parchment/60 border border-fest-border text-xs text-fest-charcoal placeholder:text-fest-charcoalTertiary focus:outline-hidden focus:ring-2 focus:ring-fest-saffron focus:bg-white transition"
+                className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-white/5 border border-white/10 text-xs text-white placeholder:text-slate-500 focus:outline-hidden focus:border-amber-400/60 focus:bg-white/10 transition"
               />
               {vendorSearch && (
                 <button
                   type="button"
                   onClick={() => setVendorSearch("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-fest-charcoalTertiary hover:text-fest-charcoal p-1"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-1"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -563,10 +563,10 @@ function VoteContent() {
                   key={cat}
                   type="button"
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-3 py-1 rounded-lg text-xs font-display font-bold whitespace-nowrap transition active-press ${
+                  className={`px-3 py-1 rounded-xl text-xs font-display font-bold whitespace-nowrap transition active-press ${
                     selectedCategory === cat
-                      ? "bg-fest-charcoal text-white shadow-2xs"
-                      : "bg-fest-parchment text-fest-charcoalMuted hover:text-fest-charcoal border border-fest-border"
+                      ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-xs"
+                      : "bg-white/5 text-slate-400 hover:text-white border border-white/10"
                   }`}
                 >
                   {cat}
@@ -575,9 +575,9 @@ function VoteContent() {
             </div>
 
             {/* Vendor List */}
-            <div className="max-h-64 overflow-y-auto divide-y divide-fest-parchment border border-fest-border rounded-xl bg-white">
+            <div className="max-h-64 overflow-y-auto divide-y divide-white/5 border border-white/10 rounded-2xl bg-white/5">
               {filteredVendors.length === 0 ? (
-                <div className="p-6 text-center text-xs text-fest-charcoalMuted">
+                <div className="p-6 text-center text-xs text-slate-400">
                   No food stalls found for &quot;{vendorSearch}&quot;
                 </div>
               ) : (
@@ -588,19 +588,19 @@ function VoteContent() {
                     <div
                       key={v.id}
                       className={`p-3 sm:px-4 flex items-center justify-between text-xs transition ${
-                        isSelected ? "bg-fest-saffronLight/40" : "hover:bg-fest-cream/60"
+                        isSelected ? "bg-amber-500/15" : "hover:bg-white/5"
                       }`}
                     >
                       <div className="pr-2 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="font-display font-bold text-fest-charcoal truncate">
+                          <span className="font-display font-bold text-white truncate">
                             {v.name}
                           </span>
-                          <span className="font-display text-[10px] font-black text-fest-charcoal bg-fest-parchment px-1.5 py-0.5 rounded border border-fest-border">
+                          <span className="font-display text-[10px] font-bold text-slate-300 bg-white/10 px-1.5 py-0.5 rounded border border-white/10">
                             Stall {v.stallNumber}
                           </span>
                         </div>
-                        <div className="text-[11px] text-fest-charcoalMuted mt-0.5 truncate">
+                        <div className="text-[11px] text-slate-400 mt-0.5 truncate">
                           {v.cuisine ? `${v.cuisine} • ${v.category}` : v.category}
                         </div>
                       </div>
@@ -610,8 +610,8 @@ function VoteContent() {
                         onClick={() => toggleVendor(v)}
                         className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-display font-bold transition active-press flex items-center gap-1 ${
                           isSelected
-                            ? "bg-fest-charcoal text-white"
-                            : "bg-fest-parchment hover:bg-fest-linen text-fest-charcoal border border-fest-border"
+                            ? "bg-amber-500 text-slate-950 font-black shadow-xs"
+                            : "bg-white/10 hover:bg-white/15 text-white border border-white/10"
                         }`}
                       >
                         {isSelected ? (
@@ -640,7 +640,7 @@ function VoteContent() {
                 type="button"
                 disabled={isSubmitting || !allExplicitlyRated}
                 onClick={handleSubmitRatings}
-                className="w-full h-13 rounded-2xl font-display font-black text-base bg-gradient-to-r from-fest-terracotta to-fest-ember hover:opacity-95 active:scale-[0.98] text-white shadow-ticket transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full h-14 rounded-2xl font-display font-black text-base bg-gradient-to-r from-orange-500 to-amber-500 hover:opacity-95 active:scale-[0.98] text-white shadow-xl shadow-amber-500/15 transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Stamp className="w-5 h-5" />
                 <span>
@@ -652,8 +652,9 @@ function VoteContent() {
                 </span>
               </button>
               {!allExplicitlyRated && (
-                <p className="text-[11px] font-medium text-center text-fest-terracotta mt-2">
-                  ⚠️ Each stall must be explicitly scored 1 to 5 stars before stamping.
+                <p className="text-[11px] font-medium text-center text-orange-400 mt-2 flex items-center justify-center gap-1.5">
+                  <AlertCircle className="w-3.5 h-3.5" />
+                  <span>Each stall must be explicitly scored 1 to 5 stars before submitting.</span>
                 </p>
               )}
             </div>

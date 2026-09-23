@@ -12,11 +12,11 @@ interface StarRatingProps {
 }
 
 const STAR_LABELS: Record<number, string> = {
-  1: "1 • Needs More Spice 🌶️",
-  2: "2 • Decent Bite 🍴",
-  3: "3 • Solid Festival Grub 😋",
-  4: "4 • Truly Delicious! ✨",
-  5: "5 • Hyderabad Hall of Fame! 🏆",
+  1: "1 • Needs Improvement",
+  2: "2 • Fair Tasting",
+  3: "3 • Good Flavor",
+  4: "4 • Very Delicious",
+  5: "5 • Festival Excellence",
 };
 
 export default function StarRating({
@@ -85,10 +85,10 @@ export default function StarRating({
               className={`${buttonSizes[size]} flex items-center justify-center rounded-xl focus:outline-hidden focus-visible:ring-2 focus-visible:ring-fest-saffron transition-all duration-150 hover:scale-110 active:scale-90 touch-manipulation`}
             >
               <Star
-                className={`${starSizes[size]} transition-all duration-150 drop-shadow-xs ${
+                className={`${starSizes[size]} transition-all duration-150 ${
                   isFilled
-                    ? "fill-fest-turmeric text-fest-saffron scale-105"
-                    : "text-fest-border hover:text-fest-turmeric fill-transparent"
+                    ? "fill-amber-400 text-amber-300 drop-shadow-[0_0_8px_rgba(245,158,11,0.5)] scale-105"
+                    : "text-slate-600 hover:text-amber-400/60 fill-transparent"
                 }`}
               />
             </button>
@@ -97,14 +97,14 @@ export default function StarRating({
       </div>
 
       {showLabel && !readOnly && (
-        <div className="min-h-[20px] flex items-center">
+        <div className="min-h-[22px] flex items-center">
           {activeScore > 0 ? (
-            <span className="text-xs font-bold text-fest-terracottaDark bg-fest-terracottaLight/80 px-2 py-0.5 rounded-md border border-fest-terracotta/20 animate-in fade-in zoom-in-95 duration-100">
+            <span className="text-xs font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full animate-in fade-in duration-150">
               {STAR_LABELS[activeScore]}
             </span>
           ) : (
-            <span className="text-xs font-medium text-fest-charcoalTertiary italic">
-              ☆ Tap a star to score (1–5)
+            <span className="text-xs font-medium text-slate-400">
+              Tap stars to rate (1–5)
             </span>
           )}
         </div>

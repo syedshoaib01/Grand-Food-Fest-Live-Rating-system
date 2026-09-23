@@ -133,42 +133,66 @@ export default function HomePage() {
   // 2. If authenticated: Show the Landing Page
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 space-y-6 pb-20">
-      {/* Top Welcome Bar */}
-      <div className="flex items-center justify-between gap-2 pb-3 border-b border-fest-border">
-        <div>
-          <span className="text-[10px] font-display font-black uppercase tracking-wider text-fest-terracotta">
-            Grand Food Fest • Gachibowli
-          </span>
-          <h1 className="text-xl sm:text-2xl font-display font-black text-fest-charcoal">
-            Welcome, {attendeeName || "Foodie"}! 👋
-          </h1>
+      {/* Top Welcome Bar - Luminous Stadium Scoreboard Hero */}
+      <div className="glass-panel p-5 sm:p-6 rounded-3xl border border-white/10 shadow-lg relative overflow-hidden space-y-4">
+        {/* Glow Accent */}
+        <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-amber-500/15 via-orange-500/10 to-transparent blur-2xl pointer-events-none" />
+
+        <div className="flex items-center justify-between gap-3 relative z-10">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#10B981]" />
+              <span className="text-[10px] font-display font-bold uppercase tracking-wider text-amber-400">
+                Live Festival Stadium Feed
+              </span>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-display font-black text-white tracking-tight">
+              Welcome, {attendeeName || "Attendee"}
+            </h1>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => logout()}
+            className="text-xs font-display font-medium text-slate-400 hover:text-white px-3 py-1.5 rounded-full border border-white/10 hover:border-white/20 bg-white/5 transition active-press"
+          >
+            Change Name
+          </button>
         </div>
 
-        <button
-          type="button"
-          onClick={() => logout()}
-          className="text-xs font-display font-bold text-fest-charcoalMuted hover:text-fest-charcoal px-2.5 py-1 rounded-lg bg-fest-parchment border border-fest-border transition active-press"
-        >
-          Change Name
-        </button>
+        {/* Live Stadium Quick Stats Strip */}
+        <div className="grid grid-cols-3 gap-2 pt-2 border-t border-white/8 text-center">
+          <div className="p-2 rounded-xl bg-white/5 border border-white/5">
+            <span className="text-[10px] uppercase font-mono tracking-wider text-slate-400 block">Stalls</span>
+            <span className="text-base font-display font-black text-white">160+</span>
+          </div>
+          <div className="p-2 rounded-xl bg-white/5 border border-white/5">
+            <span className="text-[10px] uppercase font-mono tracking-wider text-slate-400 block">Quota / Day</span>
+            <span className="text-base font-display font-black text-amber-400">5 Stalls</span>
+          </div>
+          <div className="p-2 rounded-xl bg-white/5 border border-white/5">
+            <span className="text-[10px] uppercase font-mono tracking-wider text-slate-400 block">Podium Min</span>
+            <span className="text-base font-display font-black text-orange-400">20 Votes</span>
+          </div>
+        </div>
       </div>
 
       {/* HEADER SEARCH BAR (Always accessible at top) */}
       <div className="space-y-2 sticky top-16 z-20">
-        <div className="relative shadow-card rounded-2xl">
-          <Search className="w-5 h-5 text-fest-charcoalTertiary absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+        <div className="relative rounded-2xl glass-panel shadow-md border border-white/12">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search 160+ food stalls, biryani, kebabs, desserts..."
-            className="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-white border-2 border-fest-border text-sm font-sans text-fest-charcoal placeholder:text-fest-charcoalTertiary focus:outline-hidden focus:border-fest-saffron shadow-xs transition"
+            className="w-full pl-10 pr-9 py-3 rounded-2xl bg-transparent border-0 text-sm font-sans text-white placeholder:text-slate-400 focus:outline-hidden focus:ring-0 transition"
           />
           {searchQuery && (
             <button
               type="button"
               onClick={() => setSearchQuery("")}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-fest-charcoalTertiary hover:text-fest-charcoal p-1"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-1"
             >
               <X className="w-4 h-4" />
             </button>
@@ -177,14 +201,14 @@ export default function HomePage() {
 
         {/* Live Search Results Dropdown/List */}
         {searchQuery.trim() !== "" && (
-          <div className="ticket-stub p-2 border border-fest-border bg-white shadow-warm max-h-80 overflow-y-auto divide-y divide-fest-parchment animate-in fade-in duration-150">
-            <div className="px-3 py-1.5 text-[11px] font-display font-bold text-fest-charcoalMuted flex items-center justify-between">
+          <div className="glass-panel p-2 rounded-2xl max-h-80 overflow-y-auto divide-y divide-white/5 animate-in fade-in duration-150 border border-white/10 shadow-2xl">
+            <div className="px-3 py-1.5 text-[11px] font-display font-semibold text-slate-400 flex items-center justify-between">
               <span>Matching Food Stalls ({searchResults.length})</span>
-              <span>Tap to rate with arrows</span>
+              <span className="text-amber-400/80">Tap to rate</span>
             </div>
 
             {searchResults.length === 0 ? (
-              <div className="p-6 text-center text-xs text-fest-charcoalMuted">
+              <div className="p-6 text-center text-xs text-slate-400">
                 No food stalls found matching &quot;{searchQuery}&quot;
               </div>
             ) : (
@@ -192,25 +216,25 @@ export default function HomePage() {
                 <Link
                   key={stall.id}
                   href={`/rate/${stall.id}`}
-                  className="p-3 rounded-xl flex items-center justify-between hover:bg-fest-cream/70 transition group"
+                  className="p-3 rounded-xl flex items-center justify-between hover:bg-white/5 transition group"
                 >
                   <div className="pr-3 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-display font-extrabold text-sm text-fest-charcoal group-hover:text-fest-terracotta transition-colors truncate">
+                      <span className="font-display font-bold text-sm text-white group-hover:text-amber-400 transition-colors truncate">
                         {stall.name}
                       </span>
-                      <span className="font-display text-[10px] font-black text-fest-charcoal bg-fest-parchment px-1.5 py-0.5 rounded border border-fest-border">
+                      <span className="font-display text-[10px] font-semibold text-slate-300 bg-white/10 px-1.5 py-0.5 rounded border border-white/10">
                         Stall {stall.stallNumber}
                       </span>
                     </div>
-                    <div className="text-[11px] text-fest-charcoalMuted truncate mt-0.5">
+                    <div className="text-[11px] text-slate-400 truncate mt-0.5">
                       {stall.cuisine ? `${stall.cuisine} • ${stall.category}` : stall.category}
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1 text-xs font-display font-bold text-fest-terracotta shrink-0">
+                  <div className="flex items-center gap-1 text-xs font-display font-bold text-amber-400 shrink-0">
                     <span>Rate</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <ArrowRight className="w-3.5 h-3.5 stroke-[1.75]" />
                   </div>
                 </Link>
               ))
@@ -224,76 +248,78 @@ export default function HomePage() {
         <section className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-xl bg-fest-terracottaLight flex items-center justify-center text-fest-terracotta">
-                <Flame className="w-4 h-4 fill-fest-terracotta" />
+              <div className="w-6 h-6 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                <Sparkles className="w-3.5 h-3.5 stroke-[1.75]" />
               </div>
               <div>
-                <h2 className="font-display font-black text-base sm:text-lg text-fest-charcoal">
+                <h2 className="font-display font-bold text-sm sm:text-base text-white">
                   Recently Voted Stalls
                 </h2>
-                <p className="text-[11px] text-fest-charcoalMuted">
-                  Live attendee tasting activity on festival grounds
+                <p className="text-[11px] text-slate-400">
+                  Verified attendee tasting activity on festival grounds
                 </p>
               </div>
             </div>
 
-            <span className="text-[10px] font-mono font-bold text-fest-terracotta bg-fest-terracottaLight px-2 py-0.5 rounded-full border border-fest-terracotta/20">
+            <span className="text-[10px] font-mono font-medium text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
               Live Feed
             </span>
           </div>
 
           <div className="space-y-3">
-            {RECENTLY_VOTED_STALLS.map((stall) => (
+            {RECENTLY_VOTED_STALLS.map((stall, index) => (
               <Link
                 key={stall.id}
                 href={`/rate/${stall.id}`}
-                className="ticket-stub p-4 sm:p-5 border border-fest-border hover:border-fest-saffron/50 shadow-card hover:shadow-warm transition-all duration-200 flex flex-col justify-between group bg-white active-press block"
+                className={`glass-panel float-card p-4 sm:p-5 rounded-2xl border border-white/10 flex flex-col justify-between group active-press block ${
+                  index === 0 ? "animate-stagger-1" : index === 1 ? "animate-stagger-2" : "animate-stagger-3"
+                }`}
               >
                 <div>
                   {/* Stall meta line */}
                   <div className="flex items-center justify-between gap-2 mb-1.5">
                     <div className="flex items-center gap-2">
-                      <span className="font-display text-[10px] font-black text-fest-charcoal bg-fest-parchment px-2 py-0.5 rounded border border-fest-border shadow-2xs">
+                      <span className="font-display text-[10px] font-bold text-slate-300 bg-white/10 px-2 py-0.5 rounded border border-white/10">
                         Stall {stall.stallNumber}
                       </span>
-                      <span className="text-[10px] font-semibold text-fest-terracotta bg-fest-terracottaLight px-2 py-0.5 rounded-full">
+                      <span className="text-[10px] font-medium text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
                         {stall.tag}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-1 text-[11px] font-mono text-fest-charcoalMuted">
-                      <Clock className="w-3 h-3 text-fest-charcoalTertiary" />
+                    <div className="flex items-center gap-1 text-[11px] font-mono text-slate-400">
+                      <Clock className="w-3 h-3 stroke-[1.75]" />
                       <span>{stall.recentTime}</span>
                     </div>
                   </div>
 
                   {/* Stall Name */}
                   <div className="flex items-center justify-between gap-2">
-                    <h3 className="font-display font-black text-base sm:text-lg text-fest-charcoal group-hover:text-fest-terracotta transition-colors">
+                    <h3 className="font-display font-extrabold text-base text-white group-hover:text-amber-400 transition-colors">
                       {stall.name}
                     </h3>
 
-                    <div className="flex items-center gap-1 text-xs font-display font-bold text-fest-saffron">
-                      <Star className="w-3.5 h-3.5 fill-fest-turmeric text-fest-saffron" />
-                      <span>{stall.recentVoteScore}.0★</span>
+                    <div className="flex items-center gap-1 text-xs font-display font-bold text-amber-400">
+                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 stroke-[1.5]" />
+                      <span>{stall.recentVoteScore}.0</span>
                     </div>
                   </div>
 
                   {/* Description */}
-                  <p className="text-xs text-fest-charcoalMuted mt-1 leading-relaxed line-clamp-1">
+                  <p className="text-xs text-slate-400 mt-1 leading-relaxed line-clamp-1">
                     {stall.description}
                   </p>
                 </div>
 
                 {/* Bottom CTA Bar */}
-                <div className="mt-3 pt-2.5 border-t border-fest-parchment flex items-center justify-between text-xs">
-                  <span className="text-[11px] font-semibold text-fest-charcoalTertiary">
+                <div className="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-between text-xs">
+                  <span className="text-[11px] font-medium text-slate-400">
                     {stall.cuisine} • {stall.category}
                   </span>
 
-                  <div className="inline-flex items-center gap-1 font-display font-extrabold text-xs text-fest-terracotta group-hover:translate-x-0.5 transition-transform">
+                  <div className="inline-flex items-center gap-1 font-display font-bold text-xs text-white group-hover:text-amber-400 transition-colors">
                     <span>Rate with Arrows</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <ArrowRight className="w-3.5 h-3.5 stroke-[1.75]" />
                   </div>
                 </div>
               </Link>
@@ -302,38 +328,38 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* Festival Quick Links */}
+      {/* Festival Quick Links - Weightless Minimalist Cards */}
       <div className="grid grid-cols-2 gap-3 pt-2">
         <Link
           href="/leaderboard"
-          className="p-4 rounded-2xl bg-white border border-fest-border hover:border-fest-saffron/40 shadow-card flex items-center justify-between group active-press"
+          className="glass-panel float-card p-4 rounded-2xl border border-white/10 hover:border-white/20 transition flex items-center justify-between group active-press"
         >
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-fest-saffronLight flex items-center justify-center text-fest-saffron">
-              <Trophy className="w-4 h-4 fill-fest-turmeric" />
+            <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+              <Trophy className="w-4 h-4 stroke-[1.75]" />
             </div>
             <div>
-              <div className="font-display font-bold text-xs text-fest-charcoal">Top 10</div>
-              <div className="text-[10px] text-fest-charcoalMuted">Live Leaderboard</div>
+              <div className="font-display font-bold text-xs text-white">Top 10</div>
+              <div className="text-[10px] text-slate-400">Live Leaderboard</div>
             </div>
           </div>
-          <ChevronRight className="w-4 h-4 text-fest-charcoalTertiary group-hover:text-fest-terracotta transition-colors" />
+          <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-amber-400 transition-colors stroke-[1.75]" />
         </Link>
 
         <Link
           href="/vendors"
-          className="p-4 rounded-2xl bg-white border border-fest-border hover:border-fest-saffron/40 shadow-card flex items-center justify-between group active-press"
+          className="glass-panel float-card p-4 rounded-2xl border border-white/10 hover:border-white/20 transition flex items-center justify-between group active-press"
         >
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-fest-parchment flex items-center justify-center text-fest-charcoal">
-              <UtensilsCrossed className="w-4 h-4 text-fest-terracotta" />
+            <div className="w-8 h-8 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400">
+              <UtensilsCrossed className="w-4 h-4 stroke-[1.75]" />
             </div>
             <div>
-              <div className="font-display font-bold text-xs text-fest-charcoal">All Stalls</div>
-              <div className="text-[10px] text-fest-charcoalMuted">160+ Festival Stalls</div>
+              <div className="font-display font-bold text-xs text-white">All Stalls</div>
+              <div className="text-[10px] text-slate-400">160+ Stalls</div>
             </div>
           </div>
-          <ChevronRight className="w-4 h-4 text-fest-charcoalTertiary group-hover:text-fest-terracotta transition-colors" />
+          <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-orange-400 transition-colors stroke-[1.75]" />
         </Link>
       </div>
     </div>
