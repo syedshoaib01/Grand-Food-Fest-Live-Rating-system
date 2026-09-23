@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft,
+  ArrowRight,
   CheckCircle2,
   AlertCircle,
   Ticket,
@@ -224,11 +225,11 @@ export default function VendorDetailPage() {
               </div>
             ) : (
               <Link
-                href={`/vote?vendorId=${vendor.id}`}
-                className="w-full flex items-center justify-center gap-2 h-12 rounded-xl bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 active-press text-slate-950 font-display font-black text-sm shadow-[0_0_20px_rgba(245,158,11,0.3)] transition"
+                href={`/rate/${vendor.id}`}
+                className="w-full flex items-center justify-center gap-2 h-12 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:opacity-95 active-press text-slate-950 font-display font-extrabold text-sm shadow-[0_0_20px_rgba(245,158,11,0.3)] transition"
               >
-                <Ticket className="w-4 h-4" />
-                <span>Rate this stall with your pass</span>
+                <span>Rate this stall</span>
+                <ArrowRight className="w-4 h-4" />
               </Link>
             )}
           </div>

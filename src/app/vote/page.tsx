@@ -40,6 +40,7 @@ function VoteContent() {
     ratedCount,
     ratedVendors,
     loginWithPass,
+    loginWithName,
     logout,
     refreshSession,
   } = useSession();
@@ -93,21 +94,21 @@ function VoteContent() {
     }
   }, [preselectedVendorId, availableVendors, ratedVendors]);
 
-  // Handle Pass Verification
+  // Handle Name / Attendee Login
   const handleVerifyPass = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!passInput.trim()) {
-      setPassError("Please enter your festival pass or wristband code.");
+      setPassError("Please enter your name to continue.");
       return;
     }
     setIsVerifyingPass(true);
     setPassError(null);
 
-    const result = await loginWithPass(passInput.trim());
+    const result = await loginWithName(passInput.trim());
     setIsVerifyingPass(false);
 
     if (!result.success) {
-      setPassError(result.error || "This event pass could not be verified.");
+      setPassError(result.error || "Could not log in. Please try again.");
     }
   };
 
@@ -279,61 +280,61 @@ function VoteContent() {
           </div>
         </div>
       ) : !authenticated ? (
-        /* Unauthenticated: Physical Wristband Pass Card */
-        <div className="glass-panel float-card p-6 sm:p-7 rounded-2xl border border-stone-200/90 shadow-sm space-y-5">
-          <div className="flex items-center justify-between pb-3 border-b border-stone-100">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-stone-100 flex items-center justify-center text-stone-700">
-                <Ticket className="w-4 h-4 stroke-[1.75]" />
+        /* Unauthenticated: Simple Attendee Name Entry */
+        <div className="glass-panel p-6 sm:p-7 rounded-3xl border border-white/10 shadow-xl space-y-5">
+          <div className="flex items-center justify-between pb-3 border-b border-white/8">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                <Utensils className="w-4 h-4 stroke-[1.75]" />
               </div>
               <div>
-                <h2 className="font-display font-bold text-sm text-fest-charcoal">
-                  Connect Your Wristband
+                <h2 className="font-display font-bold text-sm text-white">
+                  Enter Your Name
                 </h2>
-                <p className="text-[11px] text-stone-400">
-                  Anonymous attendee pass • 100% private
+                <p className="text-[11px] text-slate-400">
+                  Quick attendee check-in • No password required
                 </p>
               </div>
             </div>
-            <span className="text-[10px] font-mono font-medium bg-stone-100 px-2 py-0.5 rounded border border-stone-200 text-stone-600">
-              VENUE PASS
+            <span className="text-[10px] font-mono font-medium bg-white/5 px-2.5 py-0.5 rounded-full border border-white/10 text-slate-300">
+              GACHIBOWLI
             </span>
           </div>
 
-          <p className="text-xs text-fest-charcoalMuted leading-relaxed">
-            Enter the 10-character code printed on your festival wristband or digital ticket token to unlock your 5 daily rating stamps.
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Enter your name to unlock your 5 daily tasting stamps and rate stalls across the stadium.
           </p>
 
           {passError && (
-            <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2.5">
-              <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
+            <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs flex items-center gap-2.5">
+              <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
               <span className="font-medium">{passError}</span>
             </div>
           )}
 
           <form onSubmit={handleVerifyPass} className="space-y-3">
             <div>
-              <label htmlFor="passInput" className="block text-[11px] font-display font-bold uppercase tracking-wider text-fest-charcoalMuted mb-1.5">
-                Wristband / Ticket Code
+              <label htmlFor="passInput" className="block text-[11px] font-display font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+                Your Name
               </label>
               <input
                 id="passInput"
                 type="text"
                 value={passInput}
-                onChange={(e) => setPassInput(e.target.value.toUpperCase())}
-                placeholder="e.g. PASS-000001"
-                autoComplete="off"
-                className="w-full px-4 py-3 rounded-xl bg-fest-parchment/70 border border-fest-border text-fest-charcoal font-mono text-sm tracking-wider uppercase placeholder:text-fest-charcoalTertiary focus:outline-hidden focus:ring-2 focus:ring-fest-saffron focus:bg-white transition"
+                onChange={(e) => setPassInput(e.target.value)}
+                placeholder="Enter your name (e.g. Alex, Ruwaiz)..."
+                autoComplete="name"
+                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-sans text-sm placeholder:text-slate-500 focus:outline-hidden focus:border-amber-400/60 focus:bg-white/10 transition"
               />
             </div>
 
             <button
               type="submit"
               disabled={isVerifyingPass}
-              className="w-full h-12 rounded-xl font-display font-extrabold bg-gradient-to-r from-fest-terracotta to-fest-ember hover:opacity-95 active:scale-[0.98] text-white text-sm shadow-xs transition disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full h-12 rounded-xl font-display font-extrabold bg-gradient-to-r from-orange-500 to-amber-500 hover:opacity-95 active:scale-[0.98] text-slate-950 text-sm shadow-md transition disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              <span>{isVerifyingPass ? "Checking Pass..." : "Unlock Tasting Passport"}</span>
-              <ChevronRight className="w-4 h-4" />
+              <span>{isVerifyingPass ? "Entering Food Fest..." : "Start Tasting Passport"}</span>
+              <ChevronRight className="w-4 h-4 text-slate-950 stroke-[2.5]" />
             </button>
           </form>
 

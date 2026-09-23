@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, AlertCircle, Trophy } from "lucide-react";
 import { useSession } from "@/lib/SessionContext";
+import NameLoginForm from "@/components/NameLoginForm";
 
 function getChargeLabelText(direction: "up" | "down", pct: number) {
   if (direction === "up") {
@@ -25,7 +26,7 @@ export default function RateVendorPage() {
   const params = useParams();
   const router = useRouter();
   const stallId = params.id as string;
-  const { refreshSession } = useSession();
+  const { authenticated, refreshSession } = useSession();
 
   const [vendor, setVendor] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -330,8 +331,13 @@ export default function RateVendorPage() {
         )}
       </div>
 
-      {/* Submission Success View */}
-      {isSubmitted && submittedData ? (
+      {/* Attendee Name Login Check */}
+      {!authenticated ? (
+        <div className="pt-2">
+          <NameLoginForm />
+        </div>
+      ) : isSubmitted && submittedData ? (
+        /* Submission Success View */
         <div className="glass-panel p-6 sm:p-8 rounded-3xl text-center space-y-5 animate-stagger-1 border border-white/12 shadow-2xl">
           <div className="space-y-1">
             <span

@@ -41,21 +41,52 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [ratedVendors, setRatedVendors] = useState<RatedVendorInfo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const applySessionData = (data: any, nameFallback?: string) => {
+    setAuthenticated(true);
+    if (data.session) {
+      setPassToken(data.session.passToken);
+      setSessionId(data.session.id);
+      setDayNumber(data.session.dayNumber);
+    }
+    const finalName = data.attendeeName || nameFallback || (typeof window !== "undefined" ? localStorage.getItem("gff_attendee_name") : null);
+    if (finalName) {
+      setAttendeeName(finalName);
+      try {
+        localStorage.setItem("gff_attendee_name", finalName);
+      } catch {}
+    }
+    if (data.limits) {
+      setRemainingQuota(data.limits.remainingQuotaToday);
+      setRatedCount(data.limits.ratedCountToday);
+      setMaxPerDay(data.limits.maxPerDay);
+    }
+    if (data.ratedVendorsToday) {
+      setRatedVendors(data.ratedVendorsToday);
+    }
+  };
+
   const fetchSession = async () => {
     try {
       const res = await fetch("/api/voting/session", { cache: "no-store" });
       const data = await res.json();
       if (data.authenticated && data.session) {
-        setAuthenticated(true);
-        setPassToken(data.session.passToken);
-        setSessionId(data.session.id);
-        setAttendeeName(data.attendeeName || localStorage.getItem("gff_attendee_name") || null);
-        setDayNumber(data.session.dayNumber);
-        setRemainingQuota(data.limits.remainingQuotaToday);
-        setRatedCount(data.limits.ratedCountToday);
-        setMaxPerDay(data.limits.maxPerDay);
-        setRatedVendors(data.ratedVendorsToday || []);
+        applySessionData(data);
       } else {
+        // Auto-restore session from stored attendee name if available on device
+        const savedName = typeof window !== "undefined" ? localStorage.getItem("gff_attendee_name") : null;
+        if (savedName && savedName.trim()) {
+          const autoRes = await fetch("/api/voting/verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: savedName.trim() }),
+          });
+          const autoData = await autoRes.json();
+          if (autoRes.ok && autoData.authenticated && autoData.session) {
+            applySessionData(autoData, savedName.trim());
+            return;
+          }
+        }
+
         setAuthenticated(false);
         setPassToken(null);
         setSessionId(null);
@@ -91,11 +122,9 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       if (!res.ok) {
         return { success: false, error: data.error || "Login failed" };
       }
-      try {
-        localStorage.setItem("gff_attendee_name", trimmed);
-      } catch {}
-      setAttendeeName(trimmed);
-      await fetchSession();
+
+      // Immediately apply session state to React context
+      applySessionData(data, trimmed);
       return { success: true };
     } catch (e: any) {
       return { success: false, error: e.message || "Network error" };
@@ -105,18 +134,23 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   };
 
   const loginWithPass = async (token: string, dayId?: string) => {
+    const trimmed = token.trim();
+    if (!trimmed) {
+      return { success: false, error: "Please enter your name or pass." };
+    }
     try {
       setIsLoading(true);
       const res = await fetch("/api/voting/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ passToken: token, eventDayId: dayId }),
+        body: JSON.stringify({ passToken: trimmed, name: trimmed, eventDayId: dayId }),
       });
       const data = await res.json();
       if (!res.ok) {
         return { success: false, error: data.error || "Verification failed" };
       }
-      await fetchSession();
+
+      applySessionData(data, trimmed);
       return { success: true };
     } catch (e: any) {
       return { success: false, error: e.message || "Network error" };
