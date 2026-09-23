@@ -3,19 +3,25 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import {
-  ArrowLeft,
-  ArrowUp,
-  ArrowDown,
-  Sparkles,
-  Trophy,
-  AlertCircle,
-  ThumbsUp,
-  ThumbsDown,
-} from "lucide-react";
+import { ArrowLeft, AlertCircle, Trophy } from "lucide-react";
 import { useSession } from "@/lib/SessionContext";
 
-export default function RateStallPage() {
+function getChargeLabelText(direction: "up" | "down", pct: number) {
+  if (direction === "up") {
+    if (pct < 20) return "Pleasant Flavor";
+    if (pct < 45) return "Very Flavorful";
+    if (pct < 75) return "Festival Standout";
+    if (pct < 95) return "Exceptional Dish";
+    return "Hyderabad Culinary Gold";
+  } else {
+    if (pct < 25) return "Needs Seasoning";
+    if (pct < 55) return "Below Expectation";
+    if (pct < 85) return "Major Shortcoming";
+    return "Unsatisfactory";
+  }
+}
+
+export default function RateVendorPage() {
   const params = useParams();
   const router = useRouter();
   const stallId = params.id as string;
@@ -25,9 +31,8 @@ export default function RateStallPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Hold-to-Charge state
+  // High-level submission state
   const [chargingDirection, setChargingDirection] = useState<"up" | "down" | null>(null);
-  const [chargePercentage, setChargePercentage] = useState(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submittedData, setSubmittedData] = useState<{
     direction: "up" | "down";
@@ -36,14 +41,21 @@ export default function RateStallPage() {
   } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // References for high-performance timing and vibration loop
+  // Direct DOM references for 60-120 FPS animation with 0 React re-renders during hold
   const holdStartTimeRef = useRef<number | null>(null);
   const animationFrameRef = useRef<number | null>(null);
-  const vibrationIntervalRef = useRef<any>(null);
   const currentPercentageRef = useRef<number>(0);
-  const lastStateUpdateRef = useRef<number>(0);
+  const activeDirectionRef = useRef<"up" | "down" | null>(null);
 
-  // Total duration to charge from 0% to 100%: 3200ms (smooth, controllable pacing)
+  const percentDisplayRef = useRef<HTMLDivElement>(null);
+  const labelDisplayRef = useRef<HTMLParagraphElement>(null);
+  const upArrowClipRectRef = useRef<SVGRectElement>(null);
+  const downArrowClipRectRef = useRef<SVGRectElement>(null);
+  const upArrowIconRef = useRef<HTMLDivElement>(null);
+  const downArrowIconRef = useRef<HTMLDivElement>(null);
+  const upSubTextRef = useRef<HTMLSpanElement>(null);
+  const downSubTextRef = useRef<HTMLSpanElement>(null);
+
   const TOTAL_CHARGE_DURATION_MS = 3200;
 
   // Load Vendor Info
@@ -56,7 +68,6 @@ export default function RateStallPage() {
         if (res.ok && data.vendor) {
           setVendor(data.vendor);
         } else {
-          // Fallback search in vendors list
           const listRes = await fetch("/api/vendors?limit=150");
           const listData = await listRes.json();
           const found = (listData.vendors || []).find(
@@ -77,19 +88,17 @@ export default function RateStallPage() {
     loadVendor();
   }, [stallId]);
 
-  // Clean up vibration and animation on unmount
+  // Clean up animation on unmount
   useEffect(() => {
     return () => {
       if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
-      if (vibrationIntervalRef.current) clearInterval(vibrationIntervalRef.current);
     };
   }, []);
 
-  // Trigger gentle device haptic click
-  const triggerHaptic = useCallback(() => {
+  const triggerHaptic = useCallback((duration = 15) => {
     if (typeof window !== "undefined" && typeof navigator !== "undefined" && navigator.vibrate) {
       try {
-        navigator.vibrate(12);
+        navigator.vibrate(duration);
       } catch {}
     }
   }, []);
@@ -98,13 +107,10 @@ export default function RateStallPage() {
   const submitArrowRating = async (direction: "up" | "down", percentage: number) => {
     if (!vendor) return;
 
-    // Convert percentage to 1-5 scale for backend Bayesian scoring
     let stars = 3;
     if (direction === "up") {
-      // 0% -> 1 star, 100% -> 5 stars
       stars = Math.max(1, Math.min(5, Math.round(1 + (percentage / 100) * 4)));
     } else {
-      // Bad review: 0% down -> 3 stars, 100% down -> 1 star
       stars = Math.max(1, Math.min(3, 3 - Math.round((percentage / 100) * 2)));
     }
 
@@ -136,13 +142,7 @@ export default function RateStallPage() {
         throw new Error(data.error || "Failed to record your vote.");
       }
 
-      // Strong completion vibration
-      if (typeof navigator !== "undefined" && navigator.vibrate) {
-        try {
-          navigator.vibrate([30, 50, 70]);
-        } catch {}
-      }
-
+      triggerHaptic(40);
       setSubmittedData({ direction, percentage, stars });
       setIsSubmitted(true);
       await refreshSession();
@@ -153,87 +153,125 @@ export default function RateStallPage() {
     }
   };
 
-  // Start Charging (PointerDown / TouchStart)
+  // Start Charging (PointerDown / TouchStart) — Zero React re-rendering during hold
   const handlePointerDown = (direction: "up" | "down") => {
     if (isSubmitting || isSubmitted) return;
 
+    activeDirectionRef.current = direction;
     setChargingDirection(direction);
-    setChargePercentage(0);
     currentPercentageRef.current = 0;
     holdStartTimeRef.current = performance.now();
-    lastStateUpdateRef.current = performance.now();
 
-    // Initial haptic feedback
-    triggerHaptic();
-
-    // Gentle rhythmic vibration interval (every 130ms) for smooth tactile sensation
-    if (vibrationIntervalRef.current) clearInterval(vibrationIntervalRef.current);
-    vibrationIntervalRef.current = setInterval(() => {
-      triggerHaptic();
-    }, 130);
+    triggerHaptic(15);
 
     const chargeStep = (now: number) => {
-      if (!holdStartTimeRef.current) return;
+      if (!holdStartTimeRef.current || activeDirectionRef.current !== direction) return;
       const elapsed = now - holdStartTimeRef.current;
       const progress = Math.min(100, Math.round((elapsed / TOTAL_CHARGE_DURATION_MS) * 100));
 
       currentPercentageRef.current = progress;
 
-      // Throttle React state update to at most once every ~24ms to guarantee 60fps smoothness
-      if (now - lastStateUpdateRef.current >= 24 || progress === 100) {
-        setChargePercentage(progress);
-        lastStateUpdateRef.current = now;
+      // Update DOM nodes directly — zero React virtual DOM overhead
+      if (percentDisplayRef.current) {
+        percentDisplayRef.current.textContent = direction === "up" ? `+${progress}%` : `-${progress}%`;
+      }
+      if (labelDisplayRef.current) {
+        labelDisplayRef.current.textContent = getChargeLabelText(direction, progress);
+      }
+
+      if (direction === "up") {
+        if (upArrowClipRectRef.current) {
+          const fillH = (64 * progress) / 100;
+          upArrowClipRectRef.current.setAttribute("y", String(64 - fillH));
+          upArrowClipRectRef.current.setAttribute("height", String(fillH));
+        }
+        if (upArrowIconRef.current) {
+          upArrowIconRef.current.style.transform = `scale(${1 + (progress / 100) * 0.12})`;
+        }
+        if (upSubTextRef.current) {
+          upSubTextRef.current.textContent = `+${progress}%`;
+        }
+      } else {
+        if (downArrowClipRectRef.current) {
+          const fillH = (64 * progress) / 100;
+          downArrowClipRectRef.current.setAttribute("height", String(fillH));
+        }
+        if (downArrowIconRef.current) {
+          downArrowIconRef.current.style.transform = `scale(${1 + (progress / 100) * 0.12})`;
+        }
+        if (downSubTextRef.current) {
+          downSubTextRef.current.textContent = `-${progress}%`;
+        }
       }
 
       if (progress < 100) {
         animationFrameRef.current = requestAnimationFrame(chargeStep);
       } else {
-        // Max charge reached
-        triggerHaptic();
+        triggerHaptic(25);
       }
     };
 
     animationFrameRef.current = requestAnimationFrame(chargeStep);
   };
 
-  // Stop Charging & Release to Submit (PointerUp / TouchEnd)
+  // Stop Charging & Release to Submit
   const handlePointerUp = (direction: "up" | "down") => {
-    if (!chargingDirection || chargingDirection !== direction) return;
+    if (activeDirectionRef.current !== direction) return;
 
     if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
-    if (vibrationIntervalRef.current) clearInterval(vibrationIntervalRef.current);
 
     const holdDuration = holdStartTimeRef.current ? performance.now() - holdStartTimeRef.current : 0;
     const finalPercentage = currentPercentageRef.current;
 
     holdStartTimeRef.current = null;
+    activeDirectionRef.current = null;
     setChargingDirection(null);
-    setChargePercentage(0);
 
-    // If hold was shorter than 220ms, treat as a quick click/tap -> 100%
+    // Reset visual transforms
+    if (upArrowIconRef.current) upArrowIconRef.current.style.transform = "scale(1)";
+    if (downArrowIconRef.current) downArrowIconRef.current.style.transform = "scale(1)";
+    if (upArrowClipRectRef.current) {
+      upArrowClipRectRef.current.setAttribute("y", "64");
+      upArrowClipRectRef.current.setAttribute("height", "0");
+    }
+    if (downArrowClipRectRef.current) {
+      downArrowClipRectRef.current.setAttribute("height", "0");
+    }
+    if (upSubTextRef.current) upSubTextRef.current.textContent = "Tasty";
+    if (downSubTextRef.current) downSubTextRef.current.textContent = "Critique";
+
     if (holdDuration < 220) {
       submitArrowRating(direction, 100);
     } else {
-      // Hold & release: submit at the exact percentage reached!
       const effectivePercentage = Math.max(5, finalPercentage);
       submitArrowRating(direction, effectivePercentage);
     }
   };
 
-  // Cancel hold if pointer leaves or cancels
   const handlePointerCancel = () => {
     if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
-    if (vibrationIntervalRef.current) clearInterval(vibrationIntervalRef.current);
     holdStartTimeRef.current = null;
+    activeDirectionRef.current = null;
     setChargingDirection(null);
-    setChargePercentage(0);
+
+    if (upArrowIconRef.current) upArrowIconRef.current.style.transform = "scale(1)";
+    if (downArrowIconRef.current) downArrowIconRef.current.style.transform = "scale(1)";
+    if (upArrowClipRectRef.current) {
+      upArrowClipRectRef.current.setAttribute("y", "64");
+      upArrowClipRectRef.current.setAttribute("height", "0");
+    }
+    if (downArrowClipRectRef.current) {
+      downArrowClipRectRef.current.setAttribute("height", "0");
+    }
+    if (upSubTextRef.current) upSubTextRef.current.textContent = "Tasty";
+    if (downSubTextRef.current) downSubTextRef.current.textContent = "Critique";
   };
 
   if (isLoading) {
     return (
       <div className="max-w-md mx-auto px-4 py-16 text-center space-y-4">
-        <div className="w-10 h-10 rounded-full border-4 border-fest-terracotta border-t-transparent animate-spin mx-auto" />
-        <p className="font-display font-bold text-fest-charcoal text-xs">
+        <div className="w-8 h-8 rounded-full border-2 border-amber-400 border-t-transparent animate-spin mx-auto" />
+        <p className="font-display font-medium text-slate-400 text-xs">
           Loading food stall...
         </p>
       </div>
@@ -243,36 +281,18 @@ export default function RateStallPage() {
   if (error && !vendor) {
     return (
       <div className="max-w-md mx-auto px-4 py-16 text-center space-y-4">
-        <AlertCircle className="w-10 h-10 text-red-500 mx-auto" />
-        <h2 className="font-display font-black text-lg text-fest-charcoal">{error}</h2>
+        <AlertCircle className="w-10 h-10 text-rose-400 mx-auto" />
+        <h2 className="font-display font-black text-lg text-white">{error}</h2>
         <Link
           href="/"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-fest-terracotta text-white font-display font-bold text-xs"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 text-slate-950 font-display font-bold text-xs"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Back to Landing Page</span>
+          <span>Back to Stalls</span>
         </Link>
       </div>
     );
   }
-
-  // Real-time expressive professional feedback
-  const getChargeLabel = () => {
-    if (chargingDirection === "up") {
-      if (chargePercentage < 20) return "Pleasant Flavor";
-      if (chargePercentage < 45) return "Very Flavorful";
-      if (chargePercentage < 75) return "Festival Standout";
-      if (chargePercentage < 95) return "Exceptional Dish";
-      return "Hyderabad Culinary Gold";
-    }
-    if (chargingDirection === "down") {
-      if (chargePercentage < 25) return "Needs Seasoning";
-      if (chargePercentage < 55) return "Below Expectation";
-      if (chargePercentage < 85) return "Major Shortcoming";
-      return "Unsatisfactory";
-    }
-    return "Tap arrow to score, or hold to charge";
-  };
 
   return (
     <div className="max-w-md mx-auto px-4 py-6 space-y-6 select-none">
@@ -291,8 +311,8 @@ export default function RateStallPage() {
         </span>
       </div>
 
-      {/* Stall Hero Board - Antigravity Glassmorphism & Minimalist */}
-      <div className="glass-panel float-card p-6 rounded-3xl space-y-2 text-center border border-white/10 shadow-xl relative overflow-hidden">
+      {/* Stall Hero Board */}
+      <div className="glass-panel p-6 rounded-3xl space-y-2 text-center border border-white/10 shadow-xl relative overflow-hidden">
         <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-orange-500 via-amber-400 to-transparent" />
 
         <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
@@ -355,20 +375,20 @@ export default function RateStallPage() {
         <div className="space-y-6 pt-2">
           {/* Active Charging Percentage Meter Display */}
           <div className="text-center h-14 flex flex-col items-center justify-center">
-            {chargingDirection ? (
-              <div className="space-y-0.5">
-                <div
-                  className={`font-display font-black text-4xl tracking-tight leading-none tabular-nums ${
-                    chargingDirection === "up" ? "text-emerald-400 drop-shadow-[0_0_12px_rgba(16,185,129,0.5)]" : "text-rose-400 drop-shadow-[0_0_12px_rgba(244,63,94,0.5)]"
-                  }`}
-                >
-                  {chargingDirection === "up" ? `+${chargePercentage}%` : `-${chargePercentage}%`}
-                </div>
-                <p className="text-[11px] font-display font-semibold text-slate-300">
-                  {getChargeLabel()}
-                </p>
+            <div className={chargingDirection ? "space-y-0.5" : "hidden"}>
+              <div
+                ref={percentDisplayRef}
+                className={`font-display font-black text-4xl tracking-tight leading-none tabular-nums ${
+                  chargingDirection === "up" ? "text-emerald-400" : "text-rose-400"
+                }`}
+              >
+                +0%
               </div>
-            ) : (
+              <p ref={labelDisplayRef} className="text-[11px] font-display font-semibold text-slate-300">
+                Charging...
+              </p>
+            </div>
+            {!chargingDirection && (
               <span className="text-xs font-display font-medium text-slate-400">
                 {isSubmitting ? "Submitting rating..." : "Hold arrow to charge • Release to submit"}
               </span>
@@ -379,27 +399,17 @@ export default function RateStallPage() {
           <svg width="0" height="0" className="absolute pointer-events-none" aria-hidden="true">
             <defs>
               <clipPath id="upvote-arrow-clip">
-                <rect
-                  x="0"
-                  y={64 - (64 * (chargingDirection === "up" ? chargePercentage : 0)) / 100}
-                  width="64"
-                  height={(64 * (chargingDirection === "up" ? chargePercentage : 0)) / 100}
-                />
+                <rect ref={upArrowClipRectRef} x="0" y="64" width="64" height="0" />
               </clipPath>
               <clipPath id="downvote-arrow-clip">
-                <rect
-                  x="0"
-                  y="0"
-                  width="64"
-                  height={(64 * (chargingDirection === "down" ? chargePercentage : 0)) / 100}
-                />
+                <rect ref={downArrowClipRectRef} x="0" y="0" width="64" height="0" />
               </clipPath>
             </defs>
           </svg>
 
-          {/* Up & Down Arrows (Pure Arrows, No Surrounding Box) */}
+          {/* Up & Down Arrows (Pure Standalone Arrows, No Box Outline) */}
           <div className="grid grid-cols-2 gap-8 max-w-xs mx-auto py-2">
-            {/* UPWARD ARROW (PURE ARROW, NO BOX) */}
+            {/* UPWARD ARROW (PURE ARROW) */}
             <button
               type="button"
               disabled={isSubmitting}
@@ -410,23 +420,17 @@ export default function RateStallPage() {
               aria-label="Upvote food stall"
               className="flex flex-col items-center justify-center py-4 bg-transparent border-0 outline-none focus:outline-none cursor-pointer touch-none select-none transition-transform active:scale-95 group antigravity-arrow-hover"
             >
-              {/* Pure SVG Arrow Icon */}
               <div
-                className="relative transition-transform duration-100"
-                style={{
-                  transform: chargingDirection === "up" ? `scale(${1 + (chargePercentage / 100) * 0.14})` : "scale(1)",
-                  filter: chargingDirection === "up" ? "drop-shadow(0 0 20px rgba(16, 185, 129, 0.6))" : undefined,
-                }}
+                ref={upArrowIconRef}
+                className="relative transition-transform duration-75"
+                style={{ transform: "scale(1)" }}
               >
-                <svg
-                  viewBox="0 0 64 64"
-                  className="w-20 h-24 overflow-visible"
-                >
-                  {/* Unfilled Base Arrow */}
+                <svg viewBox="0 0 64 64" className="w-20 h-24 overflow-visible">
+                  {/* Base Unfilled Arrow */}
                   <path
                     d="M 32 6 L 56 30 H 42 V 58 H 22 V 30 H 8 Z"
-                    fill={chargingDirection === "up" ? "rgba(255, 255, 255, 0.12)" : "rgba(255, 255, 255, 0.05)"}
-                    stroke={chargingDirection === "up" ? "#34D399" : "rgba(255, 255, 255, 0.25)"}
+                    fill="rgba(255, 255, 255, 0.06)"
+                    stroke="rgba(255, 255, 255, 0.25)"
                     strokeWidth="2.5"
                     strokeLinejoin="round"
                     className="transition-colors group-hover:stroke-emerald-400"
@@ -444,18 +448,17 @@ export default function RateStallPage() {
                 </svg>
               </div>
 
-              {/* Minimalist Label */}
               <div className="text-center mt-3 space-y-0.5">
                 <span className="block font-display font-extrabold text-xs uppercase tracking-wider text-emerald-400">
                   Upvote
                 </span>
-                <span className="block text-[11px] font-medium text-slate-400 tabular-nums">
-                  {chargingDirection === "up" ? `+${chargePercentage}%` : "Tasty"}
+                <span ref={upSubTextRef} className="block text-[11px] font-medium text-slate-400 tabular-nums">
+                  Tasty
                 </span>
               </div>
             </button>
 
-            {/* DOWNWARD ARROW (PURE ARROW, NO BOX) */}
+            {/* DOWNWARD ARROW (PURE ARROW) */}
             <button
               type="button"
               disabled={isSubmitting}
@@ -466,23 +469,17 @@ export default function RateStallPage() {
               aria-label="Downvote food stall"
               className="flex flex-col items-center justify-center py-4 bg-transparent border-0 outline-none focus:outline-none cursor-pointer touch-none select-none transition-transform active:scale-95 group antigravity-arrow-hover"
             >
-              {/* Pure SVG Arrow Icon */}
               <div
-                className="relative transition-transform duration-100"
-                style={{
-                  transform: chargingDirection === "down" ? `scale(${1 + (chargePercentage / 100) * 0.14})` : "scale(1)",
-                  filter: chargingDirection === "down" ? "drop-shadow(0 0 20px rgba(244, 63, 94, 0.6))" : undefined,
-                }}
+                ref={downArrowIconRef}
+                className="relative transition-transform duration-75"
+                style={{ transform: "scale(1)" }}
               >
-                <svg
-                  viewBox="0 0 64 64"
-                  className="w-20 h-24 overflow-visible"
-                >
-                  {/* Unfilled Base Arrow */}
+                <svg viewBox="0 0 64 64" className="w-20 h-24 overflow-visible">
+                  {/* Base Unfilled Arrow */}
                   <path
                     d="M 32 58 L 8 34 H 22 V 6 H 42 V 34 H 56 Z"
-                    fill={chargingDirection === "down" ? "rgba(255, 255, 255, 0.12)" : "rgba(255, 255, 255, 0.05)"}
-                    stroke={chargingDirection === "down" ? "#FB7185" : "rgba(255, 255, 255, 0.25)"}
+                    fill="rgba(255, 255, 255, 0.06)"
+                    stroke="rgba(255, 255, 255, 0.25)"
                     strokeWidth="2.5"
                     strokeLinejoin="round"
                     className="transition-colors group-hover:stroke-rose-400"
@@ -500,19 +497,17 @@ export default function RateStallPage() {
                 </svg>
               </div>
 
-              {/* Minimalist Label */}
               <div className="text-center mt-3 space-y-0.5">
                 <span className="block font-display font-extrabold text-xs uppercase tracking-wider text-rose-400 group-hover:text-rose-300 transition-colors">
                   Downvote
                 </span>
-                <span className="block text-[11px] font-medium text-slate-400 tabular-nums">
-                  {chargingDirection === "down" ? `-${chargePercentage}%` : "Critique"}
+                <span ref={downSubTextRef} className="block text-[11px] font-medium text-slate-400 tabular-nums">
+                  Critique
                 </span>
               </div>
             </button>
           </div>
 
-          {/* Minimalist Helper Line */}
           <p className="text-center text-[11px] text-slate-500">
             Tap arrow for instant 100% vote • Press and hold to adjust intensity
           </p>

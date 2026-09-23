@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import VendorCard from "@/components/VendorCard";
 import { Search, Utensils, ShoppingBag, X, Sparkles } from "lucide-react";
 import { useSession } from "@/lib/SessionContext";
@@ -13,14 +13,15 @@ export default function VendorsPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [vendorType, setVendorType] = useState<"FOOD" | "LIFESTYLE">("FOOD");
   const [isLoading, setIsLoading] = useState(true);
+  const isInitialMount = useRef(true);
 
-  const fetchVendors = async () => {
+  const fetchVendors = async (query = search, cat = selectedCategory, type = vendorType) => {
     setIsLoading(true);
     try {
       const params = new URLSearchParams();
-      if (search) params.set("search", search);
-      if (selectedCategory !== "All") params.set("category", selectedCategory);
-      params.set("type", vendorType);
+      if (query.trim()) params.set("search", query.trim());
+      if (cat !== "All") params.set("category", cat);
+      params.set("type", type);
       params.set("limit", "150");
 
       const res = await fetch(`/api/vendors?${params.toString()}`);
@@ -36,23 +37,31 @@ export default function VendorsPage() {
     }
   };
 
+  // Fetch when category or vendorType changes
   useEffect(() => {
-    fetchVendors();
+    fetchVendors(search, selectedCategory, vendorType);
   }, [selectedCategory, vendorType]);
 
-  // Debounced search
+  // Debounced search (skips on initial mount to avoid duplicate request)
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
     const timer = setTimeout(() => {
-      fetchVendors();
-    }, 300);
+      fetchVendors(search, selectedCategory, vendorType);
+    }, 250);
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Build map of rated scores by attendee
-  const ratedMap = new Map<string, number>();
-  for (const r of ratedVendors) {
-    ratedMap.set(r.vendorId, r.rating);
-  }
+  // Memoize map of rated scores by attendee
+  const ratedMap = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const r of ratedVendors) {
+      map.set(r.vendorId, r.rating);
+    }
+    return map;
+  }, [ratedVendors]);
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-6 overflow-x-hidden w-full">

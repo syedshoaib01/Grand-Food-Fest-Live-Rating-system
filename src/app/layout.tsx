@@ -33,12 +33,8 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className="bg-fest-cream text-fest-charcoal flex flex-col min-h-screen selection:bg-fest-terracotta selection:text-white pb-28 md:pb-10 overflow-x-hidden w-full antialiased">
-        {/* Antigravity Ambient Stadium Lighting Orbs */}
-        <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10 select-none" aria-hidden="true">
-          <div className="absolute -top-40 -left-32 w-[34rem] h-[34rem] rounded-full bg-orange-600/15 blur-[128px] transform-gpu" />
-          <div className="absolute top-1/4 -right-32 w-[32rem] h-[32rem] rounded-full bg-amber-500/12 blur-[128px] transform-gpu" />
-          <div className="absolute bottom-10 left-1/3 w-[36rem] h-[36rem] rounded-full bg-amber-600/10 blur-[140px] transform-gpu" />
-        </div>
+        {/* Hardware-accelerated zero-repaint ambient backdrop */}
+        <div className="ambient-fixed-bg" aria-hidden="true" />
 
         <SessionProvider>
           <DevBar />

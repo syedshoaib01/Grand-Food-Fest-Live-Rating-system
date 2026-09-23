@@ -91,7 +91,7 @@ export default function LeaderboardPage() {
             {allRanked.map((v) => (
               <div
                 key={v.vendorId}
-                className="p-3.5 sm:px-5 flex items-center justify-between hover:bg-white/5 transition-colors group"
+                className="contain-card p-3.5 sm:px-5 flex items-center justify-between hover:bg-white/5 transition-colors group"
               >
                 <div className="flex items-center gap-3 min-w-0 pr-2">
                   <span className="font-display text-xs font-bold text-slate-500 w-7 text-center shrink-0">

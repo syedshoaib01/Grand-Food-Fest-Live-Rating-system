@@ -31,7 +31,7 @@ export default function VendorCard({ vendor, userRatedScore }: VendorCardProps) 
     vendor.category?.toLowerCase().includes("chaat");
 
   return (
-    <div className="glass-panel float-card rounded-3xl p-5 border border-white/10 hover:border-amber-400/30 flex flex-col justify-between group shadow-lg">
+    <div className="contain-card glass-panel float-card rounded-3xl p-5 border border-white/10 hover:border-amber-400/30 flex flex-col justify-between group shadow-lg">
       <div>
         {/* Top Meta Bar: Stall Tag + Cuisine + Dietary Marker */}
         <div className="flex items-center justify-between gap-2 mb-2">

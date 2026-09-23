@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { Star, ArrowUp, ArrowDown, RefreshCw, Crown, ShieldAlert, Sparkles, Medal } from "lucide-react";
 
@@ -21,14 +21,36 @@ export interface LeaderboardItem {
   isEligibleForLeaderboard: boolean;
 }
 
+function CountdownIndicator({ onRefresh }: { onRefresh: () => void }) {
+  const [count, setCount] = useState(20);
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      setCount((prev) => {
+        if (prev <= 1) {
+          onRefresh();
+          return 20;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(t);
+  }, [onRefresh]);
+
+  return (
+    <span className="text-[11px] hidden sm:inline font-mono text-slate-500">
+      updates in {count}s
+    </span>
+  );
+}
+
 export default function LeaderboardTable({ initialData }: { initialData?: LeaderboardItem[] }) {
   const [items, setItems] = useState<LeaderboardItem[]>(initialData || []);
   const [totalVotes, setTotalVotes] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(!initialData);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [countdown, setCountdown] = useState(20);
 
-  const fetchLeaderboard = async (showPulse = false) => {
+  const fetchLeaderboard = useCallback(async (showPulse = false) => {
     if (showPulse) setIsRefreshing(true);
     try {
       const res = await fetch("/api/leaderboard", { cache: "no-store" });
@@ -36,7 +58,6 @@ export default function LeaderboardTable({ initialData }: { initialData?: Leader
       if (res.ok) {
         setItems(data.top10 || []);
         setTotalVotes(data.totalVotesCounted || 0);
-        setCountdown(20);
       }
     } catch (err) {
       console.error("Leaderboard refresh error:", err);
@@ -44,23 +65,11 @@ export default function LeaderboardTable({ initialData }: { initialData?: Leader
       setIsLoading(false);
       setIsRefreshing(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchLeaderboard();
-    const interval = setInterval(() => {
-      fetchLeaderboard();
-    }, 20000);
-
-    const countdownTimer = setInterval(() => {
-      setCountdown((prev) => (prev > 1 ? prev - 1 : 20));
-    }, 1000);
-
-    return () => {
-      clearInterval(interval);
-      clearInterval(countdownTimer);
-    };
-  }, []);
+  }, [fetchLeaderboard]);
 
   const renderTrendBadge = (trendFormatted: string, rankChange: number) => {
     if (trendFormatted === "NEW") {
@@ -121,9 +130,7 @@ export default function LeaderboardTable({ initialData }: { initialData?: Leader
         </div>
 
         <div className="flex items-center gap-2 text-slate-400 text-xs">
-          <span className="text-[11px] hidden sm:inline font-mono text-slate-500">
-            updates in {countdown}s
-          </span>
+          <CountdownIndicator onRefresh={() => fetchLeaderboard(false)} />
           <button
             type="button"
             onClick={() => fetchLeaderboard(true)}

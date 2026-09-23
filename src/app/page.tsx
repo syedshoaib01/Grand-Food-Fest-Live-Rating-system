@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/SessionContext";
@@ -99,19 +99,20 @@ export default function HomePage() {
       .catch(() => {});
   }, []);
 
-  // Filter vendors based on user's search
-  const searchResults = searchQuery.trim()
-    ? allVendors.filter((v) => {
-        const q = searchQuery.toLowerCase().trim();
-        return (
-          v.name.toLowerCase().includes(q) ||
-          v.stallNumber.toLowerCase().includes(q) ||
-          (v.category && v.category.toLowerCase().includes(q)) ||
-          (v.cuisine && v.cuisine.toLowerCase().includes(q)) ||
-          (v.description && v.description.toLowerCase().includes(q))
-        );
-      })
-    : [];
+  // Filter vendors based on user's search (memoized)
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const q = searchQuery.toLowerCase().trim();
+    return allVendors.filter((v) => {
+      return (
+        v.name.toLowerCase().includes(q) ||
+        v.stallNumber.toLowerCase().includes(q) ||
+        (v.category && v.category.toLowerCase().includes(q)) ||
+        (v.cuisine && v.cuisine.toLowerCase().includes(q)) ||
+        (v.description && v.description.toLowerCase().includes(q))
+      );
+    });
+  }, [searchQuery, allVendors]);
 
   // If session is still loading, show a warm festival spinner
   if (isSessionLoading) {

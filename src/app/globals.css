@@ -46,66 +46,28 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-family: var(--font-sans);
+}
+
+/* Fixed hardware-accelerated ambient backdrop (zero-repaint scrolling) */
+.ambient-fixed-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -10;
+  overflow: hidden;
+  background-color: #08090D;
   background-image: 
     radial-gradient(circle at 15% 10%, rgba(255, 87, 34, 0.08) 0%, transparent 45%),
     radial-gradient(circle at 85% 20%, rgba(245, 158, 11, 0.08) 0%, transparent 45%),
     radial-gradient(circle at 50% 80%, rgba(217, 119, 6, 0.05) 0%, transparent 50%),
-    radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+    radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
   background-size: 100% 100%, 100% 100%, 100% 100%, 32px 32px;
-  background-attachment: fixed;
+  transform: translateZ(0);
 }
 
 /* Headings use Display Font */
 h1, h2, h3, .font-display {
   font-family: var(--font-display);
-}
-
-/* Tactile Physical Ticket Stub & Perforation */
-.ticket-stub {
-  position: relative;
-  background: #FFFFFF;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px -2px rgba(224, 83, 38, 0.08), 0 2px 6px -1px rgba(26, 22, 20, 0.04);
-}
-
-.ticket-perforation {
-  position: relative;
-  border-top: 2px dashed #E8DFD5;
-}
-
-.ticket-perforation::before,
-.ticket-perforation::after {
-  content: '';
-  position: absolute;
-  top: -10px;
-  width: 20px;
-  height: 20px;
-  background-color: var(--background);
-  border-radius: 50%;
-}
-
-.ticket-perforation::before {
-  left: -22px;
-}
-
-.ticket-perforation::after {
-  right: -22px;
-}
-
-/* Rubber Stamp Emblem Effect */
-.stamp-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-display);
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border: 1.5px solid currentColor;
-  border-radius: 6px;
-  padding: 2px 6px;
-  transform: rotate(-1.5deg);
-  box-shadow: 0 1px 0 0 currentColor;
 }
 
 /* Indian Dietary Symbols (Veg / Non-Veg) */
@@ -196,49 +158,50 @@ h1, h2, h3, .font-display {
    Luminous Stadium Glass • Weightlessness • 120fps Smooth Motion
    ══════════════════════════════════════════════════════════ */
 
-/* Weightless Floating Card */
+/* Weightless Floating Card (Optimized: No forced global VRAM layers) */
 .float-card {
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
-  will-change: transform;
-  transform: translate3d(0, 0, 0);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
 }
 .float-card:hover {
-  transform: translate3d(0, -3px, 0);
-  box-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.7), 0 0 24px -6px rgba(245, 158, 11, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.6), 0 0 16px -4px rgba(245, 158, 11, 0.08);
   border-color: rgba(255, 255, 255, 0.16);
 }
 
-/* Glassmorphism Panel — Frosted Obsidian Crystal */
+/* Glassmorphism Panel — High-performance frosted obsidian crystal */
 .glass-panel {
-  background: rgba(14, 18, 28, 0.72);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(14, 18, 28, 0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
 }
 
 /* Gold Luminous Podium Panel */
 .glass-panel-gold {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(14, 18, 28, 0.8) 100%);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(14, 18, 28, 0.88) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(245, 158, 11, 0.28);
-  box-shadow: 0 16px 40px -10px rgba(245, 158, 11, 0.15), inset 0 1px 0 0 rgba(245, 158, 11, 0.2);
+  box-shadow: 0 12px 30px -8px rgba(245, 158, 11, 0.15), inset 0 1px 0 0 rgba(245, 158, 11, 0.2);
+}
+
+/* Hardware-accelerated CSS containment for instant 60-120fps scrolling */
+.contain-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 140px;
 }
 
 /* Antigravity Pure Arrow Hover & Spring Levitation */
 .antigravity-arrow-hover {
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
-  will-change: transform;
-  transform: translate3d(0, 0, 0);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .antigravity-arrow-hover:hover {
-  transform: translate3d(0, -4px, 0) scale(1.08);
-  filter: drop-shadow(0 0 12px currentColor);
+  transform: translateY(-3px) scale(1.06);
 }
 .antigravity-arrow-hover:active {
-  transform: translate3d(0, 1px, 0) scale(0.94);
-  transition-duration: 0.1s;
+  transform: translateY(1px) scale(0.95);
+  transition-duration: 0.08s;
 }
 
 /* Fluid Staggered Drop-In Keyframe with GPU acceleration */
