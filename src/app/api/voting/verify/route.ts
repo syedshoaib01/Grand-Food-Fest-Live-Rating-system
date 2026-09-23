@@ -5,12 +5,18 @@ import { signSessionPayload } from "@/lib/auth";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const passToken = body.passToken;
+    const rawName = typeof body.name === "string" ? body.name.trim() : "";
+    let passToken = body.passToken;
     const eventDayId = body.eventDayId;
+
+    if (!passToken && rawName) {
+      const sanitized = rawName.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+      passToken = `NAME-${sanitized.slice(0, 20) || "ATTENDEE"}`;
+    }
 
     if (!passToken || typeof passToken !== "string") {
       return NextResponse.json(
-        { error: "Please provide a valid event pass token (e.g. PASS-000001)." },
+        { error: "Please enter your name or a valid festival pass token." },
         { status: 400 }
       );
     }
@@ -18,17 +24,19 @@ export async function POST(req: NextRequest) {
     const session = await getOrCreateAttendeeSession(passToken, eventDayId);
     const sessionStatus = await getSessionStatus(session.id);
 
-    // Create signed token
+    // Create signed token with attendeeName if provided
     const token = signSessionPayload({
       sessionId: session.id,
       passToken: session.passToken,
+      attendeeName: rawName || undefined,
       eventDayId: session.eventDayId,
       role: "ATTENDEE",
     });
 
     const response = NextResponse.json({
       success: true,
-      message: "Event pass verified successfully.",
+      message: "Session authenticated successfully.",
+      attendeeName: rawName || undefined,
       ...sessionStatus,
     });
 

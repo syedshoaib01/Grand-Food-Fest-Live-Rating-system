@@ -1,112 +1,340 @@
-import React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Trophy, Star, ArrowRight, MapPin } from "lucide-react";
-import LeaderboardTable from "@/components/LeaderboardTable";
-import TrendingSection from "@/components/TrendingSection";
+import { useRouter } from "next/navigation";
+import { useSession } from "@/lib/SessionContext";
+import NameLoginForm from "@/components/NameLoginForm";
+import {
+  Search,
+  X,
+  Sparkles,
+  ArrowRight,
+  Flame,
+  Star,
+  Trophy,
+  UtensilsCrossed,
+  Clock,
+  ChevronRight,
+  CheckCircle2,
+} from "lucide-react";
+
+// 5 Recently Voted Stalls with authentic festival mock data
+const RECENTLY_VOTED_STALLS = [
+  {
+    id: "cmuci1a710009115ecmt1ni6v",
+    name: "Spice Route",
+    slug: "spice-route",
+    stallNumber: "A-01",
+    category: "Biryani & Pulao",
+    cuisine: "Hyderabadi",
+    description: "Slow-dum Zafrani Mutton Biryani steeped in royal Nizami aromatics.",
+    recentTime: "Just now",
+    recentVoteScore: 5,
+    tag: "Trending #1",
+  },
+  {
+    id: "cmuci1aa3000z115etb5pajgs",
+    name: "Charcoal & Clay",
+    slug: "charcoal-clay",
+    stallNumber: "A-14",
+    category: "Kebabs & Tandoor",
+    cuisine: "Mughlai",
+    description: "Melt-in-mouth Kakori skewers and succulent Malai Seekh kebabs.",
+    recentTime: "3m ago",
+    recentVoteScore: 5,
+    tag: "High Velocity",
+  },
+  {
+    id: "cmuci1a7l000d115esqwb2kb6",
+    name: "Shadab Express",
+    slug: "shadab-express",
+    stallNumber: "A-03",
+    category: "Biryani & Pulao",
+    cuisine: "Nizami",
+    description: "Old City heritage dum biryani served with spicy Bagara Baingan.",
+    recentTime: "6m ago",
+    recentVoteScore: 4,
+    tag: "Heritage Favorite",
+  },
+  {
+    id: "cmuci1ae7002d115ezppz7p6w",
+    name: "Old City Kulfi Hub",
+    slug: "old-city-kulfi-hub",
+    stallNumber: "A-39",
+    category: "Desserts & Ice Cream",
+    cuisine: "Hyderabadi",
+    description: "Earthen matka kulfi loaded with dried figs, almonds, and rose falooda.",
+    recentTime: "9m ago",
+    recentVoteScore: 5,
+    tag: "Festival Dessert",
+  },
+  {
+    id: "cmuci1ad30021115ewvx9yrvs",
+    name: "The Dessert Lab",
+    slug: "the-dessert-lab",
+    stallNumber: "A-33",
+    category: "Desserts & Ice Cream",
+    cuisine: "Continental",
+    description: "Artisanal nitro-churned gelato, warm Belgian waffles, and lava pots.",
+    recentTime: "12m ago",
+    recentVoteScore: 4,
+    tag: "Crowd Favorite",
+  },
+];
 
 export default function HomePage() {
+  const router = useRouter();
+  const { authenticated, attendeeName, logout, isLoading: isSessionLoading } = useSession();
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [allVendors, setAllVendors] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
+  // Fetch all vendors for the live search bar
+  useEffect(() => {
+    fetch("/api/vendors?type=FOOD&limit=150")
+      .then((res) => res.json())
+      .then((data) => setAllVendors(data.vendors || []))
+      .catch(() => {});
+  }, []);
+
+  // Filter vendors based on user's search
+  const searchResults = searchQuery.trim()
+    ? allVendors.filter((v) => {
+        const q = searchQuery.toLowerCase().trim();
+        return (
+          v.name.toLowerCase().includes(q) ||
+          v.stallNumber.toLowerCase().includes(q) ||
+          (v.category && v.category.toLowerCase().includes(q)) ||
+          (v.cuisine && v.cuisine.toLowerCase().includes(q)) ||
+          (v.description && v.description.toLowerCase().includes(q))
+        );
+      })
+    : [];
+
+  // If session is still loading, show a warm festival spinner
+  if (isSessionLoading) {
+    return (
+      <div className="max-w-md mx-auto px-4 py-20 text-center space-y-3">
+        <div className="w-10 h-10 rounded-full border-4 border-fest-terracotta border-t-transparent animate-spin mx-auto" />
+        <p className="font-display font-bold text-fest-charcoal text-xs">
+          Loading Grand Food Fest...
+        </p>
+      </div>
+    );
+  }
+
+  // 1. If NOT authenticated: Show the Name Login Screen
+  if (!authenticated) {
+    return <NameLoginForm />;
+  }
+
+  // 2. If authenticated: Show the Landing Page
   return (
-    <div className="space-y-10 sm:space-y-14 pb-16">
-      {/* Calm, Focused First Viewport */}
-      <section className="pt-8 sm:pt-14 pb-4 px-4 sm:px-6 lg:px-8 max-w-2xl mx-auto text-center">
-        {/* Subtle festival location tag */}
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-900 border border-amber-200/60 mb-5">
-          <MapPin className="w-3.5 h-3.5 text-amber-700" />
-          <span>Gachibowli Stadium, Hyderabad • Oct 9–11, 2026</span>
-        </div>
-
-        {/* Clear, focused headline hierarchy */}
-        <div className="space-y-2.5 mb-7">
-          <p className="text-xs font-semibold tracking-wider text-amber-700 uppercase">
-            Grand Food Fest
-          </p>
-          <h1 className="text-3xl sm:text-5xl font-bold text-stone-950 tracking-tight leading-tight">
-            What’s winning right now?
+    <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 space-y-6 pb-20">
+      {/* Top Welcome Bar */}
+      <div className="flex items-center justify-between gap-2 pb-3 border-b border-fest-border">
+        <div>
+          <span className="text-[10px] font-display font-black uppercase tracking-wider text-fest-terracotta">
+            Grand Food Fest • Gachibowli
+          </span>
+          <h1 className="text-xl sm:text-2xl font-display font-black text-fest-charcoal">
+            Welcome, {attendeeName || "Foodie"}! 👋
           </h1>
-          <p className="text-base sm:text-lg text-stone-600 max-w-md mx-auto leading-relaxed">
-            Live food ratings from festival attendees.
-          </p>
         </div>
 
-        {/* Primary CTA (Rate Food) & Secondary CTA (See Top 10) */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 max-w-xs sm:max-w-sm mx-auto">
-          <Link
-            href="/vote"
-            className="flex items-center justify-center gap-2 h-12 px-6 rounded-xl font-semibold text-base bg-amber-600 hover:bg-amber-700 active:scale-[0.98] text-white shadow-xs transition"
-          >
-            <Star className="w-4 h-4 fill-current" />
-            <span>Rate food</span>
-          </Link>
+        <button
+          type="button"
+          onClick={() => logout()}
+          className="text-xs font-display font-bold text-fest-charcoalMuted hover:text-fest-charcoal px-2.5 py-1 rounded-lg bg-fest-parchment border border-fest-border transition active-press"
+        >
+          Change Name
+        </button>
+      </div>
 
-          <Link
-            href="/leaderboard"
-            className="flex items-center justify-center gap-2 h-12 px-6 rounded-xl font-medium text-base bg-white hover:bg-stone-50 active:scale-[0.98] border border-stone-200 text-stone-800 transition"
-          >
-            <Trophy className="w-4 h-4 text-amber-600" />
-            <span>See Top 10</span>
-          </Link>
+      {/* HEADER SEARCH BAR (Always accessible at top) */}
+      <div className="space-y-2 sticky top-16 z-20">
+        <div className="relative shadow-card rounded-2xl">
+          <Search className="w-5 h-5 text-fest-charcoalTertiary absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search 160+ food stalls, biryani, kebabs, desserts..."
+            className="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-white border-2 border-fest-border text-sm font-sans text-fest-charcoal placeholder:text-fest-charcoalTertiary focus:outline-hidden focus:border-fest-saffron shadow-xs transition"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-fest-charcoalTertiary hover:text-fest-charcoal p-1"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
-      </section>
 
-      {/* Main Content Area */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        {/* Trending Section */}
-        <TrendingSection />
-
-        {/* Live Top 10 Leaderboard Component */}
-        <LeaderboardTable />
-
-        {/* Editorial "How it works" Layout */}
-        <section className="pt-6 pb-2 border-t border-stone-200/80">
-          <div className="max-w-xl mx-auto space-y-8">
-            <div className="text-center">
-              <h2 className="text-xl sm:text-2xl font-bold text-stone-950">How it works</h2>
-              <p className="text-sm text-stone-500 mt-1">Simple rating from your phone while walking the stadium</p>
+        {/* Live Search Results Dropdown/List */}
+        {searchQuery.trim() !== "" && (
+          <div className="ticket-stub p-2 border border-fest-border bg-white shadow-warm max-h-80 overflow-y-auto divide-y divide-fest-parchment animate-in fade-in duration-150">
+            <div className="px-3 py-1.5 text-[11px] font-display font-bold text-fest-charcoalMuted flex items-center justify-between">
+              <span>Matching Food Stalls ({searchResults.length})</span>
+              <span>Tap to rate with arrows</span>
             </div>
 
-            <div className="space-y-6">
-              <div className="flex items-start gap-4">
-                <span className="font-mono text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200/70 rounded-md px-2 py-1 shrink-0 mt-0.5">
-                  01
-                </span>
-                <div className="space-y-0.5">
-                  <h3 className="text-base font-semibold text-stone-900">Get your pass</h3>
-                  <p className="text-sm text-stone-500">Use your festival pass or wristband to start. No signup required.</p>
-                </div>
+            {searchResults.length === 0 ? (
+              <div className="p-6 text-center text-xs text-fest-charcoalMuted">
+                No food stalls found matching &quot;{searchQuery}&quot;
               </div>
+            ) : (
+              searchResults.map((stall) => (
+                <Link
+                  key={stall.id}
+                  href={`/rate/${stall.id}`}
+                  className="p-3 rounded-xl flex items-center justify-between hover:bg-fest-cream/70 transition group"
+                >
+                  <div className="pr-3 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="font-display font-extrabold text-sm text-fest-charcoal group-hover:text-fest-terracotta transition-colors truncate">
+                        {stall.name}
+                      </span>
+                      <span className="font-display text-[10px] font-black text-fest-charcoal bg-fest-parchment px-1.5 py-0.5 rounded border border-fest-border">
+                        Stall {stall.stallNumber}
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-fest-charcoalMuted truncate mt-0.5">
+                      {stall.cuisine ? `${stall.cuisine} • ${stall.category}` : stall.category}
+                    </div>
+                  </div>
 
-              <div className="flex items-start gap-4">
-                <span className="font-mono text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200/70 rounded-md px-2 py-1 shrink-0 mt-0.5">
-                  02
-                </span>
-                <div className="space-y-0.5">
-                  <h3 className="text-base font-semibold text-stone-900">Rate what you ate</h3>
-                  <p className="text-sm text-stone-500">Rate up to 5 food stalls you tried today with honest 1–5 stars.</p>
-                </div>
+                  <div className="flex items-center gap-1 text-xs font-display font-bold text-fest-terracotta shrink-0">
+                    <span>Rate</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </div>
+                </Link>
+              ))
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* 4 to 5 RECENTLY VOTED STALLS SECTION */}
+      {searchQuery.trim() === "" && (
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-xl bg-fest-terracottaLight flex items-center justify-center text-fest-terracotta">
+                <Flame className="w-4 h-4 fill-fest-terracotta" />
               </div>
-
-              <div className="flex items-start gap-4">
-                <span className="font-mono text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200/70 rounded-md px-2 py-1 shrink-0 mt-0.5">
-                  03
-                </span>
-                <div className="space-y-0.5">
-                  <h3 className="text-base font-semibold text-stone-900">See what’s winning</h3>
-                  <p className="text-sm text-stone-500">Rankings update throughout the festival as votes roll in.</p>
-                </div>
+              <div>
+                <h2 className="font-display font-black text-base sm:text-lg text-fest-charcoal">
+                  Recently Voted Stalls
+                </h2>
+                <p className="text-[11px] text-fest-charcoalMuted">
+                  Live attendee tasting activity on festival grounds
+                </p>
               </div>
             </div>
 
-            <div className="text-center pt-2">
+            <span className="text-[10px] font-mono font-bold text-fest-terracotta bg-fest-terracottaLight px-2 py-0.5 rounded-full border border-fest-terracotta/20">
+              Live Feed
+            </span>
+          </div>
+
+          <div className="space-y-3">
+            {RECENTLY_VOTED_STALLS.map((stall) => (
               <Link
-                href="/vote"
-                className="inline-flex items-center gap-1.5 text-sm font-semibold text-amber-700 hover:text-amber-800 transition"
+                key={stall.id}
+                href={`/rate/${stall.id}`}
+                className="ticket-stub p-4 sm:p-5 border border-fest-border hover:border-fest-saffron/50 shadow-card hover:shadow-warm transition-all duration-200 flex flex-col justify-between group bg-white active-press block"
               >
-                <span>Start rating</span>
-                <ArrowRight className="w-4 h-4" />
+                <div>
+                  {/* Stall meta line */}
+                  <div className="flex items-center justify-between gap-2 mb-1.5">
+                    <div className="flex items-center gap-2">
+                      <span className="font-display text-[10px] font-black text-fest-charcoal bg-fest-parchment px-2 py-0.5 rounded border border-fest-border shadow-2xs">
+                        Stall {stall.stallNumber}
+                      </span>
+                      <span className="text-[10px] font-semibold text-fest-terracotta bg-fest-terracottaLight px-2 py-0.5 rounded-full">
+                        {stall.tag}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-1 text-[11px] font-mono text-fest-charcoalMuted">
+                      <Clock className="w-3 h-3 text-fest-charcoalTertiary" />
+                      <span>{stall.recentTime}</span>
+                    </div>
+                  </div>
+
+                  {/* Stall Name */}
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="font-display font-black text-base sm:text-lg text-fest-charcoal group-hover:text-fest-terracotta transition-colors">
+                      {stall.name}
+                    </h3>
+
+                    <div className="flex items-center gap-1 text-xs font-display font-bold text-fest-saffron">
+                      <Star className="w-3.5 h-3.5 fill-fest-turmeric text-fest-saffron" />
+                      <span>{stall.recentVoteScore}.0★</span>
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <p className="text-xs text-fest-charcoalMuted mt-1 leading-relaxed line-clamp-1">
+                    {stall.description}
+                  </p>
+                </div>
+
+                {/* Bottom CTA Bar */}
+                <div className="mt-3 pt-2.5 border-t border-fest-parchment flex items-center justify-between text-xs">
+                  <span className="text-[11px] font-semibold text-fest-charcoalTertiary">
+                    {stall.cuisine} • {stall.category}
+                  </span>
+
+                  <div className="inline-flex items-center gap-1 font-display font-extrabold text-xs text-fest-terracotta group-hover:translate-x-0.5 transition-transform">
+                    <span>Rate with Arrows</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </div>
+                </div>
               </Link>
-            </div>
+            ))}
           </div>
         </section>
+      )}
+
+      {/* Festival Quick Links */}
+      <div className="grid grid-cols-2 gap-3 pt-2">
+        <Link
+          href="/leaderboard"
+          className="p-4 rounded-2xl bg-white border border-fest-border hover:border-fest-saffron/40 shadow-card flex items-center justify-between group active-press"
+        >
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-fest-saffronLight flex items-center justify-center text-fest-saffron">
+              <Trophy className="w-4 h-4 fill-fest-turmeric" />
+            </div>
+            <div>
+              <div className="font-display font-bold text-xs text-fest-charcoal">Top 10</div>
+              <div className="text-[10px] text-fest-charcoalMuted">Live Leaderboard</div>
+            </div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-fest-charcoalTertiary group-hover:text-fest-terracotta transition-colors" />
+        </Link>
+
+        <Link
+          href="/vendors"
+          className="p-4 rounded-2xl bg-white border border-fest-border hover:border-fest-saffron/40 shadow-card flex items-center justify-between group active-press"
+        >
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-fest-parchment flex items-center justify-center text-fest-charcoal">
+              <UtensilsCrossed className="w-4 h-4 text-fest-terracotta" />
+            </div>
+            <div>
+              <div className="font-display font-bold text-xs text-fest-charcoal">All Stalls</div>
+              <div className="text-[10px] text-fest-charcoalMuted">160+ Festival Stalls</div>
+            </div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-fest-charcoalTertiary group-hover:text-fest-terracotta transition-colors" />
+        </Link>
       </div>
     </div>
   );

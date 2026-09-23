@@ -28,8 +28,9 @@ export default function BottomNav() {
     },
     {
       href: "/vote",
-      label: "Rate",
+      label: "Rate Food",
       icon: Star,
+      isCenter: true,
       badge: authenticated && remainingQuota > 0 ? remainingQuota : null,
     },
     {
@@ -42,34 +43,59 @@ export default function BottomNav() {
   return (
     <nav
       aria-label="Mobile Navigation"
-      className="md:hidden fixed bottom-0 left-0 right-0 z-bottomNav bg-white/95 backdrop-blur-md border-t border-stone-200/80 shadow-[0_-2px_10px_rgba(0,0,0,0.03)] pb-safe"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-bottomNav bg-[#FAF7F2]/95 backdrop-blur-lg border-t border-fest-border shadow-[0_-4px_20px_rgba(26,22,20,0.06)] pb-safe"
     >
-      <div className="grid grid-cols-4 h-14 max-w-md mx-auto px-2">
+      <div className="grid grid-cols-4 h-16 max-w-md mx-auto px-3 items-center">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
+
+          if (item.isCenter) {
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="flex flex-col items-center justify-center -mt-3 relative active:scale-95 transition-transform"
+              >
+                <div
+                  className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-stamp transition-all ${
+                    isActive
+                      ? "bg-gradient-to-tr from-fest-terracotta to-fest-ember text-white ring-4 ring-fest-cream scale-105"
+                      : "bg-gradient-to-tr from-fest-terracotta to-fest-turmeric text-white ring-2 ring-fest-cream"
+                  }`}
+                >
+                  <Icon className="w-5 h-5 fill-white/30 stroke-[2.25]" />
+                  {item.badge !== null && item.badge !== undefined && (
+                    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-fest-charcoal text-white font-display font-extrabold text-[10px] rounded-full flex items-center justify-center leading-none border-2 border-fest-cream shadow-xs">
+                      {item.badge}
+                    </span>
+                  )}
+                </div>
+                <span className={`text-[10px] tracking-tight mt-1 font-display font-bold ${
+                  isActive ? "text-fest-terracotta" : "text-fest-charcoal"
+                }`}>
+                  {item.label}
+                </span>
+              </Link>
+            );
+          }
 
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center justify-center py-1 transition-colors active:scale-95 relative ${
-                isActive ? "text-amber-700 font-semibold" : "text-stone-400 hover:text-stone-700"
+              className={`flex flex-col items-center justify-center py-1.5 transition-all active:scale-90 ${
+                isActive ? "text-fest-terracotta font-bold" : "text-fest-charcoalMuted hover:text-fest-charcoal"
               }`}
             >
               <div className="relative">
                 <Icon
                   className={`w-5 h-5 transition-transform ${
-                    isActive ? "text-amber-600 scale-105 stroke-[2.25]" : "text-stone-400 stroke-[1.75]"
+                    isActive ? "text-fest-terracotta scale-110 stroke-[2.5]" : "text-fest-charcoalTertiary stroke-[1.75]"
                   }`}
                 />
-                {item.badge !== null && item.badge !== undefined && (
-                  <span className="absolute -top-1 -right-2 min-w-[15px] h-[15px] px-1 bg-amber-600 text-white font-bold text-[9px] rounded-full flex items-center justify-center leading-none shadow-xs">
-                    {item.badge}
-                  </span>
-                )}
               </div>
-              <span className={`text-[10px] tracking-tight mt-1 ${isActive ? "text-stone-900 font-semibold" : "text-stone-500 font-medium"}`}>
+              <span className={`text-[10px] tracking-tight mt-1 font-display ${isActive ? "font-bold text-fest-charcoal" : "font-medium"}`}>
                 {item.label}
               </span>
             </Link>

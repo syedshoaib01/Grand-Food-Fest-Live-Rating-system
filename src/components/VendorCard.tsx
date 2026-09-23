@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Star, MapPin } from "lucide-react";
 
 export interface VendorCardProps {
   vendor: {
@@ -24,52 +24,89 @@ export interface VendorCardProps {
 
 export default function VendorCard({ vendor, userRatedScore }: VendorCardProps) {
   const isFood = vendor.vendorType === "FOOD";
+  const isVegCategory =
+    vendor.category?.toLowerCase().includes("dessert") ||
+    vendor.category?.toLowerCase().includes("ice cream") ||
+    vendor.category?.toLowerCase().includes("beverage") ||
+    vendor.category?.toLowerCase().includes("chaat");
 
   return (
-    <div className="bg-white p-4 rounded-xl border border-stone-200/70 hover:border-stone-300 shadow-2xs hover:shadow-xs transition flex flex-col justify-between">
+    <div className="bg-white rounded-2xl p-4 sm:p-5 border border-fest-border hover:border-fest-saffron/50 shadow-card hover:shadow-warm transition-all duration-200 flex flex-col justify-between group">
       <div>
-        {/* Stall Number & Cuisine */}
-        <div className="flex items-center justify-between gap-2 mb-1.5">
-          <span className="font-mono text-[10px] font-bold text-stone-500 bg-stone-100 px-1.5 py-0.5 rounded">
-            {vendor.stallNumber}
-          </span>
-          <span className="text-[11px] text-stone-400 font-medium truncate">
-            {vendor.cuisine || vendor.category}
+        {/* Top Meta Bar: Stall Tag + Cuisine + Dietary Marker */}
+        <div className="flex items-center justify-between gap-2 mb-2">
+          <div className="flex items-center gap-1.5">
+            <span className="font-display text-[11px] font-black text-fest-charcoal bg-fest-parchment px-2 py-0.5 rounded-md border border-fest-border shadow-2xs">
+              Stall {vendor.stallNumber}
+            </span>
+            {isFood && (
+              <span
+                className={isVegCategory ? "dot-veg" : "dot-nonveg"}
+                title={isVegCategory ? "Vegetarian / Dessert friendly" : "Non-Veg / Meat available"}
+              />
+            )}
+          </div>
+
+          <span className="text-[11px] font-semibold text-fest-saffronDark bg-fest-saffronLight/60 px-2 py-0.5 rounded-full border border-fest-saffron/20 truncate max-w-[150px]">
+            {vendor.cuisine ? `${vendor.cuisine} • ${vendor.category}` : vendor.category}
           </span>
         </div>
 
         {/* Vendor Name */}
-        <Link href={`/vendors/${vendor.slug}`} className="group block">
-          <h3 className="font-bold text-base text-stone-950 group-hover:text-amber-700 transition line-clamp-1">
+        <Link href={`/vendors/${vendor.slug}`} className="block">
+          <h3 className="font-display font-extrabold text-base sm:text-lg text-fest-charcoal group-hover:text-fest-terracotta transition-colors line-clamp-1">
             {vendor.name}
           </h3>
         </Link>
+
+        {/* Mouthwatering Stall Description */}
+        {vendor.description && (
+          <p className="text-xs text-fest-charcoalMuted mt-1.5 line-clamp-2 leading-relaxed font-sans">
+            {vendor.description}
+          </p>
+        )}
       </div>
 
-      {/* Rating line & Action */}
-      <div className="mt-3 pt-2.5 border-t border-stone-100 flex items-center justify-between">
+      {/* Bottom Rating Line & Action */}
+      <div className="mt-4 pt-3 border-t border-fest-parchment flex items-center justify-between gap-2">
         {isFood ? (
           <div>
-            <div className="text-xs text-stone-600 font-medium">
-              ⭐ {vendor.ratingCount > 0 ? vendor.ratingAverage.toFixed(2) : "New"} · {vendor.ratingCount} ratings
+            <div className="flex items-center gap-1.5 text-xs text-fest-charcoal font-semibold">
+              <div className="flex items-center gap-0.5 text-fest-saffron">
+                <Star className="w-3.5 h-3.5 fill-fest-turmeric text-fest-saffron" />
+                <span className="font-display font-bold">
+                  {vendor.ratingCount > 0 ? vendor.ratingAverage.toFixed(2) : "New Stall"}
+                </span>
+              </div>
+              <span className="text-fest-charcoalTertiary">•</span>
+              <span className="text-fest-charcoalMuted text-[11px]">
+                {vendor.ratingCount} {vendor.ratingCount === 1 ? "tasting" : "tastings"}
+              </span>
             </div>
+
             {userRatedScore && (
-              <span className="text-[10px] text-emerald-700 font-semibold block mt-0.5">
-                Your rating: {userRatedScore}★
+              <span className="inline-flex items-center gap-1 text-[10px] text-emerald-800 bg-emerald-50 font-bold px-1.5 py-0.5 rounded-md border border-emerald-200 mt-1">
+                ✓ Your score: {userRatedScore}★
               </span>
             )}
           </div>
         ) : (
-          <span className="text-xs text-stone-400 font-medium">Lifestyle showcase</span>
+          <span className="text-xs text-fest-charcoalTertiary font-medium">
+            Lifestyle pavilion
+          </span>
         )}
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center shrink-0">
           {isFood && (
             <Link
-              href={`/vote?vendorId=${vendor.id}`}
-              className="text-xs font-semibold text-amber-700 hover:text-amber-800 transition flex items-center gap-0.5"
+              href={`/rate/${vendor.id}`}
+              className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-display font-bold transition active-press ${
+                userRatedScore
+                  ? "bg-fest-parchment hover:bg-fest-linen text-fest-charcoal border border-fest-border"
+                  : "bg-gradient-to-r from-fest-terracotta to-fest-ember text-white shadow-xs hover:opacity-95"
+              }`}
             >
-              <span>{userRatedScore ? "Re-rate" : "Rate"}</span>
+              <span>{userRatedScore ? "Update" : "Rate"}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           )}

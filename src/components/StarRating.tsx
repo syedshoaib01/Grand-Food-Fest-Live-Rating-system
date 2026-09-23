@@ -12,11 +12,11 @@ interface StarRatingProps {
 }
 
 const STAR_LABELS: Record<number, string> = {
-  1: "1 • Poor",
-  2: "2 • Fair",
-  3: "3 • Good",
-  4: "4 • Very Good",
-  5: "5 • Excellent!",
+  1: "1 • Needs More Spice 🌶️",
+  2: "2 • Decent Bite 🍴",
+  3: "3 • Solid Festival Grub 😋",
+  4: "4 • Truly Delicious! ✨",
+  5: "5 • Hyderabad Hall of Fame! 🏆",
 };
 
 export default function StarRating({
@@ -47,7 +47,7 @@ export default function StarRating({
   return (
     <div className="flex flex-col items-start gap-1">
       <div
-        className="inline-flex items-center gap-0.5 sm:gap-1"
+        className="inline-flex items-center gap-1 sm:gap-1.5"
         role={readOnly ? "img" : "radiogroup"}
         aria-label={
           readOnly
@@ -62,8 +62,10 @@ export default function StarRating({
             return (
               <span key={star} className="p-0.5">
                 <Star
-                  className={`${starSizes[size]} ${
-                    isFilled ? "fill-amber-400 text-amber-500" : "text-stone-300 fill-transparent"
+                  className={`${starSizes[size]} transition-transform ${
+                    isFilled
+                      ? "fill-fest-turmeric text-fest-saffron"
+                      : "text-fest-border fill-transparent"
                   }`}
                 />
               </span>
@@ -80,13 +82,13 @@ export default function StarRating({
               onClick={() => onChange && onChange(star)}
               onMouseEnter={() => setHoverRating(star)}
               onMouseLeave={() => setHoverRating(null)}
-              className={`${buttonSizes[size]} flex items-center justify-center rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 transition active:scale-90`}
+              className={`${buttonSizes[size]} flex items-center justify-center rounded-xl focus:outline-hidden focus-visible:ring-2 focus-visible:ring-fest-saffron transition-all duration-150 hover:scale-110 active:scale-90 touch-manipulation`}
             >
               <Star
-                className={`${starSizes[size]} transition-colors duration-150 ${
+                className={`${starSizes[size]} transition-all duration-150 drop-shadow-xs ${
                   isFilled
-                    ? "fill-amber-400 text-amber-500"
-                    : "text-stone-300 hover:text-amber-400"
+                    ? "fill-fest-turmeric text-fest-saffron scale-105"
+                    : "text-fest-border hover:text-fest-turmeric fill-transparent"
                 }`}
               />
             </button>
@@ -95,13 +97,17 @@ export default function StarRating({
       </div>
 
       {showLabel && !readOnly && (
-        <span className="text-xs font-semibold text-stone-600 min-h-[16px]">
+        <div className="min-h-[20px] flex items-center">
           {activeScore > 0 ? (
-            <span className="text-amber-800 font-bold">{STAR_LABELS[activeScore]}</span>
+            <span className="text-xs font-bold text-fest-terracottaDark bg-fest-terracottaLight/80 px-2 py-0.5 rounded-md border border-fest-terracotta/20 animate-in fade-in zoom-in-95 duration-100">
+              {STAR_LABELS[activeScore]}
+            </span>
           ) : (
-            <span className="text-stone-400 italic">No rating selected</span>
+            <span className="text-xs font-medium text-fest-charcoalTertiary italic">
+              ☆ Tap a star to score (1–5)
+            </span>
           )}
-        </span>
+        </div>
       )}
     </div>
   );
