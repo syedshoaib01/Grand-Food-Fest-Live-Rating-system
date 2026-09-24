@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import prisma from "@/lib/prisma";
 import { getLiveLeaderboard } from "@/lib/ranking-engine";
 import { checkRateLimit, resetRateLimitStore } from "@/lib/rate-limiter";
@@ -10,14 +10,48 @@ describe("PostgreSQL Integration & Production Hardening", () => {
   let foodVendor: any;
 
   beforeAll(async () => {
-    event = await prisma.event.findFirst({
-      where: { status: "LIVE" },
-      include: { days: true },
+    event = await prisma.event.create({
+      data: {
+        name: "PG Integration Test Fest",
+        slug: `pg-fest-${Date.now()}`,
+        startDate: new Date(),
+        endDate: new Date(),
+        status: "LIVE",
+        ratingLimitPerAttendeePerDay: 5,
+        minimumRatingsForLeaderboard: 5,
+      },
     });
-    liveDay = event?.days.find((d: any) => d.status === "LIVE") || event?.days[0];
-    foodVendor = await prisma.vendor.findFirst({
-      where: { eventId: event.id, vendorType: "FOOD", status: "ACTIVE" },
+
+    liveDay = await prisma.eventDay.create({
+      data: {
+        eventId: event.id,
+        dayNumber: 1,
+        date: new Date(),
+        status: "LIVE",
+      },
     });
+
+    foodVendor = await prisma.vendor.create({
+      data: {
+        eventId: event.id,
+        name: "PG Test Food Vendor",
+        slug: `pg-vendor-${Date.now()}`,
+        category: "Biryani",
+        stallNumber: "PG-01",
+        vendorType: "FOOD",
+        status: "ACTIVE",
+      },
+    });
+  });
+
+  afterAll(async () => {
+    if (event) {
+      await prisma.rating.deleteMany({ where: { eventDay: { eventId: event.id } } });
+      await prisma.attendeeSession.deleteMany({ where: { eventId: event.id } });
+      await prisma.vendor.deleteMany({ where: { eventId: event.id } });
+      await prisma.eventDay.deleteMany({ where: { eventId: event.id } });
+      await prisma.event.delete({ where: { id: event.id } });
+    }
   });
 
   it("verifies live PostgreSQL database connectivity and query execution", async () => {

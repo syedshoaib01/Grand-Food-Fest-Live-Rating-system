@@ -1,35 +1,60 @@
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import prisma from "@/lib/prisma";
 import { submitRatings, getOrCreateAttendeeSession } from "@/lib/voting-engine";
 
 describe("Voting Concurrency & Quota Safety (PostgreSQL Transactional Locking)", () => {
   let event: any;
   let liveDay: any;
-  let foodVendors: any[];
+  let foodVendors: any[] = [];
 
   beforeAll(async () => {
-    // Fetch live event and day
-    event = await prisma.event.findFirst({
-      where: { status: "LIVE" },
-      include: { days: true },
-    });
-    if (!event) {
-      throw new Error("Live event required for concurrency test.");
-    }
-
-    liveDay = event.days.find((d: any) => d.status === "LIVE") || event.days[0];
-
-    // Pick 8 active food vendors
-    foodVendors = await prisma.vendor.findMany({
-      where: {
-        eventId: event.id,
-        vendorType: "FOOD",
-        status: "ACTIVE",
+    // Create dedicated isolated event for concurrency test
+    event = await prisma.event.create({
+      data: {
+        name: "Concurrency Test Fest",
+        slug: `conc-fest-${Date.now()}`,
+        startDate: new Date(),
+        endDate: new Date(),
+        status: "LIVE",
+        ratingLimitPerAttendeePerDay: 5,
+        minimumRatingsForLeaderboard: 5,
       },
-      take: 8,
     });
 
-    expect(foodVendors.length).toBeGreaterThanOrEqual(8);
+    liveDay = await prisma.eventDay.create({
+      data: {
+        eventId: event.id,
+        dayNumber: 1,
+        date: new Date(),
+        status: "LIVE",
+      },
+    });
+
+    // Create 8 active food vendors
+    for (let i = 1; i <= 8; i++) {
+      const v = await prisma.vendor.create({
+        data: {
+          eventId: event.id,
+          name: `Concurrency Vendor ${i}`,
+          slug: `conc-vendor-${Date.now()}-${i}`,
+          category: "Biryani",
+          stallNumber: `C-${i}`,
+          vendorType: "FOOD",
+          status: "ACTIVE",
+        },
+      });
+      foodVendors.push(v);
+    }
+  });
+
+  afterAll(async () => {
+    if (event) {
+      await prisma.rating.deleteMany({ where: { eventDay: { eventId: event.id } } });
+      await prisma.attendeeSession.deleteMany({ where: { eventId: event.id } });
+      await prisma.vendor.deleteMany({ where: { eventId: event.id } });
+      await prisma.eventDay.deleteMany({ where: { eventId: event.id } });
+      await prisma.event.delete({ where: { id: event.id } });
+    }
   });
 
   it("strictly enforces max 5 vendors under simultaneous parallel requests", async () => {

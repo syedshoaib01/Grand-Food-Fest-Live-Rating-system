@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getOrCreateAttendeeSession, getSessionStatus } from "@/lib/voting-engine";
-import { signSessionPayload } from "@/lib/auth";
+import { signSessionPayload, verifySessionPayload } from "@/lib/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limiter";
 import logger from "@/lib/logger";
+import prisma from "@/lib/prisma";
 import crypto from "crypto";
 
 export async function POST(req: NextRequest) {
@@ -43,27 +44,48 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    let passToken: string;
-    let displayName: string;
+    let session: any = null;
+    let displayName: string = rawInput;
 
-    // Check if input is a structured organizer pass (e.g. PASS-000001)
-    if (/^PASS-[A-Z0-9_-]{4,32}$/i.test(rawInput)) {
-      passToken = rawInput.toUpperCase();
-      displayName = rawInput.toUpperCase();
+    const isOrganizerPass = /^PASS-[A-Z0-9_-]{4,32}$/i.test(rawInput);
+
+    if (isOrganizerPass) {
+      // Structured organizer pass (e.g. PASS-VIP001)
+      const passToken = rawInput.toUpperCase();
+      displayName = passToken;
+      session = await getOrCreateAttendeeSession(passToken, eventDayId);
     } else {
-      // Normal attendee entering their name (e.g. "Ruwaiz", "Ruwaiz Khan", "John", "Ali")
+      // General attendee entering their display name
       displayName = rawInput;
-      const cleanSlug = rawInput.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
-      if (cleanSlug.length >= 2) {
-        passToken = `NAME-${cleanSlug.slice(0, 24)}`;
-      } else {
-        // Fallback for single character or special symbols
-        const hash = crypto.createHash("sha256").update(rawInput).digest("hex").slice(0, 8).toUpperCase();
-        passToken = `NAME-${cleanSlug || "GUEST"}-${hash}`;
+
+      // Check if client already has a valid signed session cookie
+      const cookie = req.cookies.get("gff_session")?.value;
+      if (cookie) {
+        const decoded = verifySessionPayload<{ sessionId: string; eventDayId?: string }>(cookie);
+        if (decoded?.sessionId) {
+          const existing = await prisma.attendeeSession.findUnique({
+            where: { id: decoded.sessionId },
+            include: { eventDay: true, event: true },
+          });
+
+          // Reuse session if it exists and matches the requested event day (or current active day)
+          if (existing && (!eventDayId || existing.eventDayId === eventDayId)) {
+            session = existing;
+            await prisma.attendeeSession.update({
+              where: { id: existing.id },
+              data: { lastSeenAt: new Date() },
+            });
+          }
+        }
+      }
+
+      // New visitor without an existing session cookie (or fresh session for a different event day):
+      // Generate a cryptographically random unique session token so two people with the same name never collide!
+      if (!session) {
+        const randomToken = `ANON-${crypto.randomBytes(12).toString("hex").toUpperCase()}`;
+        session = await getOrCreateAttendeeSession(randomToken, eventDayId);
       }
     }
-
-    const session = await getOrCreateAttendeeSession(passToken, eventDayId);
     const sessionStatus = await getSessionStatus(session.id);
 
     // Create signed HMAC token with verified session, attendeeName, and 72-hour TTL
