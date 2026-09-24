@@ -120,7 +120,8 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (error: any) {
-    const isLimit = error.message?.includes("limit reached") || error.message?.includes("quota");
+    const msg = (error.message || "").toLowerCase();
+    const isLimit = msg.includes("limit") || msg.includes("quota");
     if (!isLimit) {
       logger.error("Rating submission error", error, { sessionId, clientIp });
     }
