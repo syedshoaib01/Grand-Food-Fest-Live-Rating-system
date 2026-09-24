@@ -38,14 +38,14 @@ export default function TrendingSection() {
     <section className="space-y-3.5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-xl bg-orange-500/15 border border-orange-500/30 flex items-center justify-center text-orange-400 shadow-xs">
-            <Flame className="w-4 h-4 fill-orange-400" />
+          <div className="w-7 h-7 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600 shadow-2xs">
+            <Flame className="w-4 h-4 fill-orange-500" />
           </div>
-          <h2 className="font-display font-black text-base sm:text-lg text-white tracking-tight">
+          <h2 className="font-display font-black text-base sm:text-lg text-slate-900 tracking-tight">
             Buzzing Right Now
           </h2>
         </div>
-        <span className="text-[11px] font-medium text-slate-400 bg-white/5 px-2.5 py-0.5 rounded-full border border-white/10">
+        <span className="text-[11px] font-medium text-slate-500 bg-orange-50 px-2.5 py-0.5 rounded-full border border-orange-200">
           Rolling 30-min rush
         </span>
       </div>
@@ -55,43 +55,43 @@ export default function TrendingSection() {
           ? [1, 2, 3, 4].map((i) => (
               <div
                 key={i}
-                className="glass-panel p-4 rounded-2xl border border-white/10 animate-pulse space-y-3 h-24"
+                className="bg-white p-4 rounded-2xl border border-slate-100 animate-pulse space-y-3 h-24"
               >
-                <div className="h-4 bg-white/10 rounded w-3/4" />
-                <div className="h-3 bg-white/5 rounded w-1/2" />
+                <div className="h-4 bg-slate-100 rounded w-3/4" />
+                <div className="h-3 bg-slate-50 rounded w-1/2" />
               </div>
             ))
           : trending.map((item) => (
               <Link
                 key={item.vendorId}
                 href={`/vendors/${item.slug}`}
-                className="glass-panel float-card p-4 rounded-2xl border border-white/10 hover:border-amber-400/40 flex flex-col justify-between active-press group"
+                className="bg-white float-card p-4 rounded-2xl border border-slate-200 hover:border-orange-300 flex flex-col justify-between active-press group shadow-sm"
               >
                 <div>
                   <div className="flex items-center justify-between gap-1 mb-1.5">
-                    <span className="font-display text-[10px] font-bold text-slate-300 bg-white/10 px-1.5 py-0.5 rounded border border-white/10">
+                    <span className="font-display text-[10px] font-bold text-orange-800 bg-orange-50 px-1.5 py-0.5 rounded border border-orange-200">
                       Stall {item.stallNumber}
                     </span>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-400 transition-colors stroke-[1.75]" />
+                    <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-orange-600 transition-colors stroke-[2]" />
                   </div>
 
-                  <h3 className="font-display font-extrabold text-sm text-white group-hover:text-amber-400 transition-colors truncate">
+                  <h3 className="font-display font-black text-sm text-slate-900 group-hover:text-orange-600 transition-colors truncate">
                     {item.name}
                   </h3>
 
                   <div className="mt-1 flex items-center gap-1.5">
-                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-full border border-orange-500/20">
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-orange-700 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-200">
                       +{item.recentRatingCount} tastings
                     </span>
                   </div>
                 </div>
 
-                <div className="mt-3 pt-2.5 border-t border-white/8 flex items-center justify-between text-xs">
-                  <span className="text-slate-400 text-[11px] truncate font-medium">
+                <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs">
+                  <span className="text-slate-500 text-[11px] truncate font-medium">
                     {item.cuisine || item.category}
                   </span>
-                  <div className="flex items-center gap-1 font-display font-bold text-white text-xs">
-                    <Star className="w-3 h-3 fill-amber-400 text-amber-400 stroke-[1.5]" />
+                  <div className="flex items-center gap-1 font-display font-black text-slate-900 text-xs">
+                    <Star className="w-3 h-3 fill-amber-400 text-amber-500 stroke-[1.5]" />
                     <span>{item.recentAverage.toFixed(1)}</span>
                   </div>
                 </div>

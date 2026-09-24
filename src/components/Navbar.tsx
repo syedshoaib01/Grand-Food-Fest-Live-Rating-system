@@ -33,20 +33,20 @@ export default function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-header bg-slate-950/75 backdrop-blur-xl border-b border-white/8 h-14">
+    <header className="sticky top-0 z-header bg-white/95 backdrop-blur-md border-b border-orange-100 shadow-xs h-14">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 h-full">
         <div className="flex items-center justify-between h-full gap-2">
           {/* Brand Logo & Live Pill */}
           <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
             <Link href="/" className="flex items-center gap-2.5 group active-press">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500/20 to-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0 shadow-xs group-hover:scale-105 transition-transform">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center text-white shrink-0 shadow-xs group-hover:scale-105 transition-transform">
                 {/* Professional Fine Dining Cloche Symbol */}
                 <svg
                   viewBox="0 0 24 24"
-                  className="w-4 h-4 text-amber-400"
+                  className="w-4 h-4 text-white"
                   fill="none"
                   stroke="currentColor"
-                  strokeWidth="2"
+                  strokeWidth="2.2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 >
@@ -58,22 +58,22 @@ export default function Navbar() {
               </div>
               <div className="flex flex-col leading-tight">
                 <div className="flex items-center gap-1.5">
-                  <span className="font-display font-extrabold text-xs tracking-tight text-white">
+                  <span className="font-display font-extrabold text-xs tracking-tight text-slate-900">
                     GRAND FOOD FEST
                   </span>
-                  <span className="text-[9px] font-medium text-amber-400/80 tracking-wider">
+                  <span className="text-[9px] font-bold text-orange-600 tracking-wider">
                     2026
                   </span>
                 </div>
-                <span className="text-[9px] tracking-widest text-slate-400 font-medium uppercase">
+                <span className="text-[9px] tracking-widest text-slate-500 font-medium uppercase">
                   GACHIBOWLI • HYD
                 </span>
               </div>
             </Link>
 
             {/* Live Indicator - Professional & Minimalist */}
-            <div className="hidden xs:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <span className={`w-1.5 h-1.5 rounded-full ${isLive ? "bg-emerald-400 animate-pulse shadow-[0_0_6px_#10B981]" : "bg-slate-500"}`} />
+            <div className="hidden xs:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span className={`w-1.5 h-1.5 rounded-full ${isLive ? "bg-emerald-500 animate-pulse shadow-[0_0_6px_#10B981]" : "bg-slate-400"}`} />
               <span>
                 {isLive ? `Day ${activeDay?.dayNumber || 1} Live` : "Closed"}
               </span>
@@ -89,13 +89,13 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition active-press ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs transition active-press ${
                     isActive
-                      ? "bg-white/10 text-white font-semibold border border-white/10"
-                      : "text-slate-400 hover:text-white hover:bg-white/5 font-normal"
+                      ? "bg-orange-50 text-orange-600 font-bold border border-orange-200 shadow-2xs"
+                      : "text-slate-600 hover:text-orange-600 hover:bg-orange-50/50 font-medium"
                   }`}
                 >
-                  <Icon className={`w-3.5 h-3.5 stroke-[1.75] ${isActive ? "text-amber-400" : "text-slate-400"}`} />
+                  <Icon className={`w-3.5 h-3.5 stroke-[2] ${isActive ? "text-orange-600" : "text-slate-500"}`} />
                   <span>{link.label}</span>
                 </Link>
               );
@@ -107,26 +107,26 @@ export default function Navbar() {
             {authenticated ? (
               <Link
                 href="/vote"
-                className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs bg-white/5 text-white border border-white/10 hover:border-white/25 transition active-press group"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs bg-orange-50 text-slate-900 border border-orange-200 hover:border-orange-300 transition active-press group shadow-2xs"
               >
                 <div className="flex flex-col text-right leading-none">
-                  <span className="font-display font-bold text-[11px] text-white">
+                  <span className="font-display font-bold text-[11px] text-slate-900">
                     {attendeeName ? attendeeName : passToken?.startsWith("ATT-") ? passToken : passToken ? `ATT-••••-${passToken.slice(-4)}` : "Verified Pass"}
                   </span>
-                  <span className="text-[9px] text-amber-400 font-medium mt-0.5">
-                    {remainingQuota} {remainingQuota === 1 ? "vote" : "votes"} left
+                  <span className="text-[9px] text-orange-600 font-bold mt-0.5">
+                    {remainingQuota} {remainingQuota === 1 ? "stamp" : "stamps"} left
                   </span>
                 </div>
-                <div className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 group-hover:bg-amber-500/30 transition-colors">
-                  <Star className="w-3 h-3 stroke-[2] fill-amber-400" />
+                <div className="w-5 h-5 rounded-full bg-orange-500 text-white flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-2xs">
+                  <Star className="w-3 h-3 stroke-[2] fill-white" />
                 </div>
               </Link>
             ) : (
               <Link
                 href="/vote"
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-xs hover:opacity-95 transition active-press"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-xs hover:opacity-95 transition active-press"
               >
-                <Star className="w-3 h-3 stroke-[2]" />
+                <Star className="w-3 h-3 stroke-[2.2]" />
                 <span>Rate Food</span>
               </Link>
             )}

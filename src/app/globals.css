@@ -1,30 +1,30 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  /* Luminous Stadium Glass Palette — Cinematic Mobile Festival Experience */
+  /* Vibrant Festival Orange & Crisp White Theme */
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-display: 'Outfit', 'Plus Jakarta Sans', sans-serif;
   
-  --background: #08090D;
-  --foreground: #F8FAFC;
-  --surface: rgba(16, 20, 30, 0.8);
-  --surface-muted: rgba(24, 30, 44, 0.65);
-  --text-primary: #F8FAFC;
-  --text-secondary: #94A3B8;
-  --text-tertiary: #64748B;
-  --border: rgba(255, 255, 255, 0.09);
-  --border-strong: rgba(255, 255, 255, 0.18);
+  --background: #FAFAF9;
+  --foreground: #0F172A;
+  --surface: #FFFFFF;
+  --surface-muted: #FFF7ED;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-tertiary: #94A3B8;
+  --border: #FED7AA;
+  --border-strong: #EA580C;
   
-  --accent: #F59E0B;
-  --accent-soft: rgba(245, 158, 11, 0.15);
+  --accent: #FF5722;
+  --accent-soft: rgba(255, 87, 34, 0.1);
   --accent-orange: #FF5722;
-  --accent-dark: #B45309;
-  --success: #10B981;
-  --error: #EF4444;
+  --accent-dark: #C2410C;
+  --success: #15803D;
+  --error: #DC2626;
 
   /* Global Stacking System */
   --z-content: 0;
@@ -38,6 +38,11 @@
   --z-toast: 80;
 }
 
+/* Fast tap response on all touch devices (removes 300ms delay) */
+*, ::before, ::after {
+  touch-action: manipulation;
+}
+
 body {
   color: var(--foreground);
   background-color: var(--background);
@@ -48,20 +53,18 @@ body {
   font-family: var(--font-sans);
 }
 
-/* Fixed hardware-accelerated ambient backdrop (zero-repaint scrolling) */
+/* Hardware-accelerated zero-overhead ambient background */
 .ambient-fixed-bg {
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: -10;
   overflow: hidden;
-  background-color: #08090D;
+  background-color: #FAFAF9;
   background-image: 
-    radial-gradient(circle at 15% 10%, rgba(255, 87, 34, 0.08) 0%, transparent 45%),
-    radial-gradient(circle at 85% 20%, rgba(245, 158, 11, 0.08) 0%, transparent 45%),
-    radial-gradient(circle at 50% 80%, rgba(217, 119, 6, 0.05) 0%, transparent 50%),
-    radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 100% 100%, 32px 32px;
+    radial-gradient(circle at 10% 0%, rgba(255, 87, 34, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 90% 12%, rgba(245, 158, 11, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 50% 100%, rgba(255, 87, 34, 0.04) 0%, transparent 50%);
   transform: translateZ(0);
 }
 
@@ -138,11 +141,11 @@ h1, h2, h3, .font-display {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(234, 88, 12, 0.2);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.24);
+  background: rgba(234, 88, 12, 0.4);
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -154,36 +157,38 @@ h1, h2, h3, .font-display {
 }
 
 /* ══════════════════════════════════════════════════════════
-   ANTIGRAVITY DESIGN SYSTEM UTILITIES
-   Luminous Stadium Glass • Weightlessness • 120fps Smooth Motion
+   HIGH-PERFORMANCE ORANGE & WHITE FESTIVAL DESIGN SYSTEM
+   Ultra-Fast Mobile Scrolling (120 FPS) • Crisp White Cards
    ══════════════════════════════════════════════════════════ */
 
-/* Weightless Floating Card (Optimized: No forced global VRAM layers) */
+/* Crisp White Card (0 composite lag on mobile) */
 .float-card {
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
-}
-.float-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.6), 0 0 16px -4px rgba(245, 158, 11, 0.08);
-  border-color: rgba(255, 255, 255, 0.16);
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
 }
 
-/* Glassmorphism Panel — High-performance frosted obsidian crystal */
+@media (hover: hover) and (pointer: fine) {
+  .float-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px -4px rgba(234, 88, 12, 0.12), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+    border-color: #FED7AA;
+  }
+}
+
+/* White Panel with Warm Orange Accent */
 .glass-panel {
-  background: rgba(14, 18, 28, 0.82);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 4px 16px -2px rgba(234, 88, 12, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.03);
 }
 
-/* Gold Luminous Podium Panel */
+/* Warm Gold / Orange Podium Panel */
 .glass-panel-gold {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(14, 18, 28, 0.88) 100%);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(245, 158, 11, 0.28);
-  box-shadow: 0 12px 30px -8px rgba(245, 158, 11, 0.15), inset 0 1px 0 0 rgba(245, 158, 11, 0.2);
+  background: linear-gradient(135deg, #FFF7ED 0%, #FFFFFF 100%);
+  border: 1.5px solid #FDBA74;
+  box-shadow: 0 10px 25px -4px rgba(245, 158, 11, 0.15), inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
 }
 
 /* Hardware-accelerated CSS containment for instant 60-120fps scrolling */
@@ -192,23 +197,25 @@ h1, h2, h3, .font-display {
   contain-intrinsic-size: 0 140px;
 }
 
-/* Antigravity Pure Arrow Hover & Spring Levitation */
+/* Antigravity Arrow Hover & Spring Levitation */
 .antigravity-arrow-hover {
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.antigravity-arrow-hover:hover {
-  transform: translateY(-3px) scale(1.06);
+@media (hover: hover) and (pointer: fine) {
+  .antigravity-arrow-hover:hover {
+    transform: translateY(-2px) scale(1.04);
+  }
 }
 .antigravity-arrow-hover:active {
-  transform: translateY(1px) scale(0.95);
+  transform: translateY(1px) scale(0.96);
   transition-duration: 0.08s;
 }
 
-/* Fluid Staggered Drop-In Keyframe with GPU acceleration */
-@keyframes antigravity-enter {
+/* Smooth Entrance Keyframe */
+@keyframes festival-enter {
   0% {
     opacity: 0;
-    transform: translate3d(0, 14px, 0);
+    transform: translate3d(0, 10px, 0);
   }
   100% {
     opacity: 1;
@@ -217,18 +224,18 @@ h1, h2, h3, .font-display {
 }
 
 .animate-stagger-1 {
-  animation: antigravity-enter 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: 0.04s;
+  animation: festival-enter 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.03s;
 }
 
 .animate-stagger-2 {
-  animation: antigravity-enter 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: 0.08s;
+  animation: festival-enter 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.06s;
 }
 
 .animate-stagger-3 {
-  animation: antigravity-enter 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: 0.12s;
+  animation: festival-enter 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.09s;
 }
 
 /* Global Prefers-Reduced-Motion Guard */

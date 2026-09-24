@@ -271,8 +271,8 @@ export default function RateVendorPage() {
   if (isLoading) {
     return (
       <div className="max-w-md mx-auto px-4 py-16 text-center space-y-4">
-        <div className="w-8 h-8 rounded-full border-2 border-amber-400 border-t-transparent animate-spin mx-auto" />
-        <p className="font-display font-medium text-slate-400 text-xs">
+        <div className="w-8 h-8 rounded-full border-2 border-orange-500 border-t-transparent animate-spin mx-auto" />
+        <p className="font-display font-medium text-slate-500 text-xs">
           Loading food stall...
         </p>
       </div>
@@ -282,11 +282,11 @@ export default function RateVendorPage() {
   if (error && !vendor) {
     return (
       <div className="max-w-md mx-auto px-4 py-16 text-center space-y-4">
-        <AlertCircle className="w-10 h-10 text-rose-400 mx-auto" />
-        <h2 className="font-display font-black text-lg text-white">{error}</h2>
+        <AlertCircle className="w-10 h-10 text-rose-500 mx-auto" />
+        <h2 className="font-display font-black text-lg text-slate-900">{error}</h2>
         <Link
           href="/"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 text-slate-950 font-display font-bold text-xs"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-orange-600 text-white font-display font-bold text-xs"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Stalls</span>
@@ -301,31 +301,31 @@ export default function RateVendorPage() {
       <div className="flex items-center justify-between">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-xs font-display font-medium text-slate-400 hover:text-white transition active-press"
+          className="inline-flex items-center gap-1.5 text-xs font-display font-bold text-slate-600 hover:text-orange-600 transition active-press"
         >
-          <ArrowLeft className="w-4 h-4 stroke-[1.75]" />
+          <ArrowLeft className="w-4 h-4 stroke-[2]" />
           <span>Back to Stalls</span>
         </Link>
 
-        <span className="font-display text-[10px] font-bold uppercase tracking-wider text-slate-300 bg-white/10 px-2.5 py-1 rounded-full border border-white/10">
+        <span className="font-display text-[10px] font-bold uppercase tracking-wider text-orange-800 bg-orange-50 px-2.5 py-1 rounded-full border border-orange-200">
           Stall {vendor?.stallNumber}
         </span>
       </div>
 
       {/* Stall Hero Board */}
-      <div className="glass-panel p-6 rounded-3xl space-y-2 text-center border border-white/10 shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-orange-500 via-amber-400 to-transparent" />
+      <div className="bg-white p-6 rounded-3xl space-y-2 text-center border border-orange-100 shadow-sm relative overflow-hidden">
+        <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-orange-500 via-amber-400 to-orange-400" />
 
-        <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
+        <div className="inline-flex items-center gap-1.5 text-[11px] font-bold text-orange-700 bg-orange-50 px-2.5 py-0.5 rounded-full border border-orange-200">
           <span>{vendor?.cuisine ? `${vendor.cuisine} • ${vendor.category}` : vendor?.category}</span>
         </div>
 
-        <h1 className="text-2xl sm:text-3xl font-display font-black text-white tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-display font-black text-slate-900 tracking-tight">
           {vendor?.name}
         </h1>
 
         {vendor?.description && (
-          <p className="text-xs text-slate-400 leading-relaxed line-clamp-2 max-w-sm mx-auto">
+          <p className="text-xs text-slate-500 leading-relaxed line-clamp-2 max-w-sm mx-auto">
             {vendor.description}
           </p>
         )}
@@ -338,46 +338,46 @@ export default function RateVendorPage() {
         </div>
       ) : isSubmitted && submittedData ? (
         /* Submission Success View */
-        <div className="glass-panel p-6 sm:p-8 rounded-3xl text-center space-y-5 animate-stagger-1 border border-white/12 shadow-2xl">
+        <div className="bg-white p-6 sm:p-8 rounded-3xl text-center space-y-5 animate-stagger-1 border border-emerald-200 shadow-sm">
           <div className="space-y-1">
             <span
               className={`inline-block text-[11px] font-display font-bold uppercase tracking-wider px-3 py-1 rounded-full ${
                 submittedData.direction === "up"
-                  ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
-                  : "bg-rose-500/15 text-rose-400 border border-rose-500/30"
+                  ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                  : "bg-rose-50 text-rose-800 border border-rose-200"
               }`}
             >
               {submittedData.direction === "up" ? "Positive Rating Recorded" : "Critique Recorded"}
             </span>
 
-            <h2 className="text-5xl font-display font-black text-white pt-3 tabular-nums drop-shadow-md">
+            <h2 className="text-5xl font-display font-black text-slate-900 pt-3 tabular-nums">
               {submittedData.direction === "up" ? `+${submittedData.percentage}%` : `-${submittedData.percentage}%`}
             </h2>
 
-            <p className="text-xs font-medium text-slate-400">
-              Recorded as <strong className="text-white">{submittedData.stars}</strong> of 5 stars
+            <p className="text-xs font-semibold text-slate-500">
+              Recorded as <strong className="text-slate-900 font-bold">{submittedData.stars}</strong> of 5 stars
             </p>
           </div>
 
           <div className="space-y-2 pt-2 max-w-xs mx-auto">
             <Link
               href="/"
-              className="w-full flex items-center justify-center gap-2 h-12 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:opacity-95 text-white font-display font-bold text-xs tracking-wide transition active-press shadow-lg shadow-amber-500/10"
+              className="w-full flex items-center justify-center gap-2 h-12 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:opacity-95 text-white font-display font-bold text-xs tracking-wide transition active-press shadow-sm"
             >
               <span>Rate Another Stall</span>
             </Link>
 
             <Link
               href="/leaderboard"
-              className="w-full flex items-center justify-center gap-2 h-11 rounded-xl bg-white/5 hover:bg-white/10 text-white font-display font-semibold text-xs transition border border-white/10"
+              className="w-full flex items-center justify-center gap-2 h-11 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-display font-bold text-xs transition border border-slate-200"
             >
-              <Trophy className="w-3.5 h-3.5 text-amber-400 stroke-[1.75]" />
+              <Trophy className="w-3.5 h-3.5 text-orange-600 stroke-[2]" />
               <span>See Live Leaderboard</span>
             </Link>
           </div>
         </div>
       ) : (
-        /* Pure Arrows (No Box Around Them) */
+        /* Pure Arrows & Star Selector */
         <div className="space-y-6 pt-2">
           {/* Active Charging Percentage Meter Display */}
           <div className="text-center h-14 flex flex-col items-center justify-center">
@@ -385,17 +385,17 @@ export default function RateVendorPage() {
               <div
                 ref={percentDisplayRef}
                 className={`font-display font-black text-4xl tracking-tight leading-none tabular-nums ${
-                  chargingDirection === "up" ? "text-emerald-400" : "text-rose-400"
+                  chargingDirection === "up" ? "text-orange-600" : "text-rose-600"
                 }`}
               >
                 +0%
               </div>
-              <p ref={labelDisplayRef} className="text-[11px] font-display font-semibold text-slate-300">
+              <p ref={labelDisplayRef} className="text-[11px] font-display font-bold text-slate-700">
                 Charging...
               </p>
             </div>
             {!chargingDirection && (
-              <span className="text-xs font-display font-medium text-slate-400">
+              <span className="text-xs font-display font-semibold text-slate-500">
                 {isSubmitting ? "Submitting rating..." : "Hold arrow to charge • Release to submit"}
               </span>
             )}
@@ -413,9 +413,9 @@ export default function RateVendorPage() {
             </defs>
           </svg>
 
-          {/* Up & Down Arrows (Pure Standalone Arrows, No Box Outline) */}
+          {/* Up & Down Arrows (Pure Standalone Arrows) */}
           <div className="grid grid-cols-2 gap-8 max-w-xs mx-auto py-2">
-            {/* UPWARD ARROW (PURE ARROW) */}
+            {/* UPWARD ARROW */}
             <button
               type="button"
               disabled={isSubmitting}
@@ -435,18 +435,18 @@ export default function RateVendorPage() {
                   {/* Base Unfilled Arrow */}
                   <path
                     d="M 32 6 L 56 30 H 42 V 58 H 22 V 30 H 8 Z"
-                    fill="rgba(255, 255, 255, 0.06)"
-                    stroke="rgba(255, 255, 255, 0.25)"
+                    fill="#FFF7ED"
+                    stroke="#CBD5E1"
                     strokeWidth="2.5"
                     strokeLinejoin="round"
-                    className="transition-colors group-hover:stroke-emerald-400"
+                    className="transition-colors group-hover:stroke-orange-500"
                   />
 
-                  {/* Filled Dynamic Layer (Clipped to charge percentage) */}
+                  {/* Filled Dynamic Layer */}
                   <path
                     d="M 32 6 L 56 30 H 42 V 58 H 22 V 30 H 8 Z"
-                    fill="#10B981"
-                    stroke="#34D399"
+                    fill="#EA580C"
+                    stroke="#C2410C"
                     strokeWidth="2.5"
                     strokeLinejoin="round"
                     clipPath="url(#upvote-arrow-clip)"
@@ -455,16 +455,16 @@ export default function RateVendorPage() {
               </div>
 
               <div className="text-center mt-3 space-y-0.5">
-                <span className="block font-display font-extrabold text-xs uppercase tracking-wider text-emerald-400">
+                <span className="block font-display font-black text-xs uppercase tracking-wider text-orange-600">
                   Upvote
                 </span>
-                <span ref={upSubTextRef} className="block text-[11px] font-medium text-slate-400 tabular-nums">
-                  Tasty
+                <span ref={upSubTextRef} className="block text-[11px] font-bold text-slate-600 tabular-nums">
+                  Delicious
                 </span>
               </div>
             </button>
 
-            {/* DOWNWARD ARROW (PURE ARROW) */}
+            {/* DOWNWARD ARROW */}
             <button
               type="button"
               disabled={isSubmitting}
@@ -484,18 +484,18 @@ export default function RateVendorPage() {
                   {/* Base Unfilled Arrow */}
                   <path
                     d="M 32 58 L 8 34 H 22 V 6 H 42 V 34 H 56 Z"
-                    fill="rgba(255, 255, 255, 0.06)"
-                    stroke="rgba(255, 255, 255, 0.25)"
+                    fill="#FFF1F2"
+                    stroke="#CBD5E1"
                     strokeWidth="2.5"
                     strokeLinejoin="round"
                     className="transition-colors group-hover:stroke-rose-400"
                   />
 
-                  {/* Filled Dynamic Layer (Clipped to charge percentage) */}
+                  {/* Filled Dynamic Layer */}
                   <path
                     d="M 32 58 L 8 34 H 22 V 6 H 42 V 34 H 56 Z"
-                    fill="#F43F5E"
-                    stroke="#FB7185"
+                    fill="#E11D48"
+                    stroke="#BE123C"
                     strokeWidth="2.5"
                     strokeLinejoin="round"
                     clipPath="url(#downvote-arrow-clip)"
@@ -504,10 +504,10 @@ export default function RateVendorPage() {
               </div>
 
               <div className="text-center mt-3 space-y-0.5">
-                <span className="block font-display font-extrabold text-xs uppercase tracking-wider text-rose-400 group-hover:text-rose-300 transition-colors">
+                <span className="block font-display font-black text-xs uppercase tracking-wider text-rose-600">
                   Downvote
                 </span>
-                <span ref={downSubTextRef} className="block text-[11px] font-medium text-slate-400 tabular-nums">
+                <span ref={downSubTextRef} className="block text-[11px] font-bold text-slate-600 tabular-nums">
                   Critique
                 </span>
               </div>
@@ -515,8 +515,29 @@ export default function RateVendorPage() {
           </div>
 
           <p className="text-center text-[11px] text-slate-500">
-            Tap arrow for instant 100% vote • Press and hold to adjust intensity
+            Tap arrow for instant vote • Press and hold to adjust intensity
           </p>
+
+          {/* Quick 1-Tap Star Fallback Alternative */}
+          <div className="pt-2 border-t border-slate-200/80 text-center">
+            <span className="text-[11px] font-display font-bold text-slate-500 uppercase tracking-wider block mb-2">
+              Or Rate with Stars:
+            </span>
+            <div className="flex items-center justify-center gap-2">
+              {[1, 2, 3, 4, 5].map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  disabled={isSubmitting}
+                  onClick={() => submitArrowRating("up", ((s - 1) / 4) * 100)}
+                  className="w-10 h-10 rounded-xl bg-white border border-slate-200 hover:border-orange-400 hover:bg-orange-50 text-slate-800 font-display font-black text-sm flex items-center justify-center gap-0.5 transition active-press shadow-2xs"
+                >
+                  <span>{s}</span>
+                  <span className="text-amber-500 text-xs">★</span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </div>
