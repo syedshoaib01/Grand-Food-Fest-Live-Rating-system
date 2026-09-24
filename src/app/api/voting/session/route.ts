@@ -6,11 +6,13 @@ export async function GET(req: NextRequest) {
   try {
     const cookie = req.cookies.get("gff_session")?.value;
     let sessionId: string | null = null;
+    let attendeeName: string | null = null;
 
     if (cookie) {
-      const decoded = verifySessionPayload<{ sessionId: string }>(cookie);
+      const decoded = verifySessionPayload<{ sessionId: string; attendeeName?: string }>(cookie);
       if (decoded?.sessionId) {
         sessionId = decoded.sessionId;
+        attendeeName = decoded.attendeeName || null;
       }
     }
 
@@ -21,6 +23,7 @@ export async function GET(req: NextRequest) {
     const status = await getSessionStatus(sessionId);
     return NextResponse.json({
       authenticated: true,
+      attendeeName,
       ...status,
     });
   } catch (error: any) {

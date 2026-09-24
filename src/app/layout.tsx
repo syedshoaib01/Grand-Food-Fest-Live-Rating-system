@@ -1,22 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "@/lib/SessionContext";
 import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
 import DevBar from "@/components/DevBar";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
-
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
-  themeColor: "#FAF8F5",
+  themeColor: "#FF5722",
 };
 
 export const metadata: Metadata = {
@@ -38,20 +31,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body className="font-sans bg-[#FAF8F5] text-stone-900 flex flex-col min-h-screen selection:bg-amber-500 selection:text-stone-900 pb-20 md:pb-0 overflow-x-hidden w-full">
+    <html lang="en">
+      <body className="bg-[#FAFAF9] text-slate-900 flex flex-col min-h-screen selection:bg-orange-500 selection:text-white pb-28 md:pb-10 overflow-x-hidden w-full antialiased">
+        {/* Hardware-accelerated zero-repaint ambient backdrop */}
+        <div className="ambient-fixed-bg" aria-hidden="true" />
+
         <SessionProvider>
           <DevBar />
           <Navbar />
-          <main className="flex-1 w-full max-w-full overflow-x-hidden">{children}</main>
+          <main className="flex-1 w-full max-w-full overflow-x-hidden relative">{children}</main>
           <BottomNav />
-          <footer className="border-t border-stone-200 bg-white/80 py-8 px-4 text-center text-xs text-stone-500">
-            <div className="max-w-7xl mx-auto space-y-1.5">
-              <p className="font-semibold text-stone-700">
-                Grand Food Fest 2026 • Gachibowli Stadium, Hyderabad • October 9–11, 2026
-              </p>
-              <p className="text-stone-500">
-                Live rankings based on verified attendee ratings
+          <footer className="border-t border-orange-100 bg-white py-8 px-4 text-center text-xs text-slate-500">
+            <div className="max-w-4xl mx-auto space-y-2">
+              <div className="flex items-center justify-center gap-2 text-orange-600 font-display font-bold tracking-wider text-[11px] uppercase">
+                <span>Gachibowli Stadium</span>
+                <span>•</span>
+                <span>October 9–11, 2026</span>
+                <span>•</span>
+                <span>Hyderabad</span>
+              </div>
+              <p className="text-slate-500 text-[11px]">
+                Grand Food Fest Hyderabad Live Attendee Platform • Real-time Bayesian ratings verified at venue
               </p>
             </div>
           </footer>

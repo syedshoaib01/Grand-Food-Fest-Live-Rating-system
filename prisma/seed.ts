@@ -87,6 +87,22 @@ async function main() {
 
   // 4. Generate ~150 Vendors (110 Food, 40 Lifestyle)
   const foodVendorTemplates = [
+    // Iconic Flagship Hyderabad Restaurants & Stalls
+    { name: "Paradise Biryani", category: "Biryani & Pulao", cuisine: "Hyderabadi", desc: "Legendary World-Famous Hyderabadi Dum Biryani, double mutton biryani & Mirchi ka Salan since 1953." },
+    { name: "Shah Ghouse", category: "Biryani & Pulao", cuisine: "Hyderabadi", desc: "Rich authentic Hyderabadi Mutton Haleem, special mutton biryani, and crispy Tala Hua Gosht." },
+    { name: "Pista House", category: "Biryani & Pulao", cuisine: "Hyderabadi", desc: "World-renowned GI-tagged pure desi ghee Haleem, Zafrani Chai, and royal dry fruit sweets." },
+    { name: "Cafe Niloufer", category: "Beverages & Chai", cuisine: "Hyderabadi", desc: "Iconic slow-brewed Malai Chai paired with melt-in-mouth Maska Bun and Osmania biscuits." },
+    { name: "Karachi Bakery", category: "Desserts & Ice Cream", cuisine: "Traditional", desc: "Historic Moazzam Jahi bakery famous for candied fruit biscuits, rich plum cake, and cashew cookies." },
+    { name: "Bawarchi Restaurant", category: "Biryani & Pulao", cuisine: "Hyderabadi", desc: "RTC X Roads legendary coal-dum spiced Chicken Biryani served with fiery spicy gravy." },
+    { name: "Chutneys", category: "South Indian", cuisine: "South Indian", desc: "Steaming hot Babai Ghee Idli, Guntur Karam Dosa served with 6 freshly ground signature chutneys." },
+    { name: "Cream Stone", category: "Desserts & Ice Cream", cuisine: "Modern", desc: "Live frozen marble-stone whipped artisanal ice creams, Willy Wonka, and Nutty Death by Chocolate." },
+    { name: "Shadab Hotel", category: "Biryani & Pulao", cuisine: "Nizami", desc: "Old City Charminar heritage Zafrani Mutton Biryani, Boti Kebab, and spicy Bagara Baingan." },
+    { name: "Subhan Bakery", category: "Desserts & Ice Cream", cuisine: "Traditional", desc: "Nampally heritage bakers known for traditional Dum ke Roat and almond Osmania biscuits." },
+    { name: "Al Akbar Fast Food", category: "Shawarma & Wraps", cuisine: "Arabian", desc: "Charminar night-market juicy vertical spit Chicken Shawarma and buttery rumali rolls." },
+    { name: "Govind Dosa", category: "South Indian", cuisine: "Street", desc: "Old City late-night famous live butter tawa dosas with spicy red chili garlic podi." },
+    { name: "Hameedi Confectioners", category: "Desserts & Ice Cream", cuisine: "Hyderabadi", desc: "Nizami royal confectioners famous for Jouzi Halwa, Badam Halwa, and saffron sweets." },
+    { name: "Famous Ice Cream", category: "Desserts & Ice Cream", cuisine: "Hyderabadi", desc: "Heritage handmade seasonal fruit ice creams served in earthenware since 1951." },
+
     // Biryani & Pulao
     { name: "Spice Route", category: "Biryani & Pulao", cuisine: "Hyderabadi", desc: "Legendary slow-dum Zafrani Mutton Biryani steeped in royal Nizami aromatics." },
     { name: "Hyderabad House", category: "Biryani & Pulao", cuisine: "Hyderabadi", desc: "Signature fragrant Basmati Biryani paired with rich Mirchi ka Salan." },
@@ -353,21 +369,26 @@ async function main() {
 
   // Define top contender vendor slugs with their target rating bias
   const contenderWeights: Record<string, { baseAvg: number; volume: number }> = {
-    "spice-route": { baseAvg: 4.88, volume: 82 },
-    "hyderabad-house": { baseAvg: 4.82, volume: 78 },
-    "the-dessert-lab": { baseAvg: 4.79, volume: 68 },
-    "tandoor-theory": { baseAvg: 4.75, volume: 64 },
-    "shawarma-king": { baseAvg: 4.71, volume: 59 },
-    "korean-street": { baseAvg: 4.68, volume: 55 },
-    "dosa-district": { baseAvg: 4.65, volume: 52 },
-    "bombay-sandwich-co": { baseAvg: 4.62, volume: 48 },
-    "shadab-express": { baseAvg: 4.59, volume: 45 },
-    "grill-republic": { baseAvg: 4.56, volume: 42 },
-    "momo-district": { baseAvg: 4.52, volume: 38 },
-    "the-chai-stand": { baseAvg: 4.50, volume: 36 },
-    "nawabs-kitchen": { baseAvg: 4.47, volume: 32 },
-    "chaat-junction": { baseAvg: 4.44, volume: 30 },
-    "sweet-bengal": { baseAvg: 4.40, volume: 28 },
+    "paradise-biryani": { baseAvg: 4.90, volume: 88 },
+    "shah-ghouse": { baseAvg: 4.87, volume: 84 },
+    "pista-house": { baseAvg: 4.85, volume: 80 },
+    "cafe-niloufer": { baseAvg: 4.83, volume: 76 },
+    "karachi-bakery": { baseAvg: 4.80, volume: 72 },
+    "bawarchi-restaurant": { baseAvg: 4.78, volume: 68 },
+    "chutneys": { baseAvg: 4.75, volume: 64 },
+    "cream-stone": { baseAvg: 4.73, volume: 60 },
+    "shadab-hotel": { baseAvg: 4.70, volume: 56 },
+    "spice-route": { baseAvg: 4.68, volume: 52 },
+    "hyderabad-house": { baseAvg: 4.65, volume: 50 },
+    "the-dessert-lab": { baseAvg: 4.64, volume: 46 },
+    "tandoor-theory": { baseAvg: 4.60, volume: 44 },
+    "shawarma-king": { baseAvg: 4.58, volume: 40 },
+    "korean-street": { baseAvg: 4.55, volume: 38 },
+    "dosa-district": { baseAvg: 4.52, volume: 35 },
+    "bombay-sandwich-co": { baseAvg: 4.50, volume: 32 },
+    "shadab-express": { baseAvg: 4.48, volume: 30 },
+    "grill-republic": { baseAvg: 4.45, volume: 28 },
+    "the-chai-stand": { baseAvg: 4.42, volume: 26 },
   };
 
   let totalRatings = 0;
@@ -538,17 +559,19 @@ async function main() {
 
   // 6. Seed Baseline Historical RankSnapshot (from 45 mins ago)
   const historicalSnapshotTime = new Date(Date.now() - 45 * 60 * 1000);
-  if (spiceRoute && hydHouse) {
-    const shadab = createdFoodVendors.find((v) => v.slug === "shadab-express");
-    const tandoor = createdFoodVendors.find((v) => v.slug === "tandoor-theory");
-    const bawarchi = createdFoodVendors.find((v) => v.slug === "bawarchi-legacy");
+  const paradise = createdFoodVendors.find((v) => v.slug === "paradise-biryani") || createdFoodVendors[0];
+  const shahGhouse = createdFoodVendors.find((v) => v.slug === "shah-ghouse") || createdFoodVendors[1];
+  const pistaHouse = createdFoodVendors.find((v) => v.slug === "pista-house") || createdFoodVendors[2];
+  const niloufer = createdFoodVendors.find((v) => v.slug === "cafe-niloufer") || createdFoodVendors[3];
+  const karachi = createdFoodVendors.find((v) => v.slug === "karachi-bakery") || createdFoodVendors[4];
 
+  if (paradise && shahGhouse) {
     const snapshotsToCreate = [
-      { eventId: event.id, vendorId: hydHouse.id, rank: 1, score: 4.80, ratingsCount: 140, snapshotAt: historicalSnapshotTime },
-      { eventId: event.id, vendorId: bawarchi ? bawarchi.id : hydHouse.id, rank: 2, score: 4.75, ratingsCount: 120, snapshotAt: historicalSnapshotTime },
-      { eventId: event.id, vendorId: spiceRoute.id, rank: 3, score: 4.72, ratingsCount: 130, snapshotAt: historicalSnapshotTime },
-      ...(shadab ? [{ eventId: event.id, vendorId: shadab.id, rank: 4, score: 4.68, ratingsCount: 110, snapshotAt: historicalSnapshotTime }] : []),
-      ...(tandoor ? [{ eventId: event.id, vendorId: tandoor.id, rank: 5, score: 4.65, ratingsCount: 100, snapshotAt: historicalSnapshotTime }] : []),
+      { eventId: event.id, vendorId: shahGhouse.id, rank: 1, score: 4.88, ratingsCount: 140, snapshotAt: historicalSnapshotTime },
+      { eventId: event.id, vendorId: paradise.id, rank: 2, score: 4.85, ratingsCount: 135, snapshotAt: historicalSnapshotTime },
+      { eventId: event.id, vendorId: pistaHouse.id, rank: 3, score: 4.80, ratingsCount: 125, snapshotAt: historicalSnapshotTime },
+      { eventId: event.id, vendorId: niloufer.id, rank: 4, score: 4.78, ratingsCount: 120, snapshotAt: historicalSnapshotTime },
+      { eventId: event.id, vendorId: karachi.id, rank: 5, score: 4.75, ratingsCount: 110, snapshotAt: historicalSnapshotTime },
     ];
 
     await prisma.rankSnapshot.createMany({

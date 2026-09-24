@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Star } from "lucide-react";
+import { Star, Flame, ArrowUpRight } from "lucide-react";
 
 export interface TrendingVendor {
   vendorId: string;
@@ -35,52 +35,64 @@ export default function TrendingSection() {
   }
 
   return (
-    <section className="space-y-3">
-      <div className="flex items-baseline justify-between">
-        <h2 className="text-sm font-semibold tracking-tight text-stone-900 flex items-center gap-1.5">
-          <span>🔥 Trending now</span>
-        </h2>
-        <span className="text-[11px] text-stone-400">Past 30 min activity</span>
+    <section className="space-y-3.5">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600 shadow-2xs">
+            <Flame className="w-4 h-4 fill-orange-500" />
+          </div>
+          <h2 className="font-display font-black text-base sm:text-lg text-slate-900 tracking-tight">
+            Buzzing Right Now
+          </h2>
+        </div>
+        <span className="text-[11px] font-medium text-slate-500 bg-orange-50 px-2.5 py-0.5 rounded-full border border-orange-200">
+          Rolling 30-min rush
+        </span>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {isLoading
           ? [1, 2, 3, 4].map((i) => (
               <div
                 key={i}
-                className="bg-white p-3 rounded-xl border border-stone-200/70 animate-pulse space-y-2 h-20"
+                className="bg-white p-4 rounded-2xl border border-slate-100 animate-pulse space-y-3 h-24"
               >
-                <div className="h-3 bg-stone-200 rounded w-24" />
-                <div className="h-3 bg-stone-100 rounded w-16" />
+                <div className="h-4 bg-slate-100 rounded w-3/4" />
+                <div className="h-3 bg-slate-50 rounded w-1/2" />
               </div>
             ))
           : trending.map((item) => (
               <Link
                 key={item.vendorId}
                 href={`/vendors/${item.slug}`}
-                className="group bg-white p-3.5 rounded-xl border border-stone-200/70 hover:border-amber-400/80 shadow-2xs hover:shadow-xs transition flex flex-col justify-between"
+                className="bg-white float-card p-4 rounded-2xl border border-slate-200 hover:border-orange-300 flex flex-col justify-between active-press group shadow-sm"
               >
                 <div>
-                  <div className="flex items-center justify-between gap-1 mb-1">
-                    <h3 className="font-semibold text-sm text-stone-900 group-hover:text-amber-700 transition truncate">
-                      {item.name}
-                    </h3>
-                    <span className="text-[10px] font-mono text-stone-500 bg-stone-100 px-1.5 py-0.5 rounded">
-                      {item.stallNumber}
+                  <div className="flex items-center justify-between gap-1 mb-1.5">
+                    <span className="font-display text-[10px] font-bold text-orange-800 bg-orange-50 px-1.5 py-0.5 rounded border border-orange-200">
+                      Stall {item.stallNumber}
+                    </span>
+                    <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-orange-600 transition-colors stroke-[2]" />
+                  </div>
+
+                  <h3 className="font-display font-black text-sm text-slate-900 group-hover:text-orange-600 transition-colors truncate">
+                    {item.name}
+                  </h3>
+
+                  <div className="mt-1 flex items-center gap-1.5">
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-orange-700 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-200">
+                      +{item.recentRatingCount} tastings
                     </span>
                   </div>
-                  <p className="text-xs font-medium text-amber-700">
-                    +{item.recentRatingCount} ratings in the last 30 min
-                  </p>
                 </div>
 
-                <div className="mt-2 pt-2 border-t border-stone-100 flex items-center justify-between text-[11px] text-stone-500">
-                  <span>{item.category}</span>
-                  <div className="flex items-center gap-1">
-                    <Star className="w-3 h-3 fill-amber-400 text-amber-500" />
-                    <span className="font-medium text-stone-700">
-                      {item.recentAverage.toFixed(1)}
-                    </span>
+                <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs">
+                  <span className="text-slate-500 text-[11px] truncate font-medium">
+                    {item.cuisine || item.category}
+                  </span>
+                  <div className="flex items-center gap-1 font-display font-black text-slate-900 text-xs">
+                    <Star className="w-3 h-3 fill-amber-400 text-amber-500 stroke-[1.5]" />
+                    <span>{item.recentAverage.toFixed(1)}</span>
                   </div>
                 </div>
               </Link>
