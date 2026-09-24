@@ -68,6 +68,13 @@ export default function RateVendorPage() {
         const data = await res.json();
         if (res.ok && data.vendor) {
           setVendor(data.vendor);
+        } else if (res.status === 500) {
+          const errMsg = (data.error || "").toLowerCase();
+          if (errMsg.includes("database_url") || errMsg.includes("datasource") || errMsg.includes("prisma")) {
+            setError("Database connection error: DATABASE_URL is not configured in your hosting environment.");
+          } else {
+            setError(data.error || "Server or database error loading stall.");
+          }
         } else {
           const listRes = await fetch("/api/vendors?limit=150");
           const listData = await listRes.json();

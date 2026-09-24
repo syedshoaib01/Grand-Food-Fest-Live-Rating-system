@@ -37,6 +37,13 @@ export default function VendorDetailPage() {
       const json = await res.json();
       if (res.ok) {
         setData(json);
+      } else {
+        const errMsg = (json.error || "").toLowerCase();
+        if (errMsg.includes("database_url") || errMsg.includes("datasource") || errMsg.includes("prisma")) {
+          setErrorMessage("Database connection error: DATABASE_URL is not configured in your hosting environment.");
+        } else {
+          setErrorMessage(json.error || "The requested food stall could not be loaded.");
+        }
       }
     } finally {
       setIsLoading(false);
@@ -106,11 +113,15 @@ export default function VendorDetailPage() {
   if (!data || !data.vendor) {
     return (
       <div className="max-w-xl mx-auto px-4 py-16 text-center space-y-3">
-        <h1 className="text-xl font-display font-black text-fest-charcoal">Stall Not Found</h1>
-        <p className="text-xs text-fest-charcoalMuted">The requested food stall could not be found at Gachibowli Stadium.</p>
+        <h1 className="text-xl font-display font-black text-slate-900">
+          {errorMessage?.includes("Database") ? "Database Connection Error" : "Stall Not Found"}
+        </h1>
+        <p className="text-xs text-slate-500 max-w-sm mx-auto">
+          {errorMessage || "The requested food stall could not be found at Gachibowli Stadium."}
+        </p>
         <Link
           href="/vendors"
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-fest-terracotta text-white font-display font-bold text-xs"
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-orange-600 text-white font-display font-bold text-xs shadow-md shadow-orange-500/20"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to Festival Stalls</span>

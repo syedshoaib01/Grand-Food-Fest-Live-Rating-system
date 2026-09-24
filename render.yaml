@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: grand-food-fest-live-rating-system
+    runtime: node
+    plan: free
+    buildCommand: npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: ADMIN_JWT_SECRET
+        generateValue: true
+      - key: PASS_SALT
+        generateValue: true
+      - key: ADMIN_EMAIL
+        value: admin@grandfoodfest.com
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: NEXT_PUBLIC_DEV_MODE
+        value: "false"
