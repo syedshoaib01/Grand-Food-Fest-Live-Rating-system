@@ -46,7 +46,7 @@ export async function GET() {
         database: {
           status: "disconnected",
           latencyMs,
-          error: error.message || "Database connection failure",
+          error: "Database connection unavailable",
         },
       },
       { status: 503 }

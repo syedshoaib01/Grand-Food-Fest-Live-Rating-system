@@ -76,7 +76,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "anomalyId is required" }, { status: 400 });
     }
 
-    const adminEmail = auth.admin.email || "admin@grandfoodfest.com";
+    const adminEmail = auth.admin.email;
+    if (!adminEmail) {
+      return NextResponse.json({ error: "Administrator identity could not be verified" }, { status: 401 });
+    }
 
     if (action === "INVALIDATE_RECENT_RATINGS") {
       // Invalidate ratings for this vendor over the last 1 hour

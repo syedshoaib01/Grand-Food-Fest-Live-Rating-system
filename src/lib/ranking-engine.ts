@@ -44,13 +44,34 @@ export function calculateBayesianScore(
   return Number(score.toFixed(4));
 }
 
+interface CachedLeaderboard {
+  result: LeaderboardResult;
+  timestamp: number;
+}
+const leaderboardCache = new Map<string, CachedLeaderboard>();
+const LEADERBOARD_CACHE_TTL_MS = 5000; // 5 seconds fresh
+
+export function clearLeaderboardCache() {
+  leaderboardCache.clear();
+}
+
 /**
  * Compute the live leaderboard for the active event (or specific event day)
  */
 export async function getLiveLeaderboard(options?: {
   eventId?: string;
   eventDayId?: string;
+  useCache?: boolean;
+  forceRefresh?: boolean;
 }): Promise<LeaderboardResult> {
+  const cacheKey = `${options?.eventId || "default"}_${options?.eventDayId || "all"}`;
+  if (options?.useCache && !options?.forceRefresh) {
+    const cached = leaderboardCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < LEADERBOARD_CACHE_TTL_MS) {
+      return cached.result;
+    }
+  }
+
   // 1. Get Event and configuration
   const event = options?.eventId
     ? await prisma.event.findUnique({ where: { id: options.eventId } })
@@ -291,7 +312,7 @@ export async function getLiveLeaderboard(options?: {
       rank: index + 1, // Normalized display rank for Top 10
     }));
 
-  return {
+  const result: LeaderboardResult = {
     top10,
     allRanked,
     totalVotesCounted,
@@ -300,6 +321,13 @@ export async function getLiveLeaderboard(options?: {
     minimumRatingsThreshold: minThreshold,
     lastCalculatedAt: new Date().toISOString(),
   };
+
+  leaderboardCache.set(cacheKey, {
+    result,
+    timestamp: Date.now(),
+  });
+
+  return result;
 }
 
 /**

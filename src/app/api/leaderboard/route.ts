@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
     const eventDayId = searchParams.get("eventDayId") || undefined;
     const eventId = searchParams.get("eventId") || undefined;
 
-    const result = await getLiveLeaderboard({ eventId, eventDayId });
+    const result = await getLiveLeaderboard({ eventId, eventDayId, useCache: true });
 
     return NextResponse.json(result, {
       headers: {

@@ -56,7 +56,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     let isEligible = false;
 
     if (vendor.vendorType === "FOOD") {
-      const leaderboard = await getLiveLeaderboard({ eventId: vendor.eventId });
+      const leaderboard = await getLiveLeaderboard({ eventId: vendor.eventId, useCache: true });
       const found = leaderboard.allRanked.find((v) => v.vendorId === vendor.id);
       if (found) {
         rank = found.rank;

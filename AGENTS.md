@@ -41,16 +41,20 @@ Future agents must NEVER break these invariants:
 # Development server
 npm run dev
 
-# Run Vitest test suite
+# Run full Vitest test suite against database
 npm test
 
 # Typecheck and production bundle build
 npm run build
 
-# Push schema changes to database
-npx prisma db push
+# Deploy checked-in Prisma migrations to authoritative Supabase PostgreSQL
+npm run db:migrate
+# (Never use 'prisma db push' in production; use checked-in migrations)
 
-# Seed 160+ vendors, 400 sessions, and RankSnapshots
+# Bootstrap production database (164 official vendors, event days, admin account, 0 fake passes/votes)
+npm run db:seed:prod
+
+# Development seed (160+ vendors, 400 attendee sessions, demo passes, ratings, and RankSnapshots)
 npm run db:seed
 ```
 

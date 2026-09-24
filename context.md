@@ -61,18 +61,23 @@ Festival attendees use this app while outdoors, walking through crowded stadium 
 Next.js 14 (App Router) + React 18
 ├── Frontend: Tailwind CSS (Custom warm festival theme) + Lucide React + Google Inter font
 ├── Backend APIs: Next.js Route Handlers (Edge & Node runtime compatible)
-├── Data Layer: Prisma ORM v5.22.0
-├── Database: SQLite (local development) / PostgreSQL (production target)
-├── Auth / Security: Cryptographic HMAC tokens (SHA-256), PBKDF2 salted password hashing
-└── Testing: Vitest (Unit & Integration tests)
+├── Data Layer: Prisma ORM v5.22.0 with checked-in migrations (prisma/migrations/)
+├── Authoritative Database: PostgreSQL hosted by Supabase (ap-south-1 Mumbai / PostgreSQL 17+)
+├── Connection Strategy: DATABASE_URL (Session pooler 5432 / Transaction pooler 6543) + DIRECT_URL (migrations)
+├── Auth / Security: Cryptographic HMAC tokens (SHA-256), PBKDF2 salted password hashing, IP rate limiter
+├── Performance: SQL-level groupBy/aggregate, 5s TTL leaderboard cache, cached vendor rank lookup
+└── Testing: Vitest (Unit, Integration, Concurrency, and Load Simulation tests against Supabase)
 ```
 
 ### Core Domain Services (`src/lib/`)
-* [auth.ts](file:///home/shoaib/projects/my_projects/Grand-Food-Fest-Live-Rating-system/src/lib/auth.ts): Token signing, verification, password hashing, `requireAdmin()` server gate, and `anonymizePassToken()`.
-* [ranking-engine.ts](file:///home/shoaib/projects/my_projects/Grand-Food-Fest-Live-Rating-system/src/lib/ranking-engine.ts): Bayesian scoring, tie handling, threshold enforcement, `RankSnapshot` comparison for truthful trend tracking, and snapshot persistence.
-* [trending-engine.ts](file:///home/shoaib/projects/my_projects/Grand-Food-Fest-Live-Rating-system/src/lib/trending-engine.ts): Real rating velocity aggregation over a rolling 30-minute window (`+X ratings in 30 min`).
-* [voting-engine.ts](file:///home/shoaib/projects/my_projects/Grand-Food-Fest-Live-Rating-system/src/lib/voting-engine.ts): Pass normalization, anonymous attendee session creation, quota checking, atomic rating upserts, and session status retrieval.
-* [anomaly-engine.ts](file:///home/shoaib/projects/my_projects/Grand-Food-Fest-Live-Rating-system/src/lib/anomaly-engine.ts): Velocity spike detection and admin rating invalidation audit trails.
+* [auth.ts](file:///home/shoaib/projects/my_projects/Grand-Food-Fest-Live-Rating-system/src/lib/auth.ts): Token signing, verification, PBKDF2 password hashing, `requireAdmin()` server gate, 24h admin / 72h attendee session TTL, and `anonymizePassToken()`.
+* [ranking-engine.ts](file:///home/shoaib/projects/my_projects/Grand-Food-Fest-Live-Rating-system/src/lib/ranking-engine.ts): Bayesian scoring, SQL aggregation, tie handling, threshold enforcement, 5-second in-memory caching, `RankSnapshot` comparison for truthful trend tracking, and snapshot persistence.
+* [trending-engine.ts](file:///home/shoaib/projects/my_projects/Grand-Food-Fest-Live-Rating-system/src/lib/trending-engine.ts): Real rating velocity aggregation over a rolling 30-minute window (`+X ratings in 30 min`) with truthful fallback.
+* [voting-engine.ts](file:///home/shoaib/projects/my_projects/Grand-Food-Fest-Live-Rating-system/src/lib/voting-engine.ts): Pass normalization, anonymous attendee session creation, quota checking with row-level transaction locking (`AttendeeSession` update), atomic rating upserts, and session status retrieval.
+* [rate-limiter.ts](file:///home/shoaib/projects/my_projects/Grand-Food-Fest-Live-Rating-system/src/lib/rate-limiter.ts): Sliding-window in-memory IP rate limiter protecting public voting and pass verification routes.
+* [date-utils.ts](file:///home/shoaib/projects/my_projects/Grand-Food-Fest-Live-Rating-system/src/lib/date-utils.ts): Explicit `Asia/Kolkata` (IST) festival timezone boundary calculation and day validation.
+* [logger.ts](file:///home/shoaib/projects/my_projects/Grand-Food-Fest-Live-Rating-system/src/lib/logger.ts): Structured JSON logging for production observability.
+* [anomaly-engine.ts](file:///home/shoaib/projects/my_projects/Grand-Food-Fest-Live-Rating-system/src/lib/anomaly-engine.ts): Velocity spike detection and admin rating invalidation audit trails with verified admin identity.
 * [SessionContext.tsx](file:///home/shoaib/projects/my_projects/Grand-Food-Fest-Live-Rating-system/src/lib/SessionContext.tsx): Client-side React context for attendee session state and daily quota tracking.
 
 ---
@@ -226,7 +231,8 @@ toast              z-toast     (80)  Floating transient alerts and notifications
 
 | Variable Name | Purpose | Production Requirement |
 | :--- | :--- | :--- |
-| `DATABASE_URL` | Database connection string | PostgreSQL connection string with SSL |
+| `DATABASE_URL` | Pooled PostgreSQL connection string | `postgresql://user:pass@pooler.neon.tech/grandfoodfest?sslmode=require&connection_limit=50` |
+| `DIRECT_URL` | Direct unpooled PostgreSQL connection string | `postgresql://user:pass@ep-direct.neon.tech/grandfoodfest?sslmode=require` (Prisma migrations) |
 | `ADMIN_JWT_SECRET` | Secret key for signing HMAC session tokens | 32-byte cryptographically secure random string |
 | `PASS_SALT` | Salt used to hash attendee passes | 16-byte cryptographically secure random string |
 | `ADMIN_EMAIL` | Fallback admin email (dev only) | Admin accounts managed in database |
@@ -241,13 +247,17 @@ toast              z-toast     (80)  Floating transient alerts and notifications
 # 1. Install dependencies
 npm install
 
-# 2. Synchronize database schema
-npx prisma db push
+# 2. Deploy checked-in Prisma migrations to PostgreSQL
+npm run db:migrate
+# (In development when adding schema changes: npm run db:migrate:dev)
 
-# 3. Seed database with 160+ vendors, 400 sessions, ratings, and historical snapshots
+# 3. Seed database:
+# Development seed (160+ vendors, 400 sessions, demo passes, ratings, snapshots):
 npm run db:seed
+# Or production seed (160+ vendors, real event config, Day 1 LIVE, admin user only):
+npm run db:seed:prod
 
-# 4. Run automated test suite
+# 4. Run automated test suite (all 47 tests against live PostgreSQL)
 npm test
 
 # 5. Start development server
@@ -262,21 +272,33 @@ npm run build
 ## 10. AI INSTRUCTIONS (HANDOVER CHECKLIST)
 
 When continuing work on this repository:
-1. **Read `context.md` first.**
-2. **Preserve all business invariants** (never allow >5 stalls/day, never trust client-supplied session IDs, never default new ratings to 5 stars).
-3. **Never weaken server-side validation** in `/api/admin/*` or `/api/voting/*`.
-4. **Adhere to the global z-index system** (`z-content: 0` to `z-toast: 80`). Never use arbitrary `z-*` values.
-5. **Never make DevBar and Navbar siblings with sticky top-0**; keep DevBar in normal flow above Navbar.
-6. **Keep admin drawer solid and opaque** (`bg-[#1C1917]`) at `z-drawer: 60` with `z-backdrop: 50`.
-7. **Keep the public consumer experience mobile-first**, thumb-friendly, and warm festival themed.
-8. **Never invent fake metrics**: rank movement and trending must come from actual data (`RankSnapshot` and rolling activity).
-9. **Lock session rows during quota transactions** to prevent concurrent over-voting.
-10. **Run `npm test`** after any business logic change.
-11. **Run `npm run build`** after major architectural updates.
-12. **Consult key documentation**:
+1. **Read `context.md` and `AGENTS.md` first.**
+2. **PostgreSQL is the authoritative database**: Never push raw schema changes with `prisma db push` in production; use checked-in migrations in `prisma/migrations/`.
+3. **Preserve all business invariants**:
+   - Never allow >5 stalls/day per attendee session.
+   - Lock session rows during quota transactions (`tx.attendeeSession.update`) to prevent concurrent race conditions.
+   - Never trust client-supplied session IDs in request bodies or headers. Identity is strictly derived from verified `gff_session` HMAC cookie.
+   - Never default new ratings to 5 stars (must start at 0 stars, explicit user selection required).
+   - Only food stalls can be rated or enter the leaderboard (`vendorType: FOOD`).
+4. **Enforce session lifetimes & security**:
+   - 24h admin session maximum, 72h attendee session maximum.
+   - Production cookies must have `secure: true`, `httpOnly: true`, `sameSite: "lax"`.
+   - Never expose raw attendee passes in UI, logs, API responses, or exports (mask as `ATT-••••-XXXX`).
+5. **Rate Limiting & Safe Errors**:
+   - Public voting routes (`/api/voting/verify`, `/api/voting/ratings`) are protected by sliding-window rate limiting.
+   - Never leak internal error messages or database URLs to public callers.
+6. **Timezone Accuracy**:
+   - Event operates in `Asia/Kolkata` (IST). Use `src/lib/date-utils.ts` for festival day boundaries.
+7. **Performance & Scalability**:
+   - Use SQL `groupBy` and `aggregate` rather than loading all ratings into Node memory.
+   - Respect the 5-second leaderboard caching in `getLiveLeaderboard()` and cached rank lookup in `/api/vendors/[id]`.
+8. **Never invent fake metrics**: Rank movement and trending must come from actual data (`RankSnapshot` and rolling activity).
+9. **Never weaken server-side validation** in `/api/admin/*` or `/api/voting/*`.
+10. **Run `npm test`** and **`npm run build`** after changes to ensure zero regressions.
+11. **Consult key documentation**:
     - [FIRST-PRINCIPLES.md](file:///home/shoaib/projects/my_projects/Grand-Food-Fest-Live-Rating-system/docs/FIRST-PRINCIPLES.md): Real-world festival constraints & mathematical foundations.
-    - [AUDIT.md](file:///home/shoaib/projects/my_projects/Grand-Food-Fest-Live-Rating-system/docs/AUDIT.md): Comprehensive system audit & vulnerability review.
-    - [IMPROVEMENT-PLAN.md](file:///home/shoaib/projects/my_projects/Grand-Food-Fest-Live-Rating-system/docs/IMPROVEMENT-PLAN.md): Prioritized improvements and status.
-    - [OPEN-QUESTIONS.md](file:///home/shoaib/projects/my_projects/Grand-Food-Fest-Live-Rating-system/docs/OPEN-QUESTIONS.md): 8 key organizer decisions and trade-offs.
-    - [PRODUCTION-READINESS.md](file:///home/shoaib/projects/my_projects/Grand-Food-Fest-Live-Rating-system/docs/PRODUCTION-READINESS.md): Production checklist, PostgreSQL migration, & runbooks.
+    - [DATABASE.md](file:///home/shoaib/projects/my_projects/Grand-Food-Fest-Live-Rating-system/docs/DATABASE.md): PostgreSQL architecture, migrations, row-level locking, and connection pooling.
+    - [PRODUCTION-READINESS.md](file:///home/shoaib/projects/my_projects/Grand-Food-Fest-Live-Rating-system/docs/PRODUCTION-READINESS.md): Production checklist, verification matrix, & runbooks.
+    - [VERIFICATION.md](file:///home/shoaib/projects/my_projects/Grand-Food-Fest-Live-Rating-system/docs/VERIFICATION.md): Verification report covering PostgreSQL, security, concurrency, load simulation, and audit resolutions.
+
 
